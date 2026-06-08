@@ -1,0 +1,182 @@
+services:
+
+  mongodb:
+    image: mongo:7
+    container_name: mypfe-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - mypfe-net
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: mypfe-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - mypfe-net
+
+  mongo-seed:
+    build:
+      context: .
+      dockerfile: Dockerfile.seed
+    container_name: mypfe-mongo-seed
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+      MONGO_DB: mypfe
+    networks:
+      - mypfe-net
+    restart: "no"
+
+  neo4j-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.neo4j-agent
+    container_name: mypfe-neo4j-agent
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      NEO4J_URI: bolt://host.docker.internal:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: mehdi123
+      NEO4J_DATABASE: neo4j
+      SERVER_PORT: "8000"
+      BASE_URL: http://neo4j-agent:8000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - mypfe-net
+
+  code-mode:
+    build:
+      context: .
+      dockerfile: Dockerfile.code-mode
+    container_name: mypfe-code-mode
+    restart: unless-stopped
+    ports:
+      - "8010:8010"
+    depends_on:
+      neo4j-agent:
+        condition: service_healthy
+    environment:
+      NEO4J_AGENT_URL: http://neo4j-agent:8000
+      CODE_MODE_PORT: "8010"
+    networks:
+      - mypfe-net
+
+  genie:
+    build:
+      context: .
+      dockerfile: Dockerfile.genie
+    container_name: mypfe-genie
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+      MONGO_DB: mypfe
+      GENIE_PORT: "8001"
+      GENIE_BASE_URL: http://genie:8001
+    networks:
+      - mypfe-net
+
+  raduce:
+    build:
+      context: .
+      dockerfile: Dockerfile.raduce
+    container_name: mypfe-raduce
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+      MONGO_DB: mypfe
+      RADUCE_PORT: "8002"
+      RADUCE_BASE_URL: http://raduce:8002
+    networks:
+      - mypfe-net
+
+  customer:
+    build:
+      context: .
+      dockerfile: Dockerfile.customer
+    container_name: mypfe-customer
+    restart: unless-stopped
+    ports:
+      - "8003:8003"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+      MONGO_DB: mypfe
+      CUSTOMER_PORT: "8003"
+      CUSTOMER_BASE_URL: http://customer:8003
+    networks:
+      - mypfe-net
+
+  mypfe-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.mypfe-app
+    container_name: mypfe-app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    depends_on:
+      - neo4j-agent
+      - genie
+      - raduce
+      - customer
+      - ollama
+    environment:
+      OLLAMA_URL: http://ollama:11434
+      NEO4J_API: http://neo4j-agent:8000
+      GENIE_API: http://genie:8001
+      RADUCE_API: http://raduce:8002
+      CUSTOMER_API: http://customer:8003
+    networks:
+      - mypfe-net
+
+  router-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.router-agent
+    container_name: mypfe-router-agent
+    restart: unless-stopped
+    ports:
+      - "5004:5004"
+    depends_on:
+      - neo4j-agent
+      - ollama
+      - code-mode
+    environment:
+      OLLAMA_URL: http://ollama:11434
+      FASTAPI_URL: http://neo4j-agent:8000
+      CODE_MODE_URL: http://code-mode:8010
+    networks:
+      - mypfe-net
+
+volumes:
+  mongodb_data:
+  ollama_data:
+
+networks:
+  mypfe-net:
+    driver: bridge

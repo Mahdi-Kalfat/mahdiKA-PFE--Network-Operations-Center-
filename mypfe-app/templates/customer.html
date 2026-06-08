@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOPNET — Support</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:        #F4F6FB;
+  --surface:   #FFFFFF;
+  --surface2:  #EEF1F8;
+  --brand:     #2250F4;
+  --brand2:    #1540DE;
+  --brand-bg:  #EBF0FF;
+  --green:     #10B981;
+  --green-bg:  #D1FAE5;
+  --red:       #EF4444;
+  --red-bg:    #FEE2E2;
+  --amber:     #F59E0B;
+  --amber-bg:  #FEF3C7;
+  --border:    #E4E8F2;
+  --border2:   #CBD2E8;
+  --text:      #0F1724;
+  --text2:     #64748B;
+  --text3:     #A0ABBE;
+  --shadow-sm: 0 1px 3px rgba(34,80,244,.05), 0 1px 2px rgba(0,0,0,.04);
+  --shadow:    0 4px 20px rgba(34,80,244,.08), 0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg: 0 20px 60px rgba(34,80,244,.12), 0 8px 24px rgba(0,0,0,.06);
+  --mono:      'JetBrains Mono', monospace;
+  --sans:      'Outfit', sans-serif;
+  --r:         16px;
+}
+
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 90% 60% at 15% -5%, rgba(34,80,244,.07) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(34,80,244,.05) 0%, transparent 50%);
+  pointer-events:none;z-index:0
+}
+
+.shell{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh}
+
+/* ── Top bar ── */
+.topbar{
+  background:rgba(255,255,255,.88);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  height:58px;padding:0 26px;
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+  position:relative;z-index:10
+}
+.tb-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.tb-logo-icon{
+  width:31px;height:31px;border-radius:9px;
+  background:linear-gradient(135deg,var(--brand) 0%,#5E85FF 100%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(34,80,244,.3)
+}
+.tb-logo-icon svg{width:17px;height:17px}
+.tb-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+.tb-brand span{color:var(--brand)}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px}
+.tb-page{font-size:12px;color:var(--text2)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.lang-toggle{display:flex;background:var(--surface2);border-radius:8px;padding:3px;gap:2px}
+.lang-btn{padding:4px 11px;border-radius:6px;border:none;background:transparent;color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;font-family:var(--sans)}
+.lang-btn.active{background:var(--surface);color:var(--brand);font-weight:700;box-shadow:var(--shadow-sm)}
+.status-indicator{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.status-led{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px var(--green-bg);animation:ledPulse 3s infinite}
+.status-led.off{background:var(--red);box-shadow:0 0 0 2px var(--red-bg);animation:none}
+@keyframes ledPulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+.main{flex:1;display:flex;overflow:hidden;position:relative}
+
+/* ── Login ── */
+#login-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+.login-wrap{width:100%;max-width:400px}
+.login-card{
+  background:var(--surface);border-radius:22px;
+  box-shadow:var(--shadow-lg);padding:44px 40px;
+  border:1px solid var(--border)
+}
+.login-hero{
+  width:58px;height:58px;border-radius:16px;
+  background:linear-gradient(135deg,var(--brand),#5E85FF);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:24px;box-shadow:0 8px 22px rgba(34,80,244,.28)
+}
+.login-hero svg{width:28px;height:28px}
+.login-title{font-size:24px;font-weight:700;letter-spacing:-.03em;margin-bottom:5px}
+.login-sub{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:30px}
+.field-group{margin-bottom:16px}
+.field-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:7px;display:block}
+.field-wrap{position:relative}
+.field-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:15px;pointer-events:none}
+.field-input{
+  width:100%;padding:12px 13px 12px 40px;
+  border:1.5px solid var(--border);border-radius:11px;
+  font-size:14px;font-family:var(--sans);color:var(--text);
+  background:var(--bg);outline:none;transition:all .2s;-webkit-appearance:none
+}
+.field-input:focus{border-color:var(--brand);background:var(--surface);box-shadow:0 0 0 4px rgba(34,80,244,.09)}
+.field-input::placeholder{color:var(--text3)}
+.login-btn{
+  width:100%;padding:14px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,var(--brand) 0%,#4A6EFF 100%);
+  color:#fff;font-size:14px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);
+  transition:all .2s;margin-top:4px;letter-spacing:-.01em;
+  box-shadow:0 4px 16px rgba(34,80,244,.32)
+}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(34,80,244,.38)}
+.login-btn:disabled{background:var(--text3);box-shadow:none;transform:none;cursor:not-allowed}
+.login-error{
+  margin-top:12px;padding:11px 14px;border-radius:10px;
+  background:var(--red-bg);border:1px solid #FCA5A5;
+  font-size:12px;color:var(--red);
+  display:none;align-items:center;gap:7px
+}
+.login-error.show{display:flex}
+.demo-hint{margin-top:14px;padding:14px;background:var(--brand-bg);border-radius:12px;border:1px solid #C7D2FE}
+.demo-hint-title{font-size:10px;font-weight:700;color:var(--brand);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
+.demo-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0}
+.demo-row span:first-child{color:var(--text2)}
+.demo-row span:last-child{font-family:var(--mono);color:var(--text);font-weight:500;font-size:10px}
+
+/* ── Chat screen ── */
+#chat-screen{flex:1;display:none;flex-direction:row;overflow:hidden}
+
+.sidebar{width:268px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.customer-card{padding:22px 18px;border-bottom:1px solid var(--border)}
+.customer-avatar{
+  width:46px;height:46px;border-radius:13px;
+  background:linear-gradient(135deg,var(--brand),#5E85FF);
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;font-weight:700;color:#fff;margin-bottom:11px;
+  box-shadow:0 4px 12px rgba(34,80,244,.22)
+}
+.customer-name{font-size:14px;font-weight:600;letter-spacing:-.01em;margin-bottom:2px}
+.customer-plan{font-size:11px;color:var(--text2)}
+.router-info{margin-top:10px;padding:9px 11px;border-radius:9px;background:var(--bg);border:1px solid var(--border)}
+.ri-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:2px 0}
+.ri-key{color:var(--text2)}
+.ri-val{font-family:var(--mono);font-weight:500;color:var(--text);font-size:10px}
+
+.sidebar-nav{padding:14px 10px;flex:1}
+.nav-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:0 8px;margin-bottom:7px}
+.nav-btn{
+  display:flex;align-items:center;gap:9px;width:100%;
+  padding:9px 10px;border-radius:10px;border:none;
+  background:transparent;color:var(--text2);font-size:13px;
+  font-family:var(--sans);cursor:pointer;transition:all .15s;text-align:left;font-weight:500
+}
+.nav-btn:hover{background:var(--bg);color:var(--text)}
+.nav-btn.active{background:var(--brand-bg);color:var(--brand);font-weight:600}
+.nav-btn .nav-icon{font-size:15px;width:19px;text-align:center}
+
+.sidebar-footer{padding:14px 18px;border-top:1px solid var(--border)}
+.signout-btn{width:100%;padding:9px;border-radius:9px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-family:var(--sans);cursor:pointer;transition:all .15s;font-weight:500}
+.signout-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+
+/* ── Chat main ── */
+.chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.chat-header{padding:14px 22px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px;flex-shrink:0}
+.agent-avatar{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#10B981,#34D399);display:flex;align-items:center;justify-content:center;font-size:17px;position:relative}
+.agent-online{position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:var(--green);border:2px solid var(--surface)}
+.agent-info .agent-name{font-size:13px;font-weight:600}
+.agent-info .agent-status{font-size:11px;color:var(--green);font-weight:500}
+.ch-right{margin-left:auto}
+
+/* ── Messages ── */
+.messages{flex:1;overflow-y:auto;padding:26px 22px;display:flex;flex-direction:column;gap:18px;scroll-behavior:smooth}
+.messages::-webkit-scrollbar{width:3px}
+.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:36px 22px;flex:1;animation:fadeUp .4s ease}
+.welcome-orb{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--brand),#5E85FF);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 12px 32px rgba(34,80,244,.25);margin-bottom:2px}
+.welcome h2{font-size:20px;font-weight:700;letter-spacing:-.03em;color:var(--text)}
+.welcome p{font-size:13px;color:var(--text2);max-width:290px;line-height:1.65}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:6px;width:100%;max-width:320px}
+.qg-btn{
+  padding:11px 13px;border-radius:12px;border:1.5px solid var(--border);
+  background:var(--surface);color:var(--text);font-size:12px;font-weight:500;
+  cursor:pointer;font-family:var(--sans);transition:all .2s;text-align:left;
+  display:flex;flex-direction:column;gap:3px
+}
+.qg-btn:hover{border-color:var(--brand);background:var(--brand-bg);color:var(--brand);transform:translateY(-1px);box-shadow:var(--shadow)}
+.qg-icon{font-size:18px}
+.qg-label{font-size:11px;color:inherit;opacity:.65}
+
+/* ── Message bubbles ── */
+.msg-row{display:flex;gap:9px;align-items:flex-end;animation:fadeUp .25s ease}
+.msg-row.user{flex-direction:row-reverse}
+.msg-av{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px}
+.msg-av.agent{background:linear-gradient(135deg,#10B981,#34D399);color:#fff;box-shadow:0 2px 8px rgba(16,185,129,.2)}
+.msg-av.user{background:var(--brand);color:#fff;box-shadow:0 2px 8px rgba(34,80,244,.22)}
+.bubble{max-width:70%;padding:13px 16px;border-radius:18px;font-size:13px;line-height:1.7;word-break:break-word}
+.bubble.agent{background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px;box-shadow:var(--shadow-sm);color:var(--text)}
+.bubble.user{background:linear-gradient(135deg,var(--brand),#4A6EFF);color:#fff;border-bottom-right-radius:4px;box-shadow:0 4px 14px rgba(34,80,244,.28)}
+.bubble code{font-family:var(--mono);font-size:11px;background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px}
+.bubble strong{font-weight:600}
+
+/* ── Step trace (inside agent bubble) ── */
+.steps-container{margin-top:10px;display:flex;flex-direction:column;gap:5px}
+.step-row{
+  display:flex;align-items:center;gap:9px;
+  padding:7px 11px;border-radius:9px;font-size:11px;
+  background:var(--bg);border:1px solid var(--border)
+}
+.step-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.step-dot.ok{background:var(--green-bg);color:var(--green)}
+.step-dot.err{background:var(--red-bg);color:var(--red)}
+.step-dot.warn{background:var(--amber-bg);color:var(--amber)}
+.step-text{flex:1;color:var(--text2);font-weight:500}
+.step-layer{font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto}
+
+/* ── Typing ── */
+.typing-bubble{padding:14px 16px}
+.typing-dots{display:flex;gap:5px;align-items:center}
+.td{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:bounce 1.3s ease infinite}
+.td:nth-child(2){animation-delay:.15s}.td:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+
+/* ── Input ── */
+.input-area{padding:14px 22px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+.input-box{
+  display:flex;align-items:flex-end;gap:9px;
+  background:var(--bg);border:1.5px solid var(--border);border-radius:15px;
+  padding:7px 7px 7px 15px;transition:border-color .2s,box-shadow .2s
+}
+.input-box:focus-within{border-color:var(--brand);box-shadow:0 0 0 4px rgba(34,80,244,.09)}
+#user-input{flex:1;background:transparent;border:none;outline:none;font-size:13px;font-family:var(--sans);color:var(--text);resize:none;min-height:22px;max-height:100px;line-height:1.5;padding:4px 0}
+#user-input::placeholder{color:var(--text3)}
+.send-btn{width:38px;height:38px;border-radius:11px;border:none;flex-shrink:0;background:linear-gradient(135deg,var(--brand),#4A6EFF);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:0 2px 8px rgba(34,80,244,.25)}
+.send-btn:hover{transform:scale(1.06)}
+.send-btn:disabled{background:var(--text3);box-shadow:none;transform:none;cursor:not-allowed}
+.send-btn svg{width:15px;height:15px}
+
+/* ── Tickets side panel ── */
+.panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:50;display:none;animation:fadeIn .2s ease}
+.panel-overlay.open{display:block}
+.side-panel{
+  position:fixed;right:0;top:0;bottom:0;width:370px;
+  background:var(--surface);border-left:1px solid var(--border);
+  z-index:51;display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  box-shadow:-20px 0 60px rgba(0,0,0,.09)
+}
+.side-panel.open{transform:translateX(0)}
+.sp-header{padding:22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sp-title{font-size:16px;font-weight:700;letter-spacing:-.02em}
+.sp-close{width:30px;height:30px;border-radius:8px;border:none;background:var(--bg);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s}
+.sp-close:hover{background:var(--red-bg);color:var(--red)}
+.sp-body{flex:1;overflow-y:auto;padding:14px}
+.sp-body::-webkit-scrollbar{width:3px}
+.sp-body::-webkit-scrollbar-thumb{background:var(--border)}
+.ticket-card{padding:14px;border-radius:12px;border:1.5px solid var(--border);margin-bottom:9px;transition:all .15s;cursor:default}
+.ticket-card:hover{border-color:var(--border2);box-shadow:var(--shadow-sm)}
+.tc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.tc-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.03em}
+.tc-badge.resolved{background:var(--green-bg);color:var(--green)}
+.tc-badge.escalated{background:var(--amber-bg);color:var(--amber)}
+.tc-badge.open{background:var(--brand-bg);color:var(--brand)}
+.tc-date{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.tc-problem{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
+.tc-fault{font-size:11px;color:var(--text2)}
+.tc-fault span{font-family:var(--mono);color:var(--text);font-size:10px}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="topbar">
+  <a class="tb-logo" href="#">
+    <div class="tb-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="tb-brand">TOP<span>NET</span></span>
+  </a>
+  <div class="tb-sep"></div>
+  <span class="tb-page" id="tb-page">Customer Support</span>
+  <div class="tb-right">
+    <div class="status-indicator">
+      <div class="status-led" id="status-led"></div>
+      <span id="status-text">Connecting…</span>
+    </div>
+    <div class="lang-toggle">
+      <button class="lang-btn" id="btn-fr" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-hero">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h1 class="login-title" id="login-title">Customer Support</h1>
+      <p class="login-sub" id="login-sub">Sign in to get instant AI-powered support for your connection.</p>
+      <div class="field-group">
+        <label class="field-label" id="label-phone">Phone number</label>
+        <div class="field-wrap">
+          <span class="field-icon">📱</span>
+          <input class="field-input" id="phone-input" type="tel" placeholder="06X XXX XXXX" maxlength="10">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label" id="label-pin">PIN code</label>
+        <div class="field-wrap">
+          <span class="field-icon">🔑</span>
+          <input class="field-input" id="pin-input" type="password" placeholder="••••" maxlength="4">
+        </div>
+      </div>
+      <button class="login-btn" id="login-btn" onclick="doLogin()">
+        <span id="login-btn-text">Sign in</span>
+      </button>
+      <div class="login-error" id="login-error">⚠️ <span id="login-error-text"></span></div>
+    </div>
+    <div class="demo-hint" style="margin-top:14px">
+      <div class="demo-hint-title">🧪 Test accounts</div>
+      <div class="demo-row"><span>PPP failure</span><span>0661234567 · 1234</span></div>
+      <div class="demo-row"><span>Weak signal</span><span>0662345678 · 2345</span></div>
+      <div class="demo-row"><span>Wrong VLAN</span><span>0664567890 · 4567</span></div>
+      <div class="demo-row"><span>DNS failure</span><span>0666789012 · 6789</span></div>
+      <div class="demo-row"><span>Healthy</span><span>0663456789 · 3456</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div id="chat-screen">
+  <aside class="sidebar">
+    <div class="customer-card">
+      <div class="customer-avatar" id="cust-initial">M</div>
+      <div class="customer-name" id="cust-name">—</div>
+      <div class="customer-plan" id="cust-plan">—</div>
+      <div class="router-info">
+        <div class="ri-row"><span class="ri-key">Model</span><span class="ri-val" id="ri-model">—</span></div>
+        <div class="ri-row"><span class="ri-key">Tech</span><span class="ri-val" id="ri-tech">—</span></div>
+        <div class="ri-row"><span class="ri-key">Vendor</span><span class="ri-val" id="ri-vendor">—</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Menu</div>
+      <button class="nav-btn active" id="nav-chat" onclick="showView('chat')">
+        <span class="nav-icon">💬</span><span id="nav-chat-label">Support Chat</span>
+      </button>
+      <button class="nav-btn" id="nav-tickets" onclick="showView('tickets')">
+        <span class="nav-icon">🎫</span><span id="nav-tickets-label">My Tickets</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="signout-btn" onclick="doLogout()" id="signout-btn">Sign out</button>
+    </div>
+  </aside>
+
+  <div class="chat-main">
+    <div class="chat-header">
+      <div class="agent-avatar">🤖<div class="agent-online"></div></div>
+      <div class="agent-info">
+        <div class="agent-name">TOPNET AI Agent</div>
+        <div class="agent-status" id="agent-status-text">Online · Ready to help</div>
+      </div>
+      <div class="ch-right">
+        <div class="lang-toggle">
+          <button class="lang-btn" id="chat-btn-fr" onclick="setLang('fr')">FR</button>
+          <button class="lang-btn active" id="chat-btn-en" onclick="setLang('en')">EN</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-orb">👋</div>
+        <h2 id="welcome-title">How can I help you?</h2>
+        <p id="welcome-sub">Describe your problem and I'll diagnose and fix it automatically.</p>
+        <div class="quick-grid" id="quick-grid">
+          <button class="qg-btn" onclick="sendQuick('down')"><span class="qg-icon">🔴</span><strong id="qa-down">No internet</strong><span class="qg-label" id="qa-down-sub">Connection is down</span></button>
+          <button class="qg-btn" onclick="sendQuick('slow')"><span class="qg-icon">🐌</span><strong id="qa-slow">Very slow</strong><span class="qg-label" id="qa-slow-sub">Speed problem</span></button>
+          <button class="qg-btn" onclick="sendQuick('wifi')"><span class="qg-icon">📶</span><strong id="qa-wifi">WiFi issue</strong><span class="qg-label" id="qa-wifi-sub">Can't connect to WiFi</span></button>
+          <button class="qg-btn" onclick="sendQuick('history')"><span class="qg-icon">📋</span><strong id="qa-history">My tickets</strong><span class="qg-label" id="qa-history-sub">See history</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-box">
+        <textarea id="user-input" rows="1" placeholder="Describe your problem…"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<div class="panel-overlay" id="panel-overlay" onclick="hideTicketsPanel()"></div>
+<div class="side-panel" id="tickets-side">
+  <div class="sp-header">
+    <span class="sp-title" id="sp-title">My Tickets</span>
+    <button class="sp-close" onclick="hideTicketsPanel()">✕</button>
+  </div>
+  <div class="sp-body" id="sp-body">
+    <div style="text-align:center;padding:36px;color:var(--text3)">Loading...</div>
+  </div>
+</div>
+
+<script>
+let lang='en', customer=null, loading=false;
+
+const T={
+  en:{
+    loginTitle:'Customer Support',loginSub:'Sign in to get instant AI-powered support for your connection.',
+    labelPhone:'Phone number',labelPin:'PIN code',loginBtn:'Sign in',signingIn:'Signing in…',
+    welcomeTitle:'How can I help you?',welcomeSub:"Describe your problem and I'll diagnose and fix it automatically.",
+    qaDown:'No internet',qaDownSub:'Connection is down',qaSlow:'Very slow',qaSlowSub:'Speed problem',
+    qaWifi:'WiFi issue',qaWifiSub:"Can't connect to WiFi",qaHistory:'My tickets',qaHistorySub:'See history',
+    agentReady:'Online · Ready to help',agentWorking:'Analysing your connection…',
+    navChat:'Support Chat',navTickets:'My Tickets',signout:'Sign out',spTitle:'My Tickets',
+    noTickets:'No tickets yet.',
+    placeholder:'Describe your problem…',statusOk:'All systems online',statusWarn:'Some services unavailable'
+  },
+  fr:{
+    loginTitle:'Support Client',loginSub:"Connectez-vous pour obtenir une aide instantanée par notre IA.",
+    labelPhone:'Numéro de téléphone',labelPin:'Code PIN',loginBtn:'Se connecter',signingIn:'Connexion…',
+    welcomeTitle:'Comment puis-je vous aider ?',welcomeSub:'Décrivez votre problème et je le diagnostique et règle automatiquement.',
+    qaDown:"Pas d'internet",qaDownSub:'Connexion coupée',qaSlow:'Très lent',qaSlowSub:'Problème de débit',
+    qaWifi:'Problème WiFi',qaWifiSub:'Connexion WiFi impossible',qaHistory:'Mes tickets',qaHistorySub:"Voir l'historique",
+    agentReady:'En ligne · Prêt à vous aider',agentWorking:'Analyse en cours…',
+    navChat:'Chat Support',navTickets:'Mes Tickets',signout:'Déconnexion',spTitle:'Mes Tickets',
+    noTickets:'Aucun ticket pour l\'instant.',
+    placeholder:'Décrivez votre problème…',statusOk:'Tous les services en ligne',statusWarn:'Certains services indisponibles'
+  }
+};
+const QM={
+  en:{down:"My internet is not working at all",slow:"My internet connection is very slow",wifi:"I have a WiFi problem",history:"Show me my ticket history"},
+  fr:{down:"Mon internet ne fonctionne pas du tout",slow:"Ma connexion internet est très lente",wifi:"J'ai un problème WiFi",history:"Montrez-moi mon historique de tickets"}
+};
+const t=k=>(T[lang]||T.en)[k]||k;
+
+function setLang(l){
+  lang=l;
+  ['btn-fr','chat-btn-fr'].forEach(id=>document.getElementById(id)?.classList.toggle('active',l==='fr'));
+  ['btn-en','chat-btn-en'].forEach(id=>document.getElementById(id)?.classList.toggle('active',l==='en'));
+  applyTranslations();
+}
+function applyTranslations(){
+  const ids={'login-title':t('loginTitle'),'login-sub':t('loginSub'),'label-phone':t('labelPhone'),'label-pin':t('labelPin'),
+    'login-btn-text':t('loginBtn'),'welcome-title':t('welcomeTitle'),'welcome-sub':t('welcomeSub'),
+    'qa-down':t('qaDown'),'qa-down-sub':t('qaDownSub'),'qa-slow':t('qaSlow'),'qa-slow-sub':t('qaSlowSub'),
+    'qa-wifi':t('qaWifi'),'qa-wifi-sub':t('qaWifiSub'),'qa-history':t('qaHistory'),'qa-history-sub':t('qaHistorySub'),
+    'nav-chat-label':t('navChat'),'nav-tickets-label':t('navTickets'),'signout-btn':t('signout'),'sp-title':t('spTitle'),
+    'agent-status-text':t('agentReady')};
+  Object.entries(ids).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.textContent=val});
+  const inp=document.getElementById('user-input');if(inp)inp.placeholder=t('placeholder');
+}
+
+async function checkStatus(){
+  try{
+    const r=await fetch('/api/status'); const s=await r.json();
+    const ok=s.genie&&s.raduce&&s.customer;
+    document.getElementById('status-led').classList.toggle('off',!ok);
+    document.getElementById('status-text').textContent=ok?t('statusOk'):t('statusWarn');
+  }catch(e){}
+}
+checkStatus(); setInterval(checkStatus,20000);
+
+async function doLogin(){
+  if(loading)return;
+  const phone=document.getElementById('phone-input').value.trim();
+  const pin=document.getElementById('pin-input').value.trim();
+  if(!phone||!pin)return;
+  setLoginLoading(true);
+  try{
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,pin,lang})});
+    const d=await r.json();
+    if(d.success){customer=d.customer;showChat();}
+    else showLoginError(d.error||'Authentication failed');
+  }catch(e){showLoginError('Connection error');}
+  setLoginLoading(false);
+}
+function setLoginLoading(v){
+  loading=v;
+  const btn=document.getElementById('login-btn'); const txt=document.getElementById('login-btn-text');
+  btn.disabled=v; txt.textContent=v?t('signingIn'):t('loginBtn');
+}
+function showLoginError(msg){
+  const el=document.getElementById('login-error');
+  document.getElementById('login-error-text').textContent=msg;
+  el.classList.add('show');
+}
+async function doLogout(){
+  await fetch('/api/logout',{method:'POST'});
+  customer=null;
+  document.getElementById('chat-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('pin-input').value='';
+  document.getElementById('messages').innerHTML='';
+  document.getElementById('messages').appendChild(buildWelcome());
+  document.getElementById('login-error').classList.remove('show');
+}
+function showChat(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('chat-screen').style.display='flex';
+  const first=customer.name.split(' ')[0];
+  document.getElementById('cust-initial').textContent=first[0].toUpperCase();
+  document.getElementById('cust-name').textContent=customer.name;
+  document.getElementById('cust-plan').textContent=customer.subscription||'';
+  document.getElementById('ri-model').textContent=customer.router_model||'—';
+  document.getElementById('ri-tech').textContent=customer.technology||'—';
+  document.getElementById('ri-vendor').textContent=customer.vendor||'—';
+}
+function showView(v){
+  document.getElementById('nav-chat').classList.toggle('active',v==='chat');
+  document.getElementById('nav-tickets').classList.toggle('active',v==='tickets');
+  if(v==='tickets') showTicketsPanel();
+}
+function buildWelcome(){
+  const d=document.createElement('div'); d.className='welcome'; d.id='welcome';
+  d.innerHTML=`<div class="welcome-orb">👋</div>
+    <h2 id="welcome-title">${t('welcomeTitle')}</h2>
+    <p id="welcome-sub">${t('welcomeSub')}</p>
+    <div class="quick-grid">
+      <button class="qg-btn" onclick="sendQuick('down')"><span class="qg-icon">🔴</span><strong>${t('qaDown')}</strong><span class="qg-label">${t('qaDownSub')}</span></button>
+      <button class="qg-btn" onclick="sendQuick('slow')"><span class="qg-icon">🐌</span><strong>${t('qaSlow')}</strong><span class="qg-label">${t('qaSlowSub')}</span></button>
+      <button class="qg-btn" onclick="sendQuick('wifi')"><span class="qg-icon">📶</span><strong>${t('qaWifi')}</strong><span class="qg-label">${t('qaWifiSub')}</span></button>
+      <button class="qg-btn" onclick="sendQuick('history')"><span class="qg-icon">📋</span><strong>${t('qaHistory')}</strong><span class="qg-label">${t('qaHistorySub')}</span></button>
+    </div>`;
+  return d;
+}
+
+function removeWelcome(){const w=document.getElementById('welcome');if(w)w.remove()}
+
+// Step layer → display config
+const LAYER_MAP={
+  'GenieACS MCP':{icon:'📡',label:'Router State'},
+  'Neo4j MCP':   {icon:'🧠',label:'Schema Lookup'},
+  'Diagnostic Engine':{icon:'🔍',label:'Diagnosis'},
+  'RaDuce MCP':  {icon:'🔧',label:'Fix Applied'},
+};
+
+function addMsg(role,content,steps){
+  removeWelcome();
+  const row=document.createElement('div'); row.className=`msg-row ${role}`;
+  const av=document.createElement('div'); av.className=`msg-av ${role}`; av.textContent=role==='user'?'👤':'🤖';
+  const bub=document.createElement('div'); bub.className=`bubble ${role}`;
+  bub.innerHTML=renderMd(content);
+
+  if(role==='agent'&&steps?.length){
+    const displayable=steps.filter(s=>s.layer&&s.layer!=='Customer MCP');
+    if(displayable.length){
+      const sc=document.createElement('div'); sc.className='steps-container';
+      displayable.forEach(s=>{
+        const cfg=LAYER_MAP[s.layer]||{icon:'⚙️',label:s.layer};
+        // Determine dot class
+        let dotClass='ok', dotIcon='✓';
+        if(s.ok===false){dotClass='err';dotIcon='✗';}
+        else if(s.layer==='Neo4j MCP'&&s.result?.warning){dotClass='warn';dotIcon='⚠';}
+        const div=document.createElement('div'); div.className='step-row';
+        const desc=s.result?.fault_detected?` — ${s.result.fault_detected.replace(/_/g,' ')}`:
+                   s.result?.fix_tool?` → ${s.result.fix_tool.replace(/_/g,' ')}`:
+                   s.result?.warning?` ⚠ not in schema`:'';
+        div.innerHTML=`<div class="step-dot ${dotClass}">${dotIcon}</div>
+          <span class="step-text">${cfg.icon} ${cfg.label}${desc}</span>
+          <span class="step-layer">${s.tool||''}</span>`;
+        sc.appendChild(div);
+      });
+      bub.appendChild(sc);
+    }
+  }
+  row.appendChild(av); row.appendChild(bub);
+  document.getElementById('messages').appendChild(row);
+  scrollBottom();
+}
+function addTyping(){
+  removeWelcome();
+  const row=document.createElement('div'); row.className='msg-row agent'; row.id='typing';
+  row.innerHTML=`<div class="msg-av agent">🤖</div><div class="bubble agent typing-bubble"><div class="typing-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  document.getElementById('messages').appendChild(row); scrollBottom();
+}
+function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+function scrollBottom(){const m=document.getElementById('messages');m.scrollTop=m.scrollHeight}
+function renderMd(text){return(text||'').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>')}
+
+async function sendMessage(){
+  if(loading)return;
+  const inp=document.getElementById('user-input'); const text=inp.value.trim();
+  if(!text)return;
+  inp.value=''; inp.style.height='auto';
+  document.getElementById('agent-status-text').textContent=t('agentWorking');
+  setLoading(true); addMsg('user',text); addTyping();
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,lang})});
+    const d=await r.json();
+    removeTyping(); addMsg('agent',d.answer||d.error||'Error',d.steps||[]);
+  }catch(e){removeTyping();addMsg('agent','Connection error. Please try again.',[]);}
+  setLoading(false);
+  document.getElementById('agent-status-text').textContent=t('agentReady');
+}
+function sendQuick(key){document.getElementById('user-input').value=(QM[lang]||QM.en)[key]||key;sendMessage();}
+function setLoading(v){loading=v;document.getElementById('send-btn').disabled=v;document.getElementById('user-input').disabled=v;}
+
+async function showTicketsPanel(){
+  document.getElementById('panel-overlay').classList.add('open');
+  document.getElementById('tickets-side').classList.add('open');
+  const body=document.getElementById('sp-body');
+  body.innerHTML='<div style="text-align:center;padding:36px;color:var(--text3)">Loading…</div>';
+  try{
+    const r=await fetch('/api/tickets'); const d=await r.json();
+    if(!d.tickets?.length){body.innerHTML=`<div style="text-align:center;padding:36px;color:var(--text3)">${t('noTickets')}</div>`;return;}
+    body.innerHTML='';
+    d.tickets.forEach(tk=>{
+      const date=tk.created_at?new Date(tk.created_at).toLocaleDateString(lang==='fr'?'fr-FR':'en-GB'):'';
+      const labels={resolved:lang==='fr'?'✓ Résolu':'✓ Resolved',escalated:lang==='fr'?'⏳ Escaladé':'⏳ Escalated',open:lang==='fr'?'● Ouvert':'● Open'};
+      const card=document.createElement('div'); card.className='ticket-card';
+      card.innerHTML=`<div class="tc-top"><span class="tc-badge ${tk.status}">${labels[tk.status]||tk.status}</span><span class="tc-date">${date}</span></div>
+        <div class="tc-problem">${tk.problem_description||''}</div>
+        <div class="tc-fault">Fault: <span>${(tk.fault_detected||'').replace(/_/g,' ')}</span>${tk.fix_applied?` · Fix: <span>${tk.fix_applied.replace(/_/g,' ')}</span>`:''}</div>`;
+      body.appendChild(card);
+    });
+  }catch(e){body.innerHTML='<div style="color:var(--red);padding:20px">Error loading tickets</div>';}
+}
+function hideTicketsPanel(){
+  document.getElementById('panel-overlay').classList.remove('open');
+  document.getElementById('tickets-side').classList.remove('open');
+  document.getElementById('nav-tickets').classList.remove('active');
+  document.getElementById('nav-chat').classList.add('active');
+}
+
+document.getElementById('user-input').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});
+document.getElementById('user-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+document.getElementById('phone-input').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('pin-input').focus()});
+document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+applyTranslations();
+</script>
+</body>
+</html>

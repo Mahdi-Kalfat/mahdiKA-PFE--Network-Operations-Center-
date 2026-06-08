@@ -1,0 +1,5 @@
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install fastapi uvicorn pymongo bcrypt python-dotenv
+COPY mypfe-mongo/customer_server.py server.py
+CMD ["python", "server.py"]

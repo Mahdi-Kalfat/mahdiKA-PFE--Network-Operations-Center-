@@ -1,0 +1,5 @@
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install pymongo bcrypt python-dotenv
+COPY mypfe-mongo/seed.py seed.py
+CMD ["python", "seed.py"]
