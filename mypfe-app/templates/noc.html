@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOC — MyPFE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:      #060A10;
+  --bg2:     #0B1018;
+  --bg3:     #111820;
+  --bg4:     #182030;
+  --border:  #1C2A3C;
+  --border2: #233450;
+  --teal:    #00E5BE;
+  --teal2:   #00B896;
+  --teal-bg: rgba(0,229,190,.07);
+  --blue:    #4D9EFF;
+  --blue-bg: rgba(77,158,255,.08);
+  --amber:   #FFB940;
+  --amber-bg:rgba(255,185,64,.08);
+  --red:     #FF5465;
+  --red-bg:  rgba(255,84,101,.08);
+  --purple:  #9B7BFF;
+  --green:   #2FD896;
+  --text:    #B8CDE0;
+  --text2:   #4E6A88;
+  --text3:   #263C58;
+  --white:   #FFFFFF;
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'DM Sans', sans-serif;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow:hidden}
+
+/* scan-line overlay */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);pointer-events:none;z-index:999}
+
+/* ── Login ── */
+#login-overlay{
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 30%, rgba(0,229,190,.05) 0%, transparent 60%);
+  display:flex;align-items:center;justify-content:center;z-index:200
+}
+.lc{
+  background:var(--bg2);border:1px solid var(--border2);border-radius:16px;
+  padding:40px;width:360px;
+  box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 1px var(--border)
+}
+.lc-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  color:var(--teal);background:var(--teal-bg);
+  border:1px solid rgba(0,229,190,.2);padding:4px 12px;border-radius:20px;
+  letter-spacing:.12em;margin-bottom:18px
+}
+.lc-title{font-size:22px;font-weight:700;color:var(--white);letter-spacing:-.03em;margin-bottom:4px}
+.lc-sub{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.5}
+.lc-field{margin-bottom:12px}
+.lc-input{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;
+  padding:11px 14px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;
+  transition:border-color .2s
+}
+.lc-input:focus{border-color:var(--teal)}
+.lc-input::placeholder{color:var(--text3)}
+.lc-btn{
+  width:100%;padding:12px;background:var(--teal);border:none;border-radius:8px;
+  color:var(--bg);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--sans);
+  transition:all .2s;margin-top:4px;letter-spacing:-.01em
+}
+.lc-btn:hover{opacity:.9;transform:translateY(-1px)}
+.lc-creds{margin-top:18px;padding:12px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)}
+.lc-creds-title{font-size:9px;font-weight:600;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.lc-cred-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;color:var(--text2)}
+.lc-cred-row span:last-child{font-family:var(--mono);color:var(--teal)}
+.lc-err{font-size:11px;color:var(--red);margin-top:10px;display:none}
+
+/* ── Shell ── */
+#shell{display:none;height:100vh;flex-direction:column}
+
+/* ── Topbar ── */
+.topbar{
+  height:48px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0
+}
+.tb-logo{
+  display:flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:12px;font-weight:600;color:var(--teal);letter-spacing:.1em
+}
+.tb-logo-pulse{
+  width:7px;height:7px;border-radius:50%;background:var(--teal);
+  box-shadow:0 0 0 0 rgba(0,229,190,.5);
+  animation:pulse 2s infinite
+}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,229,190,.5)}70%{box-shadow:0 0 0 6px rgba(0,229,190,0)}100%{box-shadow:0 0 0 0 rgba(0,229,190,0)}}
+.tb-sep{width:1px;height:16px;background:var(--border2);margin:0 3px}
+.tb-title{font-size:11px;color:var(--text2)}
+.tb-pills{display:flex;gap:5px;margin-left:14px}
+.pill{
+  font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.06em;
+  padding:2px 8px;border-radius:20px;border:1px solid;transition:all .3s
+}
+.pill-ok{color:var(--teal);border-color:rgba(0,229,190,.3);background:rgba(0,229,190,.06)}
+.pill-err{color:var(--red);border-color:rgba(255,84,101,.3);background:rgba(255,84,101,.06)}
+.pill-dim{color:var(--text2);border-color:var(--border)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-clock{font-family:var(--mono);font-size:11px;color:var(--text2)}
+.tb-admin{font-size:11px;color:var(--text2)}
+.tb-logout{
+  font-family:var(--mono);font-size:9px;color:var(--text2);
+  background:transparent;border:1px solid var(--border2);border-radius:4px;
+  padding:3px 9px;cursor:pointer;transition:all .15s;letter-spacing:.05em
+}
+.tb-logout:hover{border-color:var(--red);color:var(--red)}
+
+/* ── Body layout ── */
+.body{flex:1;display:grid;grid-template-columns:1fr 300px;grid-template-rows:auto 1fr 210px;overflow:hidden;min-height:0}
+
+/* ── Stats row ── */
+.stats-row{grid-column:1/3;display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.stat-card{flex:1;padding:14px 20px;border-right:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.stat-card:last-child{border-right:none}
+.sc-icon{width:36px;height:36px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+.sc-icon.teal{background:var(--teal-bg);border:1px solid rgba(0,229,190,.2)}
+.sc-icon.green{background:rgba(47,216,150,.08);border:1px solid rgba(47,216,150,.2)}
+.sc-icon.red{background:var(--red-bg);border:1px solid rgba(255,84,101,.2)}
+.sc-icon.amber{background:var(--amber-bg);border:1px solid rgba(255,185,64,.2)}
+.sc-icon.blue{background:var(--blue-bg);border:1px solid rgba(77,158,255,.2)}
+.sc-val{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1;color:var(--white)}
+.sc-val.teal{color:var(--teal)}.sc-val.green{color:var(--green)}.sc-val.red{color:var(--red)}.sc-val.amber{color:var(--amber)}.sc-val.blue{color:var(--blue)}
+.sc-label{font-size:11px;color:var(--text2);margin-top:2px}
+.sc-sub{font-size:10px;color:var(--text3);margin-top:1px;font-family:var(--mono)}
+
+/* ── Fleet panel ── */
+.fleet-panel{grid-column:1;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.panel-hdr{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--bg2)}
+.ph-title{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--text2);letter-spacing:.12em;text-transform:uppercase}
+.ph-count{font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto}
+.ph-btn{font-family:var(--mono);font-size:9px;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:4px;padding:3px 9px;cursor:pointer;transition:all .15s}
+.ph-btn:hover{border-color:var(--teal);color:var(--teal)}
+.fleet-scroll{flex:1;overflow-y:auto;min-height:0}
+.fleet-scroll::-webkit-scrollbar{width:3px}
+.fleet-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.fleet-table{width:100%;border-collapse:collapse}
+.fleet-table thead{position:sticky;top:0;z-index:2}
+.fleet-table th{padding:9px 14px;background:var(--bg3);font-family:var(--mono);font-size:8px;font-weight:600;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.fleet-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text);white-space:nowrap;transition:background .1s}
+.fleet-table tr:hover td{background:var(--bg2);cursor:pointer}
+.fleet-table tr.sel td{background:var(--teal-bg)!important}
+.fleet-table tr.flashing td{animation:flash 0.6s ease 3}
+@keyframes flash{0%,100%{background:transparent}50%{background:rgba(255,84,101,.15)}}
+
+.chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-family:var(--mono);font-size:9px;font-weight:600}
+.chip-up{color:var(--teal);background:var(--teal-bg);border:1px solid rgba(0,229,190,.2)}
+.chip-down{color:var(--red);background:var(--red-bg);border:1px solid rgba(255,84,101,.2)}
+.fault-chip{color:var(--amber);background:var(--amber-bg);border:1px solid rgba(255,185,64,.2);font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:2px}
+
+/* ── Right column ── */
+.right-col{border-left:0;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:var(--bg2)}
+.detail-panel{flex:1;overflow-y:auto;min-height:0}
+.detail-panel::-webkit-scrollbar{width:3px}
+.detail-panel::-webkit-scrollbar-thumb{background:var(--border2)}
+.detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--text2);font-size:11px;text-align:center;padding:24px}
+.detail-empty .icon{font-size:28px;opacity:.4}
+.dp-hdr{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;background:var(--bg2);flex-shrink:0}
+.dp-serial{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--teal)}
+.dp-body{padding:10px 14px}
+.dp-section{font-family:var(--mono);font-size:8px;font-weight:600;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:10px 0 5px}
+.dp-section:first-child{margin-top:0}
+.dp-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(28,42,60,.6);font-size:10px}
+.dp-row:last-child{border-bottom:none}
+.dp-key{color:var(--text2);font-family:var(--mono);font-size:9px}
+.dp-val{font-family:var(--mono);font-size:9px;max-width:150px;text-align:right;overflow:hidden;text-overflow:ellipsis}
+.dp-val.ok{color:var(--teal)}.dp-val.err{color:var(--red)}.dp-val.warn{color:var(--amber)}.dp-val.dim{color:var(--text2)}
+
+/* ── Neo4j schema panel (inside detail) ── */
+.schema-section{margin-top:8px}
+.schema-pill{
+  display:inline-block;font-family:var(--mono);font-size:8px;
+  padding:1px 6px;border-radius:2px;margin:1px 2px 1px 0;
+  background:rgba(77,158,255,.08);color:var(--blue);border:1px solid rgba(77,158,255,.2)
+}
+.schema-count{font-family:var(--mono);font-size:9px;color:var(--text2)}
+
+/* ── Inject panel ── */
+.inject-panel{border-top:1px solid var(--border);padding:12px 14px;flex-shrink:0;background:var(--bg3)}
+.ip-title{font-family:var(--mono);font-size:8px;font-weight:600;color:var(--text2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}
+.ip-target{font-size:10px;color:var(--text2);margin-bottom:8px;font-family:var(--mono)}
+.ip-target .t{color:var(--teal)}
+.inject-btns{display:flex;flex-wrap:wrap;gap:4px}
+.inj-btn{font-family:var(--mono);font-size:8px;padding:4px 8px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.inj-btn:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.inj-btn.random{border-color:var(--purple);color:var(--purple);background:rgba(155,123,255,.08)}
+.inj-btn.clear{border-color:var(--teal);color:var(--teal);background:var(--teal-bg)}
+.inj-feedback{margin-top:7px;font-size:10px;padding:5px 9px;border-radius:5px;font-family:var(--mono);display:none}
+.inj-feedback.ok{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(0,229,190,.2)}
+.inj-feedback.err{background:var(--red-bg);color:var(--red);border:1px solid rgba(255,84,101,.2)}
+
+/* ── Tickets row ── */
+.tickets-row{grid-column:1/3;border-top:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.ticket-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2)}
+.tab-btn{padding:8px 14px;font-family:var(--mono);font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:none;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;border-bottom:2px solid transparent;transition:all .15s}
+.tab-btn.active{color:var(--teal);border-bottom-color:var(--teal)}
+.tab-btn:hover:not(.active){color:var(--text)}
+.tickets-body{flex:1;overflow-y:auto;padding:8px 14px;display:flex;flex-direction:column;gap:5px;min-height:0}
+.tickets-body::-webkit-scrollbar{width:3px}
+.tickets-body::-webkit-scrollbar-thumb{background:var(--border2)}
+.ticket-hdr{display:grid;grid-template-columns:80px 110px 1fr 130px 120px 80px;gap:8px;padding:5px 11px;font-family:var(--mono);font-size:8px;font-weight:600;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
+.ticket-row{display:grid;grid-template-columns:80px 110px 1fr 130px 120px 80px;gap:8px;padding:8px 11px;border-radius:5px;font-size:10px;border:1px solid transparent;transition:all .15s;align-items:center;flex-shrink:0}
+.ticket-row:hover{background:var(--bg2);border-color:var(--border);cursor:pointer}
+.tr-status{display:inline-flex}
+.st{font-family:var(--mono);font-size:8px;font-weight:600;padding:2px 6px;border-radius:2px}
+.st-resolved{color:var(--teal);background:var(--teal-bg)}
+.st-escalated{color:var(--amber);background:var(--amber-bg)}
+.st-open{color:var(--blue);background:var(--blue-bg)}
+.tr-acct{font-family:var(--mono);font-size:9px;color:var(--text2)}
+.tr-problem{color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-fault{font-family:var(--mono);font-size:9px;color:var(--amber)}
+.tr-fix{font-family:var(--mono);font-size:9px;color:var(--teal)}
+.tr-date{font-family:var(--mono);font-size:9px;color:var(--text3)}
+
+/* ── Ticket detail modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:700px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.6)}
+.modal-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.modal-title{font-size:14px;font-weight:600;color:var(--white);flex:1}
+.modal-close{width:28px;height:28px;border-radius:6px;border:none;background:var(--bg3);color:var(--text2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{color:var(--red)}
+.modal-body{flex:1;overflow-y:auto;padding:20px 22px}
+.modal-body::-webkit-scrollbar{width:3px}
+.modal-body::-webkit-scrollbar-thumb{background:var(--border2)}
+
+/* Steps in modal */
+.step-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.step-card-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.step-ok{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.step-ok.ok{background:rgba(47,216,150,.15);color:var(--green);border:1px solid rgba(47,216,150,.3)}
+.step-ok.warn{background:rgba(255,185,64,.12);color:var(--amber);border:1px solid rgba(255,185,64,.3)}
+.step-ok.err{background:rgba(255,84,101,.12);color:var(--red);border:1px solid rgba(255,84,101,.3)}
+.step-layer{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--white)}
+.step-port{font-family:var(--mono);font-size:9px;color:var(--text2);background:var(--bg4);padding:1px 6px;border-radius:3px}
+.step-tool{font-family:var(--mono);font-size:9px;color:var(--teal);margin-left:auto}
+.step-desc{padding:8px 14px;font-size:11px;color:var(--text2);line-height:1.5}
+.step-result{padding:0 14px 10px}
+.step-kv{display:flex;gap:8px;font-size:10px;padding:2px 0;align-items:flex-start}
+.step-kv-key{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;min-width:120px}
+.step-kv-val{font-family:var(--mono);font-size:9px;color:var(--text);word-break:break-all}
+.step-kv-val.ok{color:var(--teal)}.step-kv-val.err{color:var(--red)}.step-kv-val.warn{color:var(--amber)}
+.step-warn-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:3px;background:rgba(255,185,64,.08);color:var(--amber);border:1px solid rgba(255,185,64,.2);margin-top:4px}
+
+/* ── Animations ── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:slideUp .25s ease}
+
+/* ── Create Ticket Form ── */
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;letter-spacing:.05em}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:8px 11px;color:var(--text);font-family:var(--sans);font-size:11px;outline:none;transition:border-color .2s}
+.form-input:focus{border-color:var(--teal)}
+.form-input::placeholder{color:var(--text3)}
+.form-select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:8px 11px;color:var(--text);font-family:var(--sans);font-size:11px;outline:none;transition:border-color .2s}
+.form-select:focus{border-color:var(--teal)}
+.form-select option{background:var(--bg2);color:var(--text)}
+.form-btns{display:flex;gap:8px;margin-top:16px}
+.form-btn-submit{flex:1;background:var(--teal);border:none;border-radius:6px;padding:9px;color:var(--bg);font-weight:600;font-size:11px;cursor:pointer;transition:opacity .15s}
+.form-btn-submit:hover{opacity:.85}
+.form-btn-cancel{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:9px;color:var(--text2);font-weight:600;font-size:11px;cursor:pointer;transition:all .15s}
+.form-btn-cancel:hover{border-color:var(--text2)}
+
+/* Neo4j detail badge row */
+.neo4j-ok{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;padding:6px 10px;border-radius:5px;background:rgba(77,158,255,.07);border:1px solid rgba(77,158,255,.2);color:var(--blue);margin-top:4px}
+.neo4j-warn{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;padding:6px 10px;border-radius:5px;background:rgba(255,185,64,.07);border:1px solid rgba(255,185,64,.2);color:var(--amber);margin-top:4px}
+.neo4j-err{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;padding:6px 10px;border-radius:5px;background:rgba(255,84,101,.07);border:1px solid rgba(255,84,101,.2);color:var(--red);margin-top:4px}
+.tr069-path{font-family:var(--mono);font-size:8px;color:var(--text3);padding:1px 5px;background:var(--bg4);border-radius:2px;margin:1px 2px 1px 0;display:inline-block}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-overlay">
+  <div class="lc">
+    <div class="lc-badge">⬡ NOC ACCESS</div>
+    <h2 class="lc-title">Network Operations</h2>
+    <p class="lc-sub">Sign in with your admin credentials to access the dashboard.</p>
+    <div class="lc-field">
+      <input class="lc-input" id="adm-user" type="text" placeholder="Username" autocomplete="username">
+    </div>
+    <div class="lc-field">
+      <input class="lc-input" id="adm-pass" type="password" placeholder="Password" autocomplete="current-password">
+    </div>
+    <button class="lc-btn" onclick="nocLogin()">Access Dashboard</button>
+    <p class="lc-err" id="lc-err"></p>
+    <div class="lc-creds">
+      <div class="lc-creds-title">Admin accounts</div>
+      <div class="lc-cred-row"><span>Mehdi (superadmin)</span><span>mehdi / admin123</span></div>
+      <div class="lc-cred-row"><span>Operator 1</span><span>noc_op1 / noc2025!</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div id="shell" style="display:none;flex-direction:column;height:100vh">
+
+  <header class="topbar">
+    <div class="tb-logo"><div class="tb-logo-pulse"></div>NOC</div>
+    <div class="tb-sep"></div>
+    <span class="tb-title">Network Operations Center — MyPFE</span>
+    <div class="tb-pills">
+      <span class="pill pill-dim" id="p-neo4j">neo4j</span>
+      <span class="pill pill-dim" id="p-genie">genie</span>
+      <span class="pill pill-dim" id="p-raduce">raduce</span>
+      <span class="pill pill-dim" id="p-ollama">ollama</span>
+    </div>
+    <a href="/noc/tickets" style="font-family:var(--mono);font-size:9px;color:var(--teal);background:var(--teal-bg);border:1px solid rgba(0,229,190,.3);border-radius:4px;padding:4px 11px;text-decoration:none;transition:all .15s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">🎫 TICKETS</a>
+    <div class="tb-right">
+      <span class="tb-clock" id="tb-clock">00:00:00</span>
+      <div class="tb-sep"></div>
+      <span class="tb-admin" id="tb-admin">—</span>
+      <button class="tb-logout" onclick="nocLogout()">LOGOUT</button>
+    </div>
+  </header>
+
+  <div class="body">
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="sc-icon teal">📡</div>
+        <div><div class="sc-val teal" id="s-total">—</div><div class="sc-label">Total Routers</div><div class="sc-sub" id="s-total-sub">fleet</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-icon green">✓</div>
+        <div><div class="sc-val green" id="s-up">—</div><div class="sc-label">Online</div><div class="sc-sub" id="s-up-pct">—%</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-icon red">✗</div>
+        <div><div class="sc-val red" id="s-down">—</div><div class="sc-label">Faulted</div><div class="sc-sub" id="s-down-pct">—%</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-icon amber">⏳</div>
+        <div><div class="sc-val amber" id="s-esc">—</div><div class="sc-label">Escalated</div><div class="sc-sub">open tickets</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-icon blue">🎫</div>
+        <div><div class="sc-val blue" id="s-resolved">—</div><div class="sc-label">Resolved</div><div class="sc-sub">all time</div></div>
+      </div>
+    </div>
+
+    <div class="fleet-panel">
+      <div class="panel-hdr">
+        <span class="ph-title">Router Fleet</span>
+        <span class="ph-count" id="fleet-count">loading…</span>
+        <button class="ph-btn" onclick="loadFleet()">⟳ Refresh</button>
+      </div>
+      <div class="fleet-scroll">
+        <table class="fleet-table">
+          <thead>
+            <tr><th>Customer</th><th>Phone</th><th>Model</th><th>Status</th><th>Fault</th><th>Updated</th></tr>
+          </thead>
+          <tbody id="fleet-body">
+            <tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text2)">Loading fleet…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div class="detail-panel" id="detail-panel">
+        <div class="detail-empty"><div class="icon">📡</div><div>Select a router<br>to view live state</div></div>
+      </div>
+      <div class="inject-panel">
+        <div class="ip-title">Fault Injection</div>
+        <div class="ip-target">Target: <span class="t" id="inj-target">none</span></div>
+        <div class="inject-btns">
+          <button class="inj-btn random" onclick="inject('random')">⚡ Random</button>
+          <button class="inj-btn" onclick="inject('ppp_auth_failure')">PPP Auth</button>
+          <button class="inj-btn" onclick="inject('wrong_vlan')">VLAN</button>
+          <button class="inj-btn" onclick="inject('dns_failure')">DNS</button>
+          <button class="inj-btn" onclick="inject('weak_signal')">Signal</button>
+          <button class="inj-btn" onclick="inject('random_disconnect')">Disconnect</button>
+          <button class="inj-btn clear" onclick="clearFault()">✓ Clear</button>
+        </div>
+        <div class="inj-feedback" id="inj-fb"></div>
+      </div>
+    </div>
+
+    <div class="tickets-row">
+      <div class="ticket-tabs">
+        <button class="tab-btn active" onclick="loadTickets(null,this)">ALL</button>
+        <button class="tab-btn" onclick="loadTickets('escalated',this)">ESCALATED</button>
+        <button class="tab-btn" onclick="loadTickets('resolved',this)">RESOLVED</button>
+        <button class="tab-btn" onclick="loadTickets('open',this)">OPEN</button>
+        <button class="ph-btn" onclick="openCreateTicketModal()" style="margin-left:auto">+ NEW TICKET</button>
+      </div>
+      <div class="ticket-hdr">
+        <div>Status</div><div>Account</div><div>Problem</div><div>Fault</div><div>Fix</div><div>Date</div>
+      </div>
+      <div class="tickets-body" id="tickets-body">
+        <div style="text-align:center;color:var(--text2);padding:14px;font-size:11px">Loading…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Ticket detail modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title" id="modal-title">Fix Details</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Create Ticket Modal -->
+<div class="modal-overlay" id="create-ticket-modal" onclick="if(event.target===this)closeCreateTicketModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">Create Manual Ticket</span>
+      <button class="modal-close" onclick="closeCreateTicketModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Account ID</label>
+        <input type="text" id="ct-account-id" class="form-input" placeholder="e.g., ACC001" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Problem Description</label>
+        <textarea id="ct-problem" class="form-input" placeholder="Describe the customer's issue..." style="resize:none;height:80px"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fault Type</label>
+        <select id="ct-fault" class="form-select">
+          <option value="manual">Manual Entry</option>
+          <option value="ppp_auth_failure">PPP Auth Failure</option>
+          <option value="wrong_vlan">Wrong VLAN</option>
+          <option value="dns_failure">DNS Failure</option>
+          <option value="weak_signal">Weak Signal</option>
+          <option value="random_disconnect">Random Disconnect</option>
+          <option value="hardware_fault">Hardware Fault</option>
+          <option value="unknown">Unknown</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select id="ct-status" class="form-select">
+          <option value="open">Open</option>
+          <option value="escalated">Escalated</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
+      <div class="form-btns">
+        <button class="form-btn-cancel" onclick="closeCreateTicketModal()">Cancel</button>
+        <button class="form-btn-submit" onclick="submitCreateTicket()">Create Ticket</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selSerial=null, fleet=[];
+
+function updateClock(){document.getElementById('tb-clock').textContent=new Date().toLocaleTimeString('en-GB',{hour12:false});}
+updateClock(); setInterval(updateClock,1000);
+
+async function nocLogin(){
+  const u=document.getElementById('adm-user').value.trim();
+  const p=document.getElementById('adm-pass').value.trim();
+  const err=document.getElementById('lc-err'); err.style.display='none';
+  try{
+    const r=await fetch('/api/noc/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(d.success){
+      document.getElementById('login-overlay').style.display='none';
+      const sh=document.getElementById('shell'); sh.style.display='flex';
+      document.getElementById('tb-admin').textContent=d.admin.name+' · '+d.admin.role;
+      initDashboard();
+    } else {err.textContent=d.error||'Login failed';err.style.display='block';}
+  }catch(e){err.textContent='Connection error';err.style.display='block';}
+}
+async function nocLogout(){await fetch('/api/noc/logout',{method:'POST'});location.reload();}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('login-overlay').style.display!=='none')nocLogin();});
+
+function initDashboard(){
+  checkStatus(); loadFleet(); loadTickets(null,document.querySelector('.tab-btn')); loadTicketStats();
+  setInterval(checkStatus,15000); setInterval(loadFleet,30000); setInterval(loadTicketStats,20000);
+}
+
+async function checkStatus(){
+  try{
+    const r=await fetch('/api/status'); const s=await r.json();
+    setPill('p-neo4j',s.neo4j_mcp,'neo4j');
+    setPill('p-genie',s.genie,'genie');
+    setPill('p-raduce',s.raduce,'raduce');
+    setPill('p-ollama',s.ollama,'ollama');
+  }catch(e){}
+}
+function setPill(id,ok,label){
+  const el=document.getElementById(id);
+  el.textContent=label+(ok?' ✓':' ✗');
+  el.className='pill '+(ok?'pill-ok':'pill-err');
+}
+
+async function loadTicketStats(){
+  try{
+    const [re,es]=await Promise.all([
+      fetch('/api/noc/tickets?status=resolved').then(r=>r.json()),
+      fetch('/api/noc/tickets?status=escalated').then(r=>r.json()),
+    ]);
+    document.getElementById('s-resolved').textContent=re.total||0;
+    document.getElementById('s-esc').textContent=es.total||0;
+  }catch(e){}
+}
+
+async function loadFleet(){
+  try{
+    const r=await fetch('/api/noc/fleet'); const d=await r.json();
+    fleet=d.routers||[];
+    const total=d.total||0, up=d.up||0, down=d.down||0;
+    document.getElementById('s-total').textContent=total;
+    document.getElementById('s-up').textContent=up;
+    document.getElementById('s-down').textContent=down;
+    document.getElementById('s-total-sub').textContent=total+' devices';
+    document.getElementById('s-up-pct').textContent=total?Math.round(up/total*100)+'%':'—';
+    document.getElementById('s-down-pct').textContent=total?Math.round(down/total*100)+'%':'—';
+    document.getElementById('fleet-count').textContent=total+' devices';
+    renderFleet(fleet);
+    if(selSerial) refreshDetail(selSerial);
+  }catch(e){
+    document.getElementById('fleet-body').innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--red);padding:20px">Error loading fleet</td></tr>';
+  }
+}
+
+function renderFleet(routers){
+  const body=document.getElementById('fleet-body');
+  if(!routers.length){body.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:20px">No routers</td></tr>';return;}
+  body.innerHTML=routers.map(r=>{
+    const down=r.status==='DOWN';
+    const chip=down?'<span class="chip chip-down">● DOWN</span>':'<span class="chip chip-up">● UP</span>';
+    const fault=r.fault&&r.fault!=='healthy'?`<span class="fault-chip">${r.fault.replace(/_/g,' ')}</span>`:'<span style="color:var(--text3)">—</span>';
+    const upd=r.last_updated?new Date(r.last_updated).toLocaleTimeString('en-GB',{hour12:false}):'—';
+    const sel=r.serial===selSerial?'sel':'';
+    return `<tr class="${sel}" onclick="selectRouter('${r.serial}',this)">
+      <td><span style="font-weight:500">${r.customer_name}</span></td>
+      <td style="font-family:var(--mono);color:var(--text2);font-size:10px">${r.customer_phone}</td>
+      <td style="font-family:var(--mono);font-size:10px">${r.model}</td>
+      <td>${chip}</td><td>${fault}</td>
+      <td style="font-family:var(--mono);font-size:9px;color:var(--text3)">${upd}</td>
+    </tr>`;
+  }).join('');
+}
+
+function selectRouter(serial,rowEl){
+  selSerial=serial;
+  document.getElementById('inj-target').textContent=serial.split('-').slice(-1)[0]+'…';
+  document.querySelectorAll('.fleet-table tr').forEach(r=>r.classList.remove('sel'));
+  if(rowEl) rowEl.classList.add('sel');
+  refreshDetail(serial);
+}
+
+async function refreshDetail(serial){
+  try{
+    const r=await fetch(`/api/noc/router_state?serial=${serial}`);
+    const state=await r.json();
+    if(state.error){renderDetailError(state.error);return;}
+    renderDetail(serial,state);
+  }catch(e){renderDetailError(String(e));}
+}
+
+function renderDetailError(msg){
+  document.getElementById('detail-panel').innerHTML=`<div class="detail-empty"><div class="icon">⚠️</div><div style="color:var(--red)">${msg}</div></div>`;
+}
+
+function renderDetail(serial,state){
+  const p=state.parameters||{};
+  const down=state.status==='DOWN';
+  const faultTag=state.fault&&state.fault!=='healthy'?`<span class="fault-chip">${state.fault.replace(/_/g,' ')}</span>`:'';
+  const drow=(k,v,cls='dim')=>`<div class="dp-row"><span class="dp-key">${k}</span><span class="dp-val ${cls}">${v??'—'}</span></div>`;
+  const pppOk=p.PPPStatus==='Connected';
+  const dnsOk=p.DNSServer&&p.DNSServer!=='0.0.0.0';
+  let rxCls='ok'; try{if(parseFloat(p.RXPower)<-27)rxCls='err';}catch(e){}
+  const errCls=parseInt(p.ErrorCount||0)>100?'warn':'ok';
+
+  document.getElementById('detail-panel').innerHTML=`
+    <div class="dp-hdr">
+      <span class="dp-serial">${serial}</span>
+      <span class="chip ${down?'chip-down':'chip-up'}">${down?'DOWN':'UP'}</span>
+      ${faultTag}
+    </div>
+    <div class="dp-body">
+      <div class="dp-section">Connection</div>
+      ${drow('PPP Status',p.PPPStatus,pppOk?'ok':'err')}
+      ${drow('Last Error',p.LastConnectionError,p.LastConnectionError==='None'?'ok':'warn')}
+      ${drow('Conn. Status',p.ConnectionStatus,p.ConnectionStatus==='Connected'?'ok':'err')}
+      ${drow('VLAN ID',p.VLANId,p.VLANId===100?'ok':'warn')}
+      ${drow('External IP',p.ExternalIPAddress,'dim')}
+      ${drow('Uptime',p.Uptime?p.Uptime+'s':'—','dim')}
+      <div class="dp-section">Optical / Diagnostic</div>
+      ${drow('RX Power',p.RXPower!=null?p.RXPower+' dBm':'—',rxCls)}
+      ${drow('TX Power',p.TXPower!=null?p.TXPower+' dBm':'—','dim')}
+      ${drow('Temperature',p.Temperature!=null?p.Temperature+' °C':'—',parseFloat(p.Temperature||0)<80?'ok':'warn')}
+      ${drow('Signal Loss',p.SignalLoss?'YES':'NO',!p.SignalLoss?'ok':'err')}
+      ${drow('Error Count',p.ErrorCount??'—',errCls)}
+      <div class="dp-section">DNS / Network</div>
+      ${drow('DNS Server',p.DNSServer,dnsOk?'ok':'err')}
+      ${drow('DNS Status',p.DNSStatus,p.DNSStatus==='Active'?'ok':'err')}
+      <div class="dp-section">WiFi</div>
+      ${drow('SSID 2.4G',p.SSID_2G,'dim')}
+      ${drow('SSID 5G',p.SSID_5G,'dim')}
+    </div>`;
+}
+
+async function inject(fault){
+  if(!selSerial){showFb('Select a router first',false);return;}
+  const body=fault==='random'?{serial:selSerial}:{serial:selSerial,fault};
+  try{
+    const r=await fetch('/api/noc/inject_fault',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(d.success){showFb('✓ Injected: '+d.fault_injected.replace(/_/g,' '),true);flashRow(selSerial);setTimeout(()=>loadFleet(),600);}
+    else showFb(d.error||'Failed',false);
+  }catch(e){showFb('Error: '+e,false);}
+}
+
+async function clearFault(){
+  if(!selSerial){showFb('Select a router first',false);return;}
+  try{
+    const r=await fetch('/api/noc/clear_fault',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({serial:selSerial})});
+    const d=await r.json();
+    if(d.success){showFb('✓ Router cleared — now UP',true);setTimeout(()=>loadFleet(),400);}
+    else showFb(d.error||'Failed',false);
+  }catch(e){showFb('Error: '+e,false);}
+}
+
+function flashRow(serial){
+  document.querySelectorAll('.fleet-table tr').forEach(tr=>{
+    if(tr.onclick?.toString().includes(serial)){
+      tr.classList.add('flashing');
+      setTimeout(()=>tr.classList.remove('flashing'),2000);
+    }
+  });
+}
+
+function showFb(msg,ok){
+  const el=document.getElementById('inj-fb');
+  el.textContent=msg; el.className='inj-feedback '+(ok?'ok':'err');
+  el.style.display='block';
+  clearTimeout(el._t); el._t=setTimeout(()=>el.style.display='none',4000);
+}
+
+async function loadTickets(status,tabEl){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(tabEl) tabEl.classList.add('active');
+  const url=status?`/api/noc/tickets?status=${status}`:'/api/noc/tickets';
+  const body=document.getElementById('tickets-body');
+  body.innerHTML='<div style="text-align:center;color:var(--text2);padding:10px;font-size:11px">Loading…</div>';
+  try{
+    const r=await fetch(url); const d=await r.json();
+    if(!d.tickets?.length){body.innerHTML='<div style="text-align:center;color:var(--text2);padding:14px;font-size:11px">No tickets</div>';return;}
+    body.innerHTML='';
+    d.tickets.forEach(t=>{
+      const cls={resolved:'st-resolved',escalated:'st-escalated',open:'st-open'}[t.status]||'';
+      const date=t.created_at?new Date(t.created_at).toLocaleDateString('en-GB'):'—';
+      const div=document.createElement('div');
+      div.className='ticket-row animate-in';
+      div.onclick=()=>openTicketModal(t);
+      div.innerHTML=`
+        <div class="tr-status"><span class="st ${cls}">${t.status}</span></div>
+        <div class="tr-acct">${t.account_id||'—'}</div>
+        <div class="tr-problem">${(t.problem_description||'').slice(0,55)}</div>
+        <div class="tr-fault">${(t.fault_detected||'—').replace(/_/g,' ')}</div>
+        <div class="tr-fix">${(t.fix_applied||'—').replace(/_/g,' ')}</div>
+        <div class="tr-date">${date}</div>`;
+      body.appendChild(div);
+    });
+  }catch(e){body.innerHTML=`<div style="color:var(--red);padding:10px;font-size:11px">Error: ${e}</div>`;}
+}
+
+// ── Ticket detail modal with step-by-step trace ───────────────────────────
+function openTicketModal(ticket){
+  const steps=(ticket.full_log||[]);
+  document.getElementById('modal-title').textContent=
+    `${ticket.fault_detected||'?'} → ${ticket.fix_applied||'escalated'} · #${ticket.short_id||ticket._id?.slice(-6)||'?'}`;
+
+  let html='';
+
+  // Summary row
+  const stCls={resolved:'st-resolved',escalated:'st-escalated',open:'st-open'}[ticket.status]||'';
+  html+=`<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+    <span class="st ${stCls}" style="font-size:11px">${ticket.status}</span>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">${ticket.customer_name||''}</span>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">${ticket.router_serial||''}</span>
+    ${ticket.resolution_time_s!=null?`<span style="font-family:var(--mono);font-size:10px;color:var(--teal)">⏱ ${ticket.resolution_time_s}s</span>`:''}
+  </div>
+  <div style="font-size:12px;color:var(--text);margin-bottom:16px;padding:10px 14px;background:var(--bg3);border-radius:7px;border:1px solid var(--border)">
+    "${ticket.problem_description||''}"
+  </div>`;
+
+  if(!steps.length){
+    html+='<div style="color:var(--text2);font-size:11px;text-align:center;padding:20px">No step trace recorded for this ticket.</div>';
+  } else {
+    html+='<div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Fix Trace — '+steps.length+' steps</div>';
+    steps.forEach((s,i)=>{
+      const isNeo4j = (s.layer||'').includes('Neo4j');
+      // Determine status class
+      let statusClass='ok', statusIcon='✓';
+      if(s.ok===false){
+        statusClass='err'; statusIcon='✗';
+      } else if(isNeo4j && s.result?.warning){
+        statusClass='warn'; statusIcon='⚠';
+      }
+
+      html+=`<div class="step-card">
+        <div class="step-card-hdr">
+          <div class="step-ok ${statusClass}">${statusIcon}</div>
+          <span class="step-layer">${s.layer||'Step '+(i+1)}</span>
+          <span class="step-port">:${s.port||'?'}</span>
+          <span class="step-tool">${s.tool||''}</span>
+        </div>
+        <div class="step-desc">${s.description||''}</div>
+        <div class="step-result">`;
+
+      // Special rendering for Neo4j step
+      if(isNeo4j){
+        const res=s.result||{};
+        if(res.error){
+          html+=`<div class="neo4j-err">✗ Service unreachable — ${res.error}</div>`;
+        } else if(res.warning){
+          html+=`<div class="neo4j-warn">⚠ Model not found in graph — "${res.warning}" — diagnostic continues without schema</div>`;
+          if(res.categories?.length){
+            html+=`<div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px">${res.categories.map(c=>`<span class="schema-pill">${c}</span>`).join('')}</div>`;
+          }
+        } else {
+          html+=`<div class="neo4j-ok">✓ ${res.total_params||0} parameters loaded · ${(res.categories||[]).length} categories</div>`;
+          if(res.categories?.length){
+            html+=`<div style="margin-top:5px">${res.categories.map(c=>`<span class="schema-pill">${c}</span>`).join('')}</div>`;
+          }
+        }
+
+        // TR-069 paths used
+        const paths=(s.result?.tr069_paths_read||[]);
+        if(paths.length){
+          html+=`<div style="margin-top:8px;font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">TR-069 paths consulted</div>`;
+          html+=paths.slice(0,10).map(p=>`<span class="tr069-path" title="${p.path}">${p.label}</span>`).join('');
+        }
+      } else {
+        // Generic KV rendering
+        const res=s.result||{};
+        const skip=new Set(['full_log','router_state_before','router_state_after']);
+        Object.entries(res).filter(([k])=>!skip.has(k)).slice(0,12).forEach(([k,v])=>{
+          if(v===null||v===undefined||v==='') return;
+          const vs=typeof v==='object'?JSON.stringify(v):String(v);
+          let cls='';
+          if(k==='error'||k==='ok'&&v===false) cls='err';
+          else if(k==='ok'&&v===true) cls='ok';
+          else if(k.includes('warning')) cls='warn';
+          html+=`<div class="step-kv"><span class="step-kv-key">${k}</span><span class="step-kv-val ${cls}">${vs.slice(0,120)}</span></div>`;
+        });
+      }
+
+      // TR-069 write paths (RaDuce step)
+      if((s.tr069_paths_written||[]).length){
+        html+=`<div style="margin-top:6px;font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">TR-069 paths written</div>`;
+        html+=s.tr069_paths_written.map(p=>`<span class="tr069-path">${p.label}</span>`).join('');
+      }
+
+      html+='</div></div>';
+    });
+  }
+
+  document.getElementById('modal-body').innerHTML=html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+
+function openCreateTicketModal(){
+  document.getElementById('create-ticket-modal').classList.add('open');
+  document.getElementById('ct-account-id').focus();
+}
+
+function closeCreateTicketModal(){
+  document.getElementById('create-ticket-modal').classList.remove('open');
+  document.getElementById('ct-account-id').value='';
+  document.getElementById('ct-problem').value='';
+  document.getElementById('ct-fault').value='manual';
+  document.getElementById('ct-status').value='open';
+}
+
+async function submitCreateTicket(){
+  const accountId = document.getElementById('ct-account-id').value.trim();
+  const problem = document.getElementById('ct-problem').value.trim();
+  const fault = document.getElementById('ct-fault').value;
+  const status = document.getElementById('ct-status').value;
+  
+  if(!accountId || !problem){
+    alert('Please fill in all required fields');
+    return;
+  }
+  
+  try{
+    const r = await fetch('/api/noc/tickets/create', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({account_id: accountId, problem: problem, fault: fault, status: status})
+    });
+    const d = await r.json();
+    if(d.success){
+      closeCreateTicketModal();
+      loadTickets(null, document.querySelector('.tab-btn'));
+      alert('✓ Ticket #' + d.short_id + ' created');
+    } else {
+      alert('Error: ' + (d.error || 'Unknown error'));
+    }
+  }catch(e){
+    alert('Connection error: ' + e);
+  }
+}
+</script>
+</body>
+</html>

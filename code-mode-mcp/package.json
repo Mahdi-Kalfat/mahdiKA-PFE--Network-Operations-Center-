@@ -1,0 +1,64 @@
+{
+  "name": "@utcp/code-mode-mcp",
+  "version": "1.2.0",
+  "description": "Model Context Protocol (MCP) server for UTCP Code Mode - Execute TypeScript code with direct tool access",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mcp-bridge": "./dist/index.js"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc",
+    "prepublishOnly": "npm run build",
+    "start": "npm run build && node dist/index.js"
+  },
+  "keywords": [
+    "utcp",
+    "mcp",
+    "code-mode",
+    "typescript",
+    "model-context-protocol",
+    "universal-tool-calling-protocol",
+    "bridge",
+    "tools",
+    "ai",
+    "code-execution"
+  ],
+  "author": "UTCP Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/universal-tool-calling-protocol/utcp-mcp.git"
+  },
+  "homepage": "https://github.com/universal-tool-calling-protocol/utcp-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/universal-tool-calling-protocol/utcp-mcp/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "@utcp/cli": "^1.1.0",
+    "@utcp/code-mode": "^1.2.11",
+    "@utcp/dotenv-loader": "^1.1.0",
+    "@utcp/file": "^1.1.0",
+    "@utcp/http": "^1.1.0",
+    "@utcp/mcp": "^1.1.1",
+    "@utcp/sdk": "^1.1.0",
+    "@utcp/text": "^1.1.0",
+    "dotenv": "^16.0.0",
+    "zod": "^3.22.0"
+  }
+}

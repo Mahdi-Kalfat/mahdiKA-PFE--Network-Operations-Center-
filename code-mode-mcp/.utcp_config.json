@@ -1,0 +1,10 @@
+{
+  "manual_call_templates": [
+    {
+      "name": "router_mcp",
+      "call_template_type": "http",
+      "http_method": "GET",
+      "url": "http://localhost:8000/tools"
+    }
+  ]
+}

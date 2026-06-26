@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tickets — NOC MyPFE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:      #080C12;--bg2:#0E1420;--bg3:#141C2E;--bg4:#1A2440;
+  --border:  #1E2D48;--border2:#253660;
+  --teal:    #00E5BE;--teal2:#00B896;--teal-bg:rgba(0,229,190,.08);
+  --blue:    #4D8EFF;--blue-bg:rgba(77,142,255,.08);
+  --amber:   #FFB547;--amber-bg:rgba(255,181,71,.08);
+  --red:     #FF5C5C;--red-bg:rgba(255,92,92,.08);
+  --purple:  #A78BFF;--purple-bg:rgba(167,139,255,.08);
+  --green:   #34D399;
+  --text:    #C8D8F0;--text2:#5A7AA0;--text3:#2A3D5A;--white:#FFFFFF;
+  --mono:    'IBM Plex Mono',monospace;--sans:'Plus Jakarta Sans',sans-serif;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* ── Shell ── */
+.shell{display:flex;flex-direction:column;height:100vh}
+
+/* ── Topbar ── */
+.topbar{
+  height:52px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0
+}
+.tb-back{
+  display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;
+  color:var(--text2);text-decoration:none;padding:5px 10px;border-radius:6px;
+  border:1px solid var(--border);transition:all .15s
+}
+.tb-back:hover{border-color:var(--teal);color:var(--teal)}
+.tb-logo{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--teal);letter-spacing:.08em}
+.tb-sep{width:1px;height:18px;background:var(--border2)}
+.tb-title{font-size:13px;color:var(--white);font-weight:600}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-clock{font-family:var(--mono);font-size:12px;color:var(--text2)}
+.tb-admin{font-size:12px;color:var(--text2)}
+.tb-logout{font-family:var(--mono);font-size:10px;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:4px;padding:4px 10px;cursor:pointer;transition:all .15s}
+.tb-logout:hover{border-color:var(--red);color:var(--red)}
+
+/* ── Stats bar ── */
+.stats-bar{
+  display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2)
+}
+.sc{flex:1;padding:14px 22px;border-right:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.sc:last-child{border-right:none}
+.sc-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sc-icon.teal{background:var(--teal-bg);border:1px solid rgba(0,229,190,.2)}
+.sc-icon.green{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)}
+.sc-icon.amber{background:var(--amber-bg);border:1px solid rgba(255,181,71,.2)}
+.sc-icon.red{background:var(--red-bg);border:1px solid rgba(255,92,92,.2)}
+.sc-icon.blue{background:var(--blue-bg);border:1px solid rgba(77,142,255,.2)}
+.sc-val{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--white)}
+.sc-val.teal{color:var(--teal)} .sc-val.green{color:var(--green)}
+.sc-val.amber{color:var(--amber)} .sc-val.red{color:var(--red)} .sc-val.blue{color:var(--blue)}
+.sc-label{font-size:11px;color:var(--text2);margin-top:1px}
+.sc-sub{font-size:10px;color:var(--text3);margin-top:1px;font-family:var(--mono)}
+
+/* ── Controls ── */
+.controls{
+  padding:12px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--bg2)
+}
+.filter-tabs{display:flex;gap:4px}
+.ft{
+  font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.06em;
+  padding:6px 14px;border-radius:5px;border:1px solid var(--border2);
+  background:transparent;color:var(--text2);cursor:pointer;transition:all .15s
+}
+.ft.active{background:var(--teal-bg);color:var(--teal);border-color:rgba(0,229,190,.3)}
+.ft:hover:not(.active){color:var(--text);border-color:var(--border2)}
+.search-wrap{position:relative;flex:1;max-width:320px}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3)}
+.search-input{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;
+  padding:7px 12px 7px 30px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;
+  transition:border-color .2s
+}
+.search-input:focus{border-color:var(--teal)}
+.search-input::placeholder{color:var(--text3)}
+.ctrl-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.total-badge{font-family:var(--mono);font-size:11px;color:var(--text2)}
+.refresh-btn{font-family:var(--mono);font-size:10px;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:5px;padding:6px 12px;cursor:pointer;transition:all .15s}
+.refresh-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+/* ── Table ── */
+.table-wrap{flex:1;overflow-y:auto}
+.table-wrap::-webkit-scrollbar{width:4px}
+.table-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+table{width:100%;border-collapse:collapse}
+thead{position:sticky;top:0;z-index:2}
+th{
+  padding:10px 18px;background:var(--bg3);border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:9px;font-weight:600;color:var(--text3);
+  letter-spacing:.1em;text-transform:uppercase;text-align:left;white-space:nowrap
+}
+td{padding:13px 18px;border-bottom:1px solid rgba(30,45,72,.6);font-size:12px;color:var(--text);vertical-align:middle}
+tr:hover td{background:var(--bg2);cursor:pointer}
+.badge{display:inline-flex;align-items:center;font-family:var(--mono);font-size:9px;font-weight:600;padding:3px 8px;border-radius:3px}
+.badge.resolved{color:var(--teal);background:var(--teal-bg);border:1px solid rgba(0,229,190,.2)}
+.badge.escalated{color:var(--amber);background:var(--amber-bg);border:1px solid rgba(255,181,71,.2)}
+.badge.open{color:var(--blue);background:var(--blue-bg);border:1px solid rgba(77,142,255,.2)}
+.fault-tag{font-family:var(--mono);font-size:10px;color:var(--amber)}
+.fix-tag{font-family:var(--mono);font-size:10px;color:var(--teal)}
+.acct{font-family:var(--mono);font-size:10px;color:var(--text2)}
+.dur{font-family:var(--mono);font-size:10px;color:var(--text2)}
+.model-tag{font-family:var(--mono);font-size:10px;color:var(--text2)}
+.ts{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.steps-count{
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  padding:2px 7px;border-radius:10px;background:var(--purple-bg);
+  color:var(--purple);border:1px solid rgba(167,139,255,.2)
+}
+.view-btn{
+  font-family:var(--mono);font-size:9px;color:var(--blue);
+  background:var(--blue-bg);border:1px solid rgba(77,142,255,.2);
+  border-radius:4px;padding:4px 10px;cursor:pointer;transition:all .15s
+}
+.view-btn:hover{background:rgba(77,142,255,.15);color:var(--white)}
+
+/* ── Detail modal ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;
+  display:none;animation:fadeIn .2s ease
+}
+.modal-overlay.open{display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto}
+.modal{
+  background:var(--bg2);border:1px solid var(--border2);border-radius:16px;
+  width:100%;max-width:820px;box-shadow:0 40px 80px rgba(0,0,0,.6);
+  animation:slideUp .25s ease;flex-shrink:0
+}
+.modal-hdr{
+  padding:22px 28px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:14px
+}
+.mh-icon{
+  width:42px;height:42px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:20px
+}
+.mh-icon.resolved{background:var(--teal-bg);border:1px solid rgba(0,229,190,.2)}
+.mh-icon.escalated{background:var(--amber-bg);border:1px solid rgba(255,181,71,.2)}
+.mh-icon.open{background:var(--blue-bg);border:1px solid rgba(77,142,255,.2)}
+.mh-title{font-size:17px;font-weight:700;color:var(--white);letter-spacing:-.02em;margin-bottom:4px}
+.mh-sub{font-size:12px;color:var(--text2);font-family:var(--mono)}
+.mh-close{margin-left:auto;width:32px;height:32px;border:1px solid var(--border2);border-radius:7px;background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s;flex-shrink:0}
+.mh-close:hover{background:var(--red-bg);color:var(--red);border-color:rgba(255,92,92,.3)}
+
+.modal-body{padding:24px 28px;display:flex;flex-direction:column;gap:22px}
+
+/* Meta grid */
+.meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.meta-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.meta-key{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.meta-val{font-size:13px;font-weight:600;color:var(--white)}
+.meta-val.teal{color:var(--teal)} .meta-val.amber{color:var(--amber)} .meta-val.red{color:var(--red)} .meta-val.green{color:var(--green)}
+.meta-val.mono{font-family:var(--mono);font-size:11px}
+
+/* Section title */
+.sect-title{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sect-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Layer trace */
+.layer-trace{display:flex;flex-direction:column;gap:10px}
+.layer-card{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.lc-hdr{
+  padding:10px 14px;display:flex;align-items:center;gap:10px;
+  background:var(--bg3);border-bottom:1px solid var(--border);cursor:pointer;
+  transition:background .15s
+}
+.lc-hdr:hover{background:var(--bg4)}
+.lc-num{
+  width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;font-weight:600;flex-shrink:0
+}
+.lc-num.ok{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(0,229,190,.3)}
+.lc-num.err{background:var(--red-bg);color:var(--red);border:1px solid rgba(255,92,92,.3)}
+.lc-layer{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--white)}
+.lc-port{font-family:var(--mono);font-size:9px;color:var(--text2);padding:1px 6px;background:var(--bg);border:1px solid var(--border2);border-radius:3px}
+.lc-tool{font-family:var(--mono);font-size:10px;color:var(--teal)}
+.lc-ok{font-family:var(--mono);font-size:9px;font-weight:600;margin-left:auto}
+.lc-ok.ok{color:var(--teal)} .lc-ok.err{color:var(--red)}
+.lc-desc{font-size:11px;color:var(--text2);margin-left:auto;font-style:italic}
+.lc-body{padding:12px 14px;display:none;background:var(--bg)}
+.lc-body.open{display:block}
+.lc-section{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;margin-top:10px}
+.lc-section:first-child{margin-top:0}
+.param-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.param-row{display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:5px;background:var(--bg2);font-size:11px}
+.param-key{color:var(--text2);font-family:var(--mono);font-size:10px}
+.param-val{font-family:var(--mono);font-size:10px;max-width:200px;text-align:right;overflow:hidden;text-overflow:ellipsis}
+.param-val.ok{color:var(--teal)} .param-val.err{color:var(--red)} .param-val.warn{color:var(--amber)} .param-val.dim{color:var(--text)}
+
+/* Router state diff */
+.state-diff{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.state-panel{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px}
+.sp-title{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.sp-title.before{color:var(--red)} .sp-title.after{color:var(--teal)}
+.sp-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(30,45,72,.5);font-size:10px}
+.sp-row:last-child{border-bottom:none}
+.sp-key{color:var(--text2);font-family:var(--mono)}
+.sp-val{font-family:var(--mono)}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.row-in{animation:fadeIn .2s ease}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <a class="tb-back" href="/noc">← NOC</a>
+    <div class="tb-sep"></div>
+    <span class="tb-logo">NOC</span>
+    <div class="tb-sep"></div>
+    <span class="tb-title">Ticket Management</span>
+    <div class="tb-right">
+      <span class="tb-clock" id="tb-clock">00:00:00</span>
+      <div class="tb-sep"></div>
+      <span class="tb-admin" id="tb-admin">—</span>
+      <button class="tb-logout" onclick="logout()">LOGOUT</button>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="sc"><div class="sc-icon teal">🎫</div><div><div class="sc-val teal" id="s-total">—</div><div class="sc-label">Total Tickets</div></div></div>
+    <div class="sc"><div class="sc-icon green">✓</div><div><div class="sc-val green" id="s-res">—</div><div class="sc-label">Resolved</div><div class="sc-sub" id="s-res-pct">—</div></div></div>
+    <div class="sc"><div class="sc-icon amber">⏳</div><div><div class="sc-val amber" id="s-esc">—</div><div class="sc-label">Escalated</div></div></div>
+    <div class="sc"><div class="sc-icon blue">●</div><div><div class="sc-val blue" id="s-open">—</div><div class="sc-label">Open</div></div></div>
+    <div class="sc"><div class="sc-icon teal">⚡</div><div><div class="sc-val teal" id="s-avgtime">—</div><div class="sc-label">Avg Resolution</div><div class="sc-sub">seconds</div></div></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="filter-tabs">
+      <button class="ft active" onclick="setFilter(null,this)">ALL</button>
+      <button class="ft" onclick="setFilter('resolved',this)">RESOLVED</button>
+      <button class="ft" onclick="setFilter('escalated',this)">ESCALATED</button>
+      <button class="ft" onclick="setFilter('open',this)">OPEN</button>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="search" placeholder="Search account, fault, problem..." oninput="applySearch()">
+    </div>
+    <div class="ctrl-right">
+      <span class="total-badge" id="showing-count">—</span>
+      <button class="refresh-btn" onclick="loadTickets()">⟳ Refresh</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Status</th><th>Customer</th><th>Problem</th>
+          <th>Fault</th><th>Fix</th><th>Router</th><th>Duration</th>
+          <th>Steps</th><th>Date</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="ticket-body">
+        <tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text2)">Loading tickets…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- .shell -->
+
+<!-- Detail modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-hdr">
+      <div class="mh-icon" id="mh-icon">🎫</div>
+      <div>
+        <div class="mh-title" id="mh-title">Ticket</div>
+        <div class="mh-sub" id="mh-sub">—</div>
+      </div>
+      <button class="mh-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <div style="text-align:center;padding:40px;color:var(--text2)">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let allTickets = [];
+let currentFilter = null;
+let searchTerm = '';
+
+// ── Clock ──────────────────────────────────────────────────────────────────
+function updateClock(){
+  document.getElementById('tb-clock').textContent = new Date().toLocaleTimeString('en-GB',{hour12:false});
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// ── Auth check ─────────────────────────────────────────────────────────────
+async function checkAuth(){
+  const r = await fetch('/api/noc/fleet');
+  if(r.status === 401){ window.location.href='/noc'; return false; }
+  return true;
+}
+
+async function logout(){ await fetch('/api/noc/logout',{method:'POST'}); window.location.href='/noc'; }
+
+// ── Load tickets ───────────────────────────────────────────────────────────
+async function loadTickets(){
+  try{
+    const r   = await fetch('/api/noc/tickets/search?limit=200');
+    const d   = await r.json();
+    allTickets = d.tickets || [];
+    computeStats();
+    render();
+  }catch(e){
+    document.getElementById('ticket-body').innerHTML=
+      `<tr><td colspan="11" style="color:var(--red);text-align:center;padding:24px">Error: ${e}</td></tr>`;
+  }
+}
+
+function computeStats(){
+  const res  = allTickets.filter(t=>t.status==='resolved');
+  const esc  = allTickets.filter(t=>t.status==='escalated');
+  const open = allTickets.filter(t=>t.status==='open');
+  const times = res.filter(t=>t.resolution_time_s).map(t=>t.resolution_time_s);
+  const avg  = times.length ? Math.round(times.reduce((a,b)=>a+b,0)/times.length) : null;
+
+  document.getElementById('s-total').textContent = allTickets.length;
+  document.getElementById('s-res').textContent   = res.length;
+  document.getElementById('s-res-pct').textContent= allTickets.length ? Math.round(res.length/allTickets.length*100)+'% resolve rate' : '';
+  document.getElementById('s-esc').textContent   = esc.length;
+  document.getElementById('s-open').textContent  = open.length;
+  document.getElementById('s-avgtime').textContent= avg ? avg+'s' : '—';
+}
+
+// ── Filter + search ────────────────────────────────────────────────────────
+function setFilter(status, btn){
+  currentFilter = status;
+  document.querySelectorAll('.ft').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+function applySearch(){
+  searchTerm = document.getElementById('search').value.toLowerCase();
+  render();
+}
+
+function render(){
+  let tickets = allTickets;
+  if(currentFilter) tickets = tickets.filter(t=>t.status===currentFilter);
+  if(searchTerm) tickets = tickets.filter(t=>{
+    const s = (t.account_id||'')+' '+(t.customer_name||'')+' '+(t.problem_description||'')+' '+(t.fault_detected||'')+' '+(t.router_model||'');
+    return s.toLowerCase().includes(searchTerm);
+  });
+  document.getElementById('showing-count').textContent = `${tickets.length} tickets`;
+  renderRows(tickets);
+}
+
+function renderRows(tickets){
+  const body = document.getElementById('ticket-body');
+  if(!tickets.length){
+    body.innerHTML='<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--text2)">No tickets found</td></tr>';
+    return;
+  }
+  body.innerHTML = tickets.map((t,i)=>{
+    const stCls = t.status||'open';
+    const stIcon = {resolved:'✓',escalated:'⏳',open:'●'}[t.status]||'?';
+    const date  = t.created_at ? new Date(t.created_at).toLocaleDateString('en-GB')+' '+new Date(t.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '—';
+    const dur   = t.resolution_time_s ? `${t.resolution_time_s}s` : '—';
+    const steps = (t.agent_trace||[]).length;
+    const prob  = (t.problem_description||'').slice(0,45);
+    const tid   = t.ticket_id || '';
+    return `<tr class="row-in" onclick="openModal('${tid}')">
+      <td class="acct">${tid?tid.slice(-6).toUpperCase():'—'}</td>
+      <td><span class="badge ${stCls}">${stIcon} ${t.status}</span></td>
+      <td>
+        <div style="font-weight:500;font-size:12px">${t.customer_name||'—'}</div>
+        <div class="acct">${t.account_id||''}</div>
+      </td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${prob}</td>
+      <td class="fault-tag">${(t.fault_detected||'—').replace(/_/g,' ')}</td>
+      <td class="fix-tag">${(t.fix_applied||t.escalation_reason?'escalated':'—').replace(/_/g,' ').slice(0,20)}</td>
+      <td class="model-tag">${t.router_model||'—'}</td>
+      <td class="dur">${dur}</td>
+      <td><span class="steps-count">${steps} steps</span></td>
+      <td class="ts">${date}</td>
+      <td><button class="view-btn" onclick="event.stopPropagation();openModal('${tid}')">VIEW LOG</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────
+async function openModal(ticketId){
+  if(!ticketId){return;}
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.add('open');
+  document.getElementById('modal-body').innerHTML=
+    '<div style="text-align:center;padding:48px;color:var(--text2)">Loading ticket…</div>';
+
+  try{
+    const r   = await fetch(`/api/noc/ticket/${ticketId}`);
+    const t   = await r.json();
+    if(t.error){
+      document.getElementById('modal-body').innerHTML=`<div style="color:var(--red);padding:24px">${t.error}</div>`;
+      return;
+    }
+    renderModal(t);
+  }catch(e){
+    document.getElementById('modal-body').innerHTML=`<div style="color:var(--red);padding:24px">Error: ${e}</div>`;
+  }
+}
+
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.getElementById('modal-overlay').classList.remove('open'); });
+
+function renderModal(t){
+  const stCls = t.status||'open';
+  const stIcon = {resolved:'✓',escalated:'⏳',open:'●'}[t.status]||'?';
+
+  // Header
+  const icon = document.getElementById('mh-icon');
+  icon.className = `mh-icon ${stCls}`;
+  icon.textContent = {resolved:'✅',escalated:'⏳',open:'🔵'}[t.status]||'🎫';
+  document.getElementById('mh-title').textContent = `Ticket #${t._id?.slice(-6).toUpperCase()||'—'} — ${(t.problem_description||'').slice(0,50)}`;
+  document.getElementById('mh-sub').textContent = `${t.customer_name||'?'} · ${t.account_id||'?'} · ${t.created_at?new Date(t.created_at).toLocaleString('en-GB'):'?'}`;
+
+  const dur = t.resolution_time_s ? `${t.resolution_time_s}s` : '—';
+  const steps = (t.full_log||t.agent_trace||[]).length;
+
+  document.getElementById('modal-body').innerHTML = `
+
+    <!-- Meta grid -->
+    <div class="meta-grid">
+      <div class="meta-card">
+        <div class="meta-key">Status</div>
+        <div class="meta-val ${stCls==='resolved'?'green':stCls==='escalated'?'amber':'blue'}">${stIcon} ${t.status}</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-key">Fault Detected</div>
+        <div class="meta-val amber mono">${(t.fault_detected||'—').replace(/_/g,' ')}</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-key">Fix Applied</div>
+        <div class="meta-val ${t.fix_applied?'teal':'red'} mono">${t.fix_applied?t.fix_applied.replace(/_/g,' '):(t.escalation_reason?'Escalated':'—')}</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-key">Resolution Time</div>
+        <div class="meta-val teal mono">${dur}</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-key">Router Model</div>
+        <div class="meta-val mono">${t.router_model||'—'}</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-key">Router Serial</div>
+        <div class="meta-val mono" style="font-size:10px">${t.router_serial||'—'}</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-key">Customer</div>
+        <div class="meta-val">${t.customer_name||'—'}</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-key">Diagnostic Steps</div>
+        <div class="meta-val blue">${steps} steps</div>
+      </div>
+    </div>
+
+    ${t.escalation_reason ? `
+    <div style="padding:12px 16px;background:var(--amber-bg);border:1px solid rgba(255,181,71,.3);border-radius:8px;font-size:12px;color:var(--amber)">
+      ⚠️ Escalation reason: ${t.escalation_reason}
+    </div>` : ''}
+
+    <!-- Layer trace -->
+    <div>
+      <div class="sect-title">Layer-by-Layer Diagnostic Trace</div>
+      <div class="layer-trace" id="layer-trace">
+        ${renderLayerTrace(t.full_log||[])}
+      </div>
+    </div>
+
+    <!-- Router state diff -->
+    ${t.router_state_before || t.router_state_after ? `
+    <div>
+      <div class="sect-title">Router State — Before & After</div>
+      <div class="state-diff">
+        <div class="state-panel">
+          <div class="sp-title before">● Before fix</div>
+          ${renderStateParams(t.router_state_before?.parameters||{})}
+        </div>
+        <div class="state-panel">
+          <div class="sp-title after">✓ After fix</div>
+          ${renderStateParams(t.router_state_after?.parameters||{},'after')}
+        </div>
+      </div>
+    </div>` : ''}
+
+  `;
+}
+
+function renderLayerTrace(log){
+  if(!log.length) return '<div style="color:var(--text2);font-size:12px;padding:12px">No trace data available for this ticket.</div>';
+
+  const layerColors = {
+    'GenieACS MCP':     {color:'teal', icon:'📡'},
+    'Diagnostic Engine':{color:'blue', icon:'🔍'},
+    'RaDuce MCP':       {color:'amber',icon:'🔧'},
+    'Customer MCP':     {color:'purple',icon:'🎫'},
+    'Neo4j MCP':        {color:'green', icon:'🗄️'},
+  };
+
+  return log.map((step, i) => {
+    const lc   = layerColors[step.layer] || {color:'dim', icon:'⚙️'};
+    const ok   = step.ok !== false;
+    const num  = i + 1;
+
+    const argsHtml  = renderKV(step.args||{});
+    const resultHtml= renderResult(step.result||{}, step.tool);
+
+    return `
+    <div class="layer-card">
+      <div class="lc-hdr" onclick="toggleLayer(this)">
+        <div class="lc-num ${ok?'ok':'err'}">${ok?num:'✗'}</div>
+        <span class="lc-layer">${step.layer||'Unknown'}</span>
+        <span class="lc-port">:${step.port||'?'}</span>
+        <span class="lc-tool">${step.tool||''}</span>
+        <span class="lc-desc">${step.description||''}</span>
+        <span class="lc-ok ${ok?'ok':'err'}">${ok?'✓ OK':'✗ FAIL'}</span>
+      </div>
+      <div class="lc-body">
+        ${step.args && Object.keys(step.args).length ? `
+          <div class="lc-section">Input Parameters</div>
+          <div class="param-grid">${argsHtml}</div>` : ''}
+
+        ${step.tr069_paths_read && step.tr069_paths_read.length ? `
+          <div class="lc-section" style="margin-top:10px">TR-069 Paths Read (from Neo4j Graph)</div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            ${step.tr069_paths_read.map(p=>`
+              <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;background:var(--bg2);border-radius:5px;border-left:2px solid var(--blue)">
+                <span style="font-size:10px;color:var(--text2);flex-shrink:0;min-width:90px">${p.label||''}</span>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--blue);word-break:break-all">${p.path||''}</span>
+                ${p.value!=null?`<span style="font-family:var(--mono);font-size:10px;margin-left:auto;flex-shrink:0;color:${classifyVal('status',String(p.value))==='ok'?'var(--teal)':classifyVal('status',String(p.value))==='err'?'var(--red)':'var(--amber)'}">${p.value}</span>`:''}
+              </div>`).join('')}
+          </div>` : ''}
+
+        ${step.tr069_paths_written && step.tr069_paths_written.length ? `
+          <div class="lc-section" style="margin-top:10px">TR-069 Paths Written (SetParameterValues)</div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            ${step.tr069_paths_written.map(p=>`
+              <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;background:var(--bg2);border-radius:5px;border-left:2px solid var(--teal)">
+                <span style="font-size:10px;color:var(--text2);flex-shrink:0;min-width:90px">${p.label||''}</span>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--teal);word-break:break-all">${p.path||''}</span>
+                <span style="font-size:9px;color:var(--text3);margin-left:auto;flex-shrink:0">${p.category||''}</span>
+              </div>`).join('')}
+          </div>` : ''}
+
+        <div class="lc-section" style="margin-top:${(step.args&&Object.keys(step.args).length)||(step.tr069_paths_read&&step.tr069_paths_read.length)?'10px':'0'}">Result</div>
+        ${resultHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleLayer(hdr){
+  const body = hdr.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function renderKV(obj, depth=0){
+  if(!obj || typeof obj !== 'object') return `<div class="param-row"><span class="param-val dim">${JSON.stringify(obj)}</span></div>`;
+  return Object.entries(obj).slice(0,20).map(([k,v])=>{
+    const vs = v===null?'null':typeof v==='object'?JSON.stringify(v).slice(0,60):String(v);
+    const cls = classifyVal(k,vs);
+    return `<div class="param-row"><span class="param-key">${k}</span><span class="param-val ${cls}">${vs}</span></div>`;
+  }).join('');
+}
+
+function classifyVal(key,val){
+  const k=key.toLowerCase(), v=String(val).toLowerCase();
+  if(k.includes('status')&&v==='connected') return 'ok';
+  if(k.includes('status')&&(v==='disconnected'||v==='error')) return 'err';
+  if(k.includes('error')&&v==='none') return 'ok';
+  if(k.includes('error')&&v!=='none'&&v!=='null') return 'warn';
+  if(k.includes('rx')&&!isNaN(parseFloat(val))) return parseFloat(val)<-27?'err':'ok';
+  if(k.includes('dns')&&v==='0.0.0.0') return 'err';
+  if(k.includes('success')&&v==='true') return 'ok';
+  if(k.includes('ok')&&v==='true') return 'ok';
+  if(k.includes('ok')&&v==='false') return 'err';
+  return 'dim';
+}
+
+function renderResult(result, tool){
+  if(!result||typeof result!=='object') return `<div style="font-family:var(--mono);font-size:11px;color:var(--text2)">${result}</div>`;
+  if(result.error) return `<div style="padding:8px 10px;background:var(--red-bg);border-radius:6px;font-family:var(--mono);font-size:11px;color:var(--red)">✗ ${result.error}</div>`;
+
+  // For diagnose results, show nicely
+  if(tool==='diagnose'){
+    return `<div class="param-grid">
+      <div class="param-row"><span class="param-key">fault_detected</span><span class="param-val warn">${result.fault_detected||'—'}</span></div>
+      <div class="param-row"><span class="param-key">fix_tool</span><span class="param-val teal">${result.fix_tool||'—'}</span></div>
+    </div>`;
+  }
+
+  // For state results, show key params
+  if(result.parameters){
+    const p = result.parameters;
+    const keyParams = ['PPPStatus','ConnectionStatus','VLANId','DNSServer','RXPower','ErrorCount','Uptime','LastConnectionError'];
+    return `<div class="param-grid">
+      ${keyParams.filter(k=>p[k]!==undefined).map(k=>`
+        <div class="param-row">
+          <span class="param-key">${k}</span>
+          <span class="param-val ${classifyVal(k,p[k])}">${p[k]}</span>
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--text3)">
+      Status: <span style="color:${result.status==='UP'?'var(--teal)':'var(--red)'}">${result.status}</span>
+      · Fault: <span style="color:var(--amber)">${result.fault||'healthy'}</span>
+    </div>`;
+  }
+
+  // Generic result
+  const entries = Object.entries(result).filter(([k])=>!['parameters'].includes(k)).slice(0,10);
+  return `<div class="param-grid">${entries.map(([k,v])=>`
+    <div class="param-row"><span class="param-key">${k}</span><span class="param-val ${classifyVal(k,v)}">${String(v).slice(0,60)}</span></div>
+  `).join('')}</div>`;
+}
+
+function renderStateParams(params, mode=''){
+  const keys = ['PPPStatus','LastConnectionError','ConnectionStatus','VLANId','ExternalIPAddress','DNSServer','DNSStatus','RXPower','TXPower','Temperature','ErrorCount','Uptime'];
+  return keys.filter(k=>params[k]!==undefined).map(k=>{
+    const v   = String(params[k]);
+    const cls = classifyVal(k, v);
+    return `<div class="sp-row"><span class="sp-key">${k}</span><span class="sp-val" style="color:${cls==='ok'?'var(--teal)':cls==='err'?'var(--red)':cls==='warn'?'var(--amber)':'var(--text2)'}">${v}</span></div>`;
+  }).join('');
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+(async()=>{
+  const ok = await checkAuth();
+  if(!ok) return;
+  // Get admin name
+  try{
+    const r=await fetch('/api/noc/fleet');
+    if(r.ok) document.getElementById('tb-admin').textContent='Admin';
+  }catch(e){}
+  loadTickets();
+})();
+</script>
+</body>
+</html>

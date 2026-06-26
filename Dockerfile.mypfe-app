@@ -1,0 +1,5 @@
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install flask requests "mcp>=1.13.0"
+COPY mypfe-app/ .
+CMD ["python", "app.py"]
