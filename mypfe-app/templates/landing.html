@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Byrsa — Smart Customer Care</title>
+<meta name="description" content="Byrsa réinvente le support télécom grâce à l'IA agentive : diagnostic et réparation autonomes, 24/7, multilingue.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0A0E1A;--ink2:#141928;--ink3:#1C2436;--ink4:#232D42;
+  --edge:rgba(255,255,255,.07);--edge2:rgba(255,255,255,.13);
+  --sky:#4F8EF7;--sky2:#6AA3FF;--sky3:#2563EB;
+  --mint:#22D3B0;--mint2:#0FA891;
+  --lime:#C6EE00;--lime2:#A6C700;
+  --rose:#F45B69;--rose2:#FF7080;
+  --mist:#8899BB;--mist2:#5A6E8C;--mist3:#3A4E6A;
+  --white:#FFFFFF;
+  --mono:'Space Mono',monospace;
+  --sans:'Space Grotesk',sans-serif;
+}
+html,body{min-height:100%;font-family:var(--sans);background:var(--ink);color:#C8D8F0;-webkit-font-smoothing:antialiased}
+img,svg{display:block}
+a{color:inherit}
+
+/* ── noise + aurora (shared with the rest of the Byrsa product family) ── */
+body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aurora-band{position:absolute;border-radius:50%;filter:blur(110px);opacity:.14}
+.aurora-band:nth-child(1){width:900px;height:520px;background:#1E40AF;top:-18%;left:-15%;animation:drift 22s ease-in-out infinite}
+.aurora-band:nth-child(2){width:720px;height:420px;background:var(--mint2);bottom:-18%;right:-10%;animation:drift 26s ease-in-out infinite reverse}
+.aurora-band:nth-child(3){width:520px;height:320px;background:#5B21B6;top:35%;left:42%;opacity:.10;animation:drift 19s ease-in-out infinite 5s}
+@keyframes drift{0%,100%{transform:translate(0,0)}33%{transform:translate(40px,-30px)}66%{transform:translate(-25px,40px)}}
+.gridlines{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:44px 44px;mask-image:radial-gradient(ellipse 70% 60% at 60% 20%,#000 30%,transparent 75%)}
+
+.shell{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── NAV ── */
+nav{height:64px;flex-shrink:0;display:flex;align-items:center;padding:0 32px;gap:14px;
+  background:rgba(10,14,26,.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge);
+  position:sticky;top:0;z-index:20}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo{height:32px;width:auto;display:block}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.lang-sw{display:flex;background:var(--ink3);border:1px solid var(--edge);border-radius:6px;padding:2px;gap:1px}
+.lang-sw button{padding:4px 11px;border-radius:4px;border:none;background:transparent;color:var(--mist);font-size:10px;font-weight:600;cursor:pointer;font-family:var(--sans);letter-spacing:.05em;transition:all .15s}
+.lang-sw button.on{background:var(--sky);color:var(--white);box-shadow:0 2px 6px rgba(79,142,247,.4)}
+.nav-signin{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9px;border:1px solid var(--edge2);background:rgba(255,255,255,.03);color:var(--white);font-size:12.5px;font-weight:600;text-decoration:none;transition:all .18s}
+.nav-signin:hover{border-color:rgba(198,238,0,.4);background:rgba(198,238,0,.06);color:var(--lime)}
+
+/* ── HERO ── */
+.hero{flex:1;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;padding:64px 32px 56px;max-width:1280px;margin:0 auto;width:100%}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-family:var(--mono);letter-spacing:.14em;color:var(--lime);background:rgba(198,238,0,.08);border:1px solid rgba(198,238,0,.22);padding:6px 13px;border-radius:20px;margin-bottom:22px}
+.eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--lime);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+h1{font-size:clamp(30px,4.2vw,50px);font-weight:700;letter-spacing:-.035em;line-height:1.06;color:var(--white);margin-bottom:20px}
+h1 .hl{background:linear-gradient(90deg,var(--sky2),var(--mint) 55%,var(--lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:15.5px;line-height:1.7;color:var(--mist);max-width:480px;margin-bottom:32px}
+.hero-cta{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.cta-btn{display:inline-flex;align-items:center;gap:9px;padding:15px 26px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,var(--lime),var(--lime2));color:#0A2100;font-size:14.5px;font-weight:700;
+  text-decoration:none;letter-spacing:-.01em;box-shadow:0 10px 30px rgba(198,238,0,.22);transition:all .22s}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(198,238,0,.32)}
+.cta-secondary{font-size:13px;font-weight:600;color:var(--mist);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .18s}
+.cta-secondary:hover{color:var(--sky2)}
+
+/* ── DASHBOARD MOCK ── */
+.dash-wrap{position:relative;display:flex;justify-content:center}
+.dash-card{width:100%;max-width:420px;background:rgba(16,20,32,.85);backdrop-filter:blur(24px);border:1px solid var(--edge2);border-radius:18px;padding:20px 20px 22px;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.02);animation:floaty 7s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.dash-hd{display:flex;align-items:center;gap:9px;margin-bottom:16px}
+.dash-dots{display:flex;gap:5px}
+.dash-dots i{width:8px;height:8px;border-radius:50%;background:var(--ink4);display:block}
+.dash-dots i:nth-child(1){background:var(--rose)}.dash-dots i:nth-child(2){background:#F4A72A}.dash-dots i:nth-child(3){background:var(--mint)}
+.dash-title{font-size:10px;font-family:var(--mono);letter-spacing:.1em;color:var(--mist2);text-transform:uppercase}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dash-tile{background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:12px;padding:13px 14px;position:relative;overflow:hidden}
+.dash-tile.wide{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between}
+.dt-label{font-size:9.5px;color:var(--mist2);font-weight:600;letter-spacing:.02em;margin-bottom:6px}
+.dt-value{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--white);letter-spacing:-.02em}
+.dt-value .dt-sub{font-size:12px;color:var(--mist2);font-weight:400;margin-left:2px}
+.dt-value.g{color:var(--mint)}.dt-value.r{color:var(--rose2)}
+.dt-spark{width:100%;height:26px;margin-top:6px}
+.dt-gauge{margin-top:9px;height:6px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden}
+.dt-gauge-fill{height:100%;width:var(--pct);border-radius:4px;background:linear-gradient(90deg,var(--mint2),var(--lime));transition:width 1s ease}
+.dt-bars{display:flex;align-items:flex-end;gap:3px;height:26px;margin-top:6px}
+.dt-bars i{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(180deg,var(--sky2),var(--sky3));height:var(--h);display:block;transition:height .8s ease}
+.dash-badge{position:absolute;top:-14px;right:18px;background:linear-gradient(135deg,var(--mint2),var(--lime));color:#06210F;font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.06em;padding:6px 12px;border-radius:20px;box-shadow:0 8px 20px rgba(198,238,0,.3)}
+.glow-ring{position:absolute;width:340px;height:340px;border-radius:50%;border:1px solid rgba(198,238,0,.12);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:ringPulse 4s ease infinite}
+@keyframes ringPulse{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:0;transform:translate(-50%,-50%) scale(1.12)}}
+
+/* ── FEATURE STRIP ── */
+.feat-strip{background:linear-gradient(90deg,#12306B,#1B49A0);border-top:1px solid rgba(255,255,255,.08);padding:18px 24px;flex-shrink:0}
+.feat-row{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px 24px}
+.feat-item{display:flex;align-items:center;gap:9px;color:#EAF1FF;font-size:12.5px;font-weight:600;white-space:nowrap}
+.feat-ic{width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:13px;flex-shrink:0}
+
+/* ── FOOTER ── */
+footer{padding:20px 24px 26px;text-align:center}
+.footer-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--mist3)}
+.footer-row a{color:var(--mist2);text-decoration:none;font-weight:600;transition:color .15s}
+.footer-row a:hover{color:var(--lime)}
+.footer-row .sep{opacity:.5}
+
+/* ── RESPONSIVE ── */
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;padding:44px 22px 40px;gap:44px}
+  .dash-wrap{order:-1}
+  .dash-card{max-width:460px}
+}
+@media (max-width:600px){
+  nav{padding:0 16px}
+  .feat-row{justify-content:flex-start}
+  h1{font-size:30px}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<div class="aurora"><div class="aurora-band"></div><div class="aurora-band"></div><div class="aurora-band"></div></div>
+<div class="gridlines"></div>
+
+<div class="shell">
+  <nav>
+    <a class="nav-brand" href="/">
+      <img class="nav-logo" src="/static/logo.png" alt="Byrsa — Smart Customer Care">
+    </a>
+    <div class="nav-right">
+      <div class="lang-sw">
+        <button id="lfr" class="on" onclick="setLang('fr')">FR</button>
+        <button id="len" onclick="setLang('en')">EN</button>
+      </div>
+      <a class="nav-signin" href="/app" id="nav-signin">Se connecter</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="eyebrow-dot"></span><span id="tag-eyebrow">IA AGENTIVE POUR LE SUPPORT TÉLÉCOM</span></div>
+      <h1 id="tag-h1">Réinventer le Support Télécom<br>avec l'<span class="hl">IA Agentive</span></h1>
+      <p class="hero-sub" id="tag-sub">Byrsa diagnostique et répare de façon autonome les problèmes de connectivité de vos clients, en temps réel — jour et nuit, sans agent humain.</p>
+      <div class="hero-cta">
+        <a class="cta-btn" href="/app" id="tag-cta">Découvrir nos solutions →</a>
+        <a class="cta-secondary" href="https://byrsa.ai/en/" target="_blank" rel="noopener noreferrer" id="tag-more">En savoir plus sur Byrsa →</a>
+      </div>
+    </div>
+
+    <div class="dash-wrap">
+      <div class="glow-ring"></div>
+      <div class="dash-card">
+        <div class="dash-badge" id="tag-badge">LIVE</div>
+        <div class="dash-hd">
+          <div class="dash-dots"><i></i><i></i><i></i></div>
+          <span class="dash-title" id="tag-dashtitle">TABLEAU DE BORD BYRSA</span>
+        </div>
+        <div class="dash-grid">
+          <div class="dash-tile">
+            <div class="dt-label" id="tag-l1">Sessions actives</div>
+            <div class="dt-value" id="dv-sessions">0</div>
+            <svg class="dt-spark" viewBox="0 0 100 30" preserveAspectRatio="none">
+              <defs><linearGradient id="gradSpark" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#22D3B0"/><stop offset="100%" stop-color="#C6EE00"/></linearGradient></defs>
+              <polyline points="0,25 15,20 30,22 45,12 60,15 75,6 90,10 100,4" fill="none" stroke="url(#gradSpark)" stroke-width="2.2"/>
+            </svg>
+          </div>
+          <div class="dash-tile">
+            <div class="dt-label" id="tag-l2">Indice d'humeur client</div>
+            <div class="dt-value g"><span id="dv-mood">0.0</span><span class="dt-sub">/10</span></div>
+            <div class="dt-gauge"><div class="dt-gauge-fill" id="dv-mood-fill" style="--pct:0%"></div></div>
+          </div>
+          <div class="dash-tile">
+            <div class="dt-label" id="tag-l3">Temps de réponse moyen</div>
+            <div class="dt-value"><span id="dv-resp">0.00</span><span class="dt-sub">s</span></div>
+            <div class="dt-bars">
+              <i style="--h:40%"></i><i style="--h:55%"></i><i style="--h:35%"></i><i style="--h:70%"></i>
+              <i style="--h:50%"></i><i style="--h:85%"></i><i style="--h:60%"></i><i style="--h:95%"></i>
+            </div>
+          </div>
+          <div class="dash-tile">
+            <div class="dt-label" id="tag-l5">Taux d'erreur</div>
+            <div class="dt-value r"><span id="dv-err">0.000</span><span class="dt-sub">%</span></div>
+          </div>
+          <div class="dash-tile wide">
+            <div><div class="dt-label" id="tag-l4">Volume de requêtes (24h)</div><div class="dt-value"><span id="dv-vol">0.0</span><span class="dt-sub">M</span></div></div>
+            <svg width="90" height="30" viewBox="0 0 90 30"><polyline points="0,26 10,20 20,23 30,14 40,17 50,8 60,12 70,5 80,9 90,3" fill="none" stroke="#4F8EF7" stroke-width="2.2"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="feat-strip">
+    <div class="feat-row">
+      <div class="feat-item"><span class="feat-ic">🔄</span><span id="feat-1">Expertise 360°</span></div>
+      <div class="feat-item"><span class="feat-ic">💬</span><span id="feat-2">Multi-canal</span></div>
+      <div class="feat-item"><span class="feat-ic">🌐</span><span id="feat-3">Multilingue</span></div>
+      <div class="feat-item"><span class="feat-ic">⏱</span><span id="feat-4">Disponible 24/7/365</span></div>
+      <div class="feat-item"><span class="feat-ic">📶</span><span id="feat-5">Expertise N1, N2, N3</span></div>
+      <div class="feat-item"><span class="feat-ic">🎭</span><span id="feat-6">Détection d'humeur client</span></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-row">
+      <span>© 2026 Byrsa</span><span class="sep">·</span>
+      <a href="https://byrsa.ai/en/" target="_blank" rel="noopener noreferrer">byrsa.ai</a><span class="sep">·</span>
+      <span id="tag-builtby">Conçu par</span>
+      <a href="https://tritux.com" target="_blank" rel="noopener noreferrer">Tritux Groupe</a><span class="sep">·</span>
+      <a href="https://www.linkedin.com/company/byrsa-ai/posts/?feedView=all" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+let lang = 'fr';
+
+const TX = {
+  fr:{
+    eyebrow:"IA AGENTIVE POUR LE SUPPORT TÉLÉCOM",
+    h1:"Réinventer le Support Télécom<br>avec l'<span class='hl'>IA Agentive</span>",
+    sub:"Byrsa diagnostique et répare de façon autonome les problèmes de connectivité de vos clients, en temps réel — jour et nuit, sans agent humain.",
+    cta:"Découvrir nos solutions →",more:"En savoir plus sur Byrsa →",signin:"Se connecter",
+    dashtitle:"TABLEAU DE BORD BYRSA",
+    l1:"Sessions actives",l2:"Indice d'humeur client",l3:"Temps de réponse moyen",l4:"Volume de requêtes (24h)",l5:"Taux d'erreur",
+    f1:"Expertise 360°",f2:"Multi-canal",f3:"Multilingue",f4:"Disponible 24/7/365",f5:"Expertise N1, N2, N3",f6:"Détection d'humeur client",
+    builtby:"Conçu par"
+  },
+  en:{
+    eyebrow:"AGENTIC AI FOR TELECOM SUPPORT",
+    h1:"Reinventing Telecom Support<br>with <span class='hl'>Agentic AI</span>",
+    sub:"Byrsa autonomously diagnoses and repairs your customers' connectivity issues in real time — day or night, no human agent required.",
+    cta:"Discover our solutions →",more:"Learn more about Byrsa →",signin:"Sign in",
+    dashtitle:"BYRSA OPERATIONS DASHBOARD",
+    l1:"Active Sessions",l2:"Client Mood Index",l3:"Avg Response Time",l4:"Query Volume (24h)",l5:"Error Rate",
+    f1:"360° Expertise",f2:"Multi-channel",f3:"Multilingual",f4:"Available 24/7/365",f5:"N1, N2, N3 Expertise",f6:"Customer Mood Detection",
+    builtby:"Built by"
+  }
+};
+
+function setLang(l){
+  lang = l;
+  document.getElementById('lfr').classList.toggle('on', l==='fr');
+  document.getElementById('len').classList.toggle('on', l==='en');
+  document.documentElement.lang = l;
+  applyTx();
+}
+
+function applyTx(){
+  const x = TX[lang];
+  document.getElementById('tag-eyebrow').textContent = x.eyebrow;
+  document.getElementById('tag-h1').innerHTML = x.h1;
+  document.getElementById('tag-sub').textContent = x.sub;
+  document.getElementById('tag-cta').textContent = x.cta;
+  document.getElementById('tag-more').textContent = x.more;
+  document.getElementById('nav-signin').textContent = x.signin;
+  document.getElementById('tag-dashtitle').textContent = x.dashtitle;
+  document.getElementById('tag-l1').textContent = x.l1;
+  document.getElementById('tag-l2').textContent = x.l2;
+  document.getElementById('tag-l3').textContent = x.l3;
+  document.getElementById('tag-l4').textContent = x.l4;
+  document.getElementById('tag-l5').textContent = x.l5;
+  document.getElementById('feat-1').textContent = x.f1;
+  document.getElementById('feat-2').textContent = x.f2;
+  document.getElementById('feat-3').textContent = x.f3;
+  document.getElementById('feat-4').textContent = x.f4;
+  document.getElementById('feat-5').textContent = x.f5;
+  document.getElementById('feat-6').textContent = x.f6;
+  document.getElementById('tag-builtby').textContent = x.builtby;
+}
+
+/* Animated dashboard counters — purely decorative, gives the mock dashboard a "live" feel */
+function animateValue(el, start, end, decimals, dur){
+  const t0 = performance.now();
+  function tick(now){
+    const p = Math.min((now - t0) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const v = start + (end - start) * ease;
+    el.textContent = decimals ? v.toFixed(decimals) : Math.round(v).toLocaleString();
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+setLang('fr');
+animateValue(document.getElementById('dv-sessions'), 0, 1452, 0, 1200);
+animateValue(document.getElementById('dv-mood'), 0, 8.9, 1, 1200);
+document.getElementById('dv-mood-fill').style.setProperty('--pct','89%');
+animateValue(document.getElementById('dv-resp'), 1, 0.12, 2, 1200);
+animateValue(document.getElementById('dv-err'), 1, 0.012, 3, 1200);
+animateValue(document.getElementById('dv-vol'), 0, 12.3, 1, 1200);
+</script>
+</body>
+</html>

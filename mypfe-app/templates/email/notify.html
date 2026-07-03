@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ subject }}</title>
+</head>
+<body style="margin:0;padding:0;background:#F2F4F8;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2F4F8;padding:32px 16px;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(10,14,26,.12);">
+        <!-- header -->
+        <tr>
+          <td style="background:#0A0E1A;padding:28px 32px;">
+            <img src="cid:byrsa_logo" width="150" alt="Byrsa" style="display:block;border:0;outline:none;">
+          </td>
+        </tr>
+        <!-- body -->
+        <tr>
+          <td style="padding:36px 34px 10px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 18px;">
+              <tr>
+                <td style="background:#FDECEC;border-radius:20px;padding:6px 14px;">
+                  <span style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#D9455F;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">{{ eyebrow }}</span>
+                </td>
+              </tr>
+            </table>
+            <h1 style="margin:0 0 14px;font-size:21px;font-weight:800;color:#0A0E1A;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">{{ greeting }}</h1>
+            <p style="margin:0 0 22px;font-size:14px;line-height:1.7;color:#4B5768;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">{{ intro }}</p>
+
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+              <tr>
+                <td style="background:#F7F9FC;border:1px solid #E7ECF3;border-left:4px solid #4F8EF7;border-radius:10px;padding:16px 18px;">
+                  <p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8899BB;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">{{ fault_label_head }}</p>
+                  <p style="margin:0;font-size:15px;font-weight:700;color:#0A0E1A;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">{{ fault_title }}</p>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:0 0 28px;font-size:14px;line-height:1.7;color:#4B5768;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">{{ description }}</p>
+
+            <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 30px;">
+              <tr>
+                <td style="border-radius:10px;background:#1E40AF;">
+                  <a href="{{ app_url }}" style="display:inline-block;padding:13px 26px;font-size:14px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:10px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">{{ cta }}</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- footer -->
+        <tr>
+          <td style="background:#F7F9FC;padding:20px 34px;border-top:1px solid #E7ECF3;">
+            <p style="margin:0;font-size:11px;color:#8899BB;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">{{ footer_note }}</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

@@ -155,6 +155,11 @@ services:
       GENIE_MCP: http://genie:8001/mcp/
       RADUCE_MCP: http://raduce:8002/mcp/
       CUSTOMER_MCP: http://customer:8003/mcp/
+      GMAIL_USER: ${GMAIL_USER:-}
+      GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD:-}
+      GMAIL_SMTP_HOST: smtp.gmail.com
+      GMAIL_SMTP_PORT: "587"
+      PYTHONUNBUFFERED: "1"
     networks:
       - mypfe-net
 

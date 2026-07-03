@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TOPNET Support</title>
+<title>Byrsa — Smart Customer Care</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -16,6 +16,7 @@
   --rose:#F45B69;--rose2:#FF7080;
   --gold:#F4A72A;--gold2:#FFB84D;
   --lime:#4ADE80;
+  --byrsa-lime:#C6EE00;--byrsa-lime2:#A6C700;
   --mist:#8899BB;--mist2:#5A6E8C;--mist3:#3A4E6A;
   --white:#FFFFFF;
   --mono:'Space Mono',monospace;
@@ -45,15 +46,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
   border-bottom:1px solid var(--edge);flex-shrink:0;position:relative;z-index:20
 }
 .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.brand-cube{
-  width:32px;height:32px;border-radius:8px;
-  background:linear-gradient(135deg,var(--sky3),var(--sky));
-  display:grid;place-items:center;flex-shrink:0;
-  box-shadow:0 0 16px rgba(79,142,247,.35)
-}
-.brand-cube svg{width:16px;height:16px}
-.brand-name{font-weight:700;font-size:14px;letter-spacing:.04em;color:var(--white)}
-.brand-name b{color:var(--sky2);font-weight:700}
+.nav-logo{height:30px;width:auto;display:block}
 .nav-tag{font-size:10px;font-family:var(--mono);color:var(--mist2);background:var(--ink3);border:1px solid var(--edge);padding:3px 9px;border-radius:4px}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .sys-status{display:flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono);color:var(--mist)}
@@ -63,6 +56,41 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .lang-sw{display:flex;background:var(--ink3);border:1px solid var(--edge);border-radius:6px;padding:2px;gap:1px}
 .lang-sw button{padding:3px 10px;border-radius:4px;border:none;background:transparent;color:var(--mist);font-size:10px;font-weight:600;cursor:pointer;font-family:var(--sans);letter-spacing:.05em;transition:all .15s}
 .lang-sw button.on{background:var(--sky);color:var(--white);box-shadow:0 2px 6px rgba(79,142,247,.4)}
+
+/* ── NOTIFICATION BELL ── */
+.bell-wrap{position:relative}
+.bell-btn{position:relative;width:32px;height:32px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--mist);cursor:pointer;display:grid;place-items:center;font-size:15px;transition:all .15s}
+.bell-btn:hover{background:var(--ink3);color:#C8D8F0;border-color:var(--edge2)}
+.bell-btn.ringing{animation:bellRing 0.6s ease}
+@keyframes bellRing{0%,100%{transform:rotate(0)}20%{transform:rotate(-15deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(5deg)}}
+.bell-badge{position:absolute;top:-4px;right:-4px;background:var(--rose);color:var(--white);font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 0 0 2px var(--ink)}
+.bell-badge.show{display:flex}
+.bell-dd{position:absolute;top:calc(100% + 10px);right:0;width:320px;max-height:420px;overflow-y:auto;background:rgba(16,20,32,.97);backdrop-filter:blur(24px);border:1px solid var(--edge2);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:100;opacity:0;transform:translateY(-6px);pointer-events:none;transition:all .18s ease}
+.bell-dd.open{opacity:1;transform:translateY(0);pointer-events:auto}
+.bell-dd::-webkit-scrollbar{width:3px}.bell-dd::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+.bell-dd-hd{padding:12px 15px;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--white);border-bottom:1px solid var(--edge)}
+.bell-item{display:flex;align-items:flex-start;gap:6px;padding:12px 10px 12px 15px;border-bottom:1px solid var(--edge);transition:background .15s}
+.bell-item:last-child{border-bottom:none}
+.bell-item:hover{background:rgba(79,142,247,.07)}
+.bell-item.unread{background:rgba(244,91,105,.05)}
+.bi-body{flex:1;min-width:0;text-align:left;background:transparent;border:none;cursor:pointer;padding:0;font-family:var(--sans)}
+.bi-main{font-size:12.5px;color:#C8D8F0;line-height:1.5;font-weight:500}
+.bi-main b{color:var(--white)}
+.bi-sub{font-size:11px;color:var(--sky2);font-weight:600;margin-top:4px}
+.bi-time{font-size:9px;font-family:var(--mono);color:var(--mist3);margin-top:5px}
+.bi-del{flex-shrink:0;width:22px;height:22px;border-radius:6px;border:none;background:transparent;color:var(--mist3);cursor:pointer;font-size:12px;display:grid;place-items:center;transition:all .15s}
+.bi-del:hover{background:rgba(244,91,105,.14);color:var(--rose2)}
+.bell-empty{padding:30px 18px;text-align:center;font-size:12px;color:var(--mist2)}
+
+/* quick-reply buttons inside chat */
+.qr-row{display:flex;gap:8px;margin-top:12px}
+.qr-btn{padding:8px 16px;border-radius:20px;border:1px solid var(--edge2);background:rgba(255,255,255,.04);color:#C8D8F0;font-size:12px;font-weight:600;font-family:var(--sans);cursor:pointer;transition:all .15s}
+.qr-btn:hover{border-color:rgba(79,142,247,.4);background:rgba(79,142,247,.1)}
+.qr-btn.yes{border-color:rgba(34,211,176,.3);color:var(--mint)}
+.qr-btn.yes:hover{background:rgba(34,211,176,.1)}
+.qr-btn.no{border-color:rgba(244,91,105,.25);color:var(--rose2)}
+.qr-btn.no:hover{background:rgba(244,91,105,.08)}
+.qr-row.disabled .qr-btn{opacity:.4;pointer-events:none}
 
 .main{flex:1;display:flex;overflow:hidden;position:relative}
 
@@ -81,11 +109,11 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 }
 .lcard::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(79,142,247,.5),transparent)}
 
-.ltag{display:inline-flex;align-items:center;gap:6px;margin-bottom:26px;font-size:9px;font-family:var(--mono);letter-spacing:.12em;color:var(--sky2);background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);padding:5px 12px;border-radius:20px}
-.ltag-dot{width:5px;height:5px;border-radius:50%;background:var(--sky2);animation:ledPulse 2s infinite}
+.ltag{display:inline-flex;align-items:center;gap:6px;margin-bottom:26px;font-size:9px;font-family:var(--mono);letter-spacing:.12em;color:var(--byrsa-lime);background:rgba(198,238,0,.08);border:1px solid rgba(198,238,0,.22);padding:5px 12px;border-radius:20px}
+.ltag-dot{width:5px;height:5px;border-radius:50%;background:var(--byrsa-lime);animation:ledPulse 2s infinite}
 
 .ltitle{font-size:28px;font-weight:700;letter-spacing:-.03em;color:var(--white);line-height:1.1;margin-bottom:8px}
-.ltitle .hl{background:linear-gradient(90deg,var(--sky2),var(--mint));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ltitle .hl{background:linear-gradient(90deg,var(--sky2),var(--mint) 60%,var(--byrsa-lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .lsub{font-size:13px;color:var(--mist);line-height:1.65;margin-bottom:28px}
 
 .lfield{margin-bottom:12px}
@@ -118,6 +146,15 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 
 .lerr{display:flex;align-items:center;gap:7px;margin-top:10px;padding:10px 13px;border-radius:9px;background:rgba(244,91,105,.1);border:1px solid rgba(244,91,105,.25);font-size:12px;color:var(--rose2);opacity:0;transition:opacity .2s;pointer-events:none}
 .lerr.show{opacity:1;pointer-events:auto}
+
+/* Footer credit */
+.footer-credit{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;font-size:10px;color:var(--mist3);padding:2px 4px;text-align:center}
+.footer-credit a{color:var(--mist2);text-decoration:none;font-weight:600;transition:color .15s}
+.footer-credit a:hover{color:var(--byrsa-lime)}
+.footer-credit .sep{color:var(--mist3);opacity:.5}
+.sb-credit{padding:9px 8px 2px;font-size:9px;color:var(--mist3);text-align:center;line-height:1.6}
+.sb-credit a{color:var(--mist2);text-decoration:none;font-weight:600}
+.sb-credit a:hover{color:var(--byrsa-lime)}
 
 /* Demo grid */
 .demo-panel{background:rgba(20,25,40,.6);backdrop-filter:blur(20px);border:1px solid var(--edge);border-radius:14px;padding:16px 18px}
@@ -170,8 +207,8 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .chat-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
 .chat-hd{padding:13px 22px;background:rgba(10,14,26,.6);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:11px;flex-shrink:0}
-.agent-av{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#065F46,var(--mint));display:grid;place-items:center;font-size:16px;position:relative;box-shadow:0 3px 10px rgba(34,211,176,.2)}
-.ag-dot{position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:var(--lime);border:2px solid var(--ink2);box-shadow:0 0 6px var(--lime)}
+.agent-av{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#065F46,var(--mint) 60%,var(--byrsa-lime));display:grid;place-items:center;font-size:16px;position:relative;box-shadow:0 3px 10px rgba(34,211,176,.2)}
+.ag-dot{position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:var(--byrsa-lime);border:2px solid var(--ink2);box-shadow:0 0 6px var(--byrsa-lime)}
 .ag-nm{font-size:13px;font-weight:600;color:var(--white);letter-spacing:-.01em}
 .ag-st{font-size:11px;color:var(--mint);font-weight:500}
 .ag-st.busy{color:var(--gold2)}
@@ -204,12 +241,12 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .mav.a{background:linear-gradient(135deg,#065F46,var(--mint));box-shadow:0 2px 8px rgba(34,211,176,.2)}
 .mav.u{background:linear-gradient(135deg,#1E40AF,var(--sky));box-shadow:0 2px 8px rgba(79,142,247,.2)}
 
-.bubble{max-width:73%;padding:13px 17px;border-radius:18px;font-size:13.5px;line-height:1.75;word-break:break-word}
+.bubble{max-width:100%;padding:13px 17px;border-radius:18px;font-size:13.5px;line-height:1.75;word-break:break-word}
 .bubble.a{background:rgba(20,25,40,.9);border:1px solid var(--edge2);border-bottom-left-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
 .bubble.u{background:linear-gradient(135deg,#1E3A8A,var(--sky));border-bottom-right-radius:4px;color:var(--white);box-shadow:0 6px 20px rgba(79,142,247,.28)}
 .bubble strong{font-weight:600}.bubble code{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.09);padding:2px 5px;border-radius:4px}
 .mtime{font-size:9px;font-family:var(--mono);color:var(--mist3);margin-top:4px;padding:0 3px}
-.mwrap{display:flex;flex-direction:column;max-width:73%}
+.mwrap{display:flex;flex-direction:column;width:fit-content;max-width:73%}
 .mwrap.u{align-items:flex-end}
 
 /* diagnostic trace */
@@ -311,6 +348,32 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .toast.show{transform:translateX(0)}
 .toast.ok{border-color:rgba(34,211,176,.3)}.toast.bad{border-color:rgba(244,91,105,.3)}
 
+/* ── EMAIL VERIFICATION GATE ── */
+#app.gated{filter:blur(10px) saturate(.7);pointer-events:none;user-select:none;transition:filter .25s ease}
+.egate{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:24px;
+  background:rgba(6,9,18,.6);backdrop-filter:blur(4px)}
+.egate.show{display:flex}
+.egate-card{width:100%;max-width:400px;background:rgba(20,25,40,.92);backdrop-filter:blur(32px);
+  border:1px solid var(--edge2);border-radius:20px;padding:36px 34px;position:relative;overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);animation:up .3s ease forwards}
+.egate-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(79,142,247,.5),transparent)}
+.egate-ic{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#1E40AF,var(--sky),var(--mint));display:grid;place-items:center;font-size:24px;margin-bottom:18px;box-shadow:0 8px 22px rgba(79,142,247,.3)}
+.egate-title{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--white);margin-bottom:8px}
+.egate-sub{font-size:12.5px;color:var(--mist);line-height:1.65;margin-bottom:24px}
+.egate-sub b{color:#C8D8F0;font-weight:600}
+.egate-step{display:none}
+.egate-step.on{display:block}
+.egate-code-row{display:flex;gap:8px}
+.egate-code-row input{text-align:center;letter-spacing:.06em;font-family:var(--mono);font-size:16px}
+.egate-actions{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.egate-link{background:none;border:none;color:var(--sky2);font-size:11.5px;font-weight:600;cursor:pointer;padding:4px 0;text-align:center;font-family:var(--sans)}
+.egate-link:hover{color:var(--sky)}
+.egate-link:disabled{color:var(--mist3);cursor:not-allowed}
+.egate-foot{margin-top:18px;padding-top:16px;border-top:1px solid var(--edge);text-align:center}
+.egate-signout{background:none;border:none;color:var(--mist3);font-size:11px;cursor:pointer;font-family:var(--sans)}
+.egate-signout:hover{color:var(--rose2)}
+.egate-ok{display:flex;align-items:center;gap:7px;margin-top:10px;padding:10px 13px;border-radius:9px;background:rgba(34,211,176,.1);border:1px solid rgba(34,211,176,.25);font-size:12px;color:var(--mint)}
+
 /* mobile */
 .sb-mob-btn{display:none;width:32px;height:32px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--mist);cursor:pointer;place-items:center;font-size:18px}
 .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:45;backdrop-filter:blur(3px)}
@@ -333,16 +396,75 @@ button:focus:not(:focus-visible){outline:none}
 <div class="toast" id="toast"></div>
 <div class="mob-overlay" id="mob-ov" onclick="closeSB()"></div>
 
+<!-- EMAIL VERIFICATION GATE -->
+<div class="egate" id="egate" role="dialog" aria-modal="true" aria-labelledby="egate-title">
+  <div class="egate-card">
+    <div class="egate-ic">📧</div>
+
+    <div class="egate-step on" id="egate-step-email">
+      <h2 class="egate-title" id="egate-title">Verify your email</h2>
+      <p class="egate-sub" id="egate-sub-email">Add your email address so we can send you an important account verification code before you continue.</p>
+      <div class="lfield">
+        <label class="lfl" id="egate-fl-email">Email Address</label>
+        <div class="lfwrap">
+          <span class="lficon">✉</span>
+          <input class="lfinput" id="egate-input-email" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+      </div>
+      <button class="lbtn" id="egate-send-btn" onclick="submitEmail()">
+        <div class="lspin" id="egate-send-spin"></div>
+        <span class="larr">→</span>
+        <span id="egate-send-txt">Send Code</span>
+      </button>
+      <div class="lerr" id="egate-err-email"><span>⚠</span> <span id="egate-err-email-msg"></span></div>
+    </div>
+
+    <div class="egate-step" id="egate-step-code">
+      <h2 class="egate-title" id="egate-code-title">Enter verification code</h2>
+      <p class="egate-sub">We sent a 6-digit code to <b id="egate-email-shown"></b>. Enter it below to continue.</p>
+      <div class="lfield">
+        <label class="lfl" id="egate-fl-code">Verification Code</label>
+        <div class="lfwrap egate-code-row" style="padding-left:0">
+          <input class="lfinput" id="egate-input-code" type="text" inputmode="numeric" maxlength="6" placeholder="000000" style="padding-left:14px">
+        </div>
+      </div>
+      <button class="lbtn" id="egate-verify-btn" onclick="submitCode()">
+        <div class="lspin" id="egate-verify-spin"></div>
+        <span class="larr">✓</span>
+        <span id="egate-verify-txt">Verify</span>
+      </button>
+      <div class="lerr" id="egate-err-code"><span>⚠</span> <span id="egate-err-code-msg"></span></div>
+      <div class="egate-ok" id="egate-sent-ok" style="display:none">✓ <span id="egate-sent-ok-msg">Code sent</span></div>
+      <div class="egate-actions">
+        <button class="egate-link" id="egate-resend-btn" onclick="resendCode()">Resend code</button>
+        <button class="egate-link" id="egate-change-btn" onclick="backToEmailStep()">Use a different email</button>
+      </div>
+    </div>
+
+    <div class="egate-foot">
+      <button class="egate-signout" id="egate-signout-btn" onclick="doLogout()">Sign out instead</button>
+    </div>
+  </div>
+</div>
+
 <div class="shell">
 <nav>
   <button class="sb-mob-btn" id="mob-btn" onclick="toggleSB()" style="display:none" aria-label="Open menu">☰</button>
-  <a class="nav-brand" href="#">
-    <div class="brand-cube"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-    <span class="brand-name">TOP<b>NET</b></span>
+  <a class="nav-brand" href="/">
+    <img class="nav-logo" src="/static/logo.png" alt="Byrsa — Smart Customer Care">
   </a>
-  <span class="nav-tag" id="nav-tag">support</span>
+  <span class="nav-tag" id="nav-tag">AI support</span>
   <div class="nav-right">
     <div class="sys-status"><div class="sys-led" id="sys-led"></div><span id="sys-txt">—</span></div>
+    <div class="bell-wrap" id="bell-wrap" style="display:none">
+      <button class="bell-btn" id="bell-btn" onclick="toggleBell()" aria-label="Notifications" aria-haspopup="true">
+        🔔<span class="bell-badge" id="bell-badge">0</span>
+      </button>
+      <div class="bell-dd" id="bell-dd" role="menu">
+        <div class="bell-dd-hd" id="bell-dd-hd">Notifications</div>
+        <div id="bell-list"></div>
+      </div>
+    </div>
     <div class="lang-sw">
       <button id="lfr" onclick="setLang('fr')">FR</button>
       <button id="len" class="on" onclick="setLang('en')">EN</button>
@@ -356,8 +478,8 @@ button:focus:not(:focus-visible){outline:none}
 <div id="login">
   <div class="lbox">
     <div class="lcard">
-      <div class="ltag"><div class="ltag-dot"></div><span id="ltag">AI-POWERED SUPPORT</span></div>
-      <h1 class="ltitle"><span id="lt1">Welcome to</span><br><span class="hl" id="lt2">TOPNET Support</span></h1>
+      <div class="ltag"><div class="ltag-dot"></div><span id="ltag">SMART CUSTOMER CARE</span></div>
+      <h1 class="ltitle"><span id="lt1">Welcome to</span><br><span class="hl" id="lt2">Byrsa Support</span></h1>
       <p class="lsub" id="lsub">Sign in with your phone number and PIN to get instant AI-powered diagnosis and repair.</p>
       <div class="lfield">
         <label class="lfl" id="lfl-phone">Phone Number</label>
@@ -390,6 +512,13 @@ button:focus:not(:focus-visible){outline:none}
         <div class="demo-c" onclick="fill('0663456789','3456')"><div class="demo-f">✓ Healthy Line</div><div class="demo-k">0663456789 · 3456</div></div>
       </div>
     </div>
+    <div class="footer-credit">
+      <span>Byrsa</span><span class="sep">·</span>
+      <a href="https://byrsa.ai/en/" target="_blank" rel="noopener noreferrer">byrsa.ai</a><span class="sep">·</span>
+      <span>Built by</span>
+      <a href="https://tritux.com" target="_blank" rel="noopener noreferrer">Tritux Groupe</a><span class="sep">·</span>
+      <a href="https://www.linkedin.com/company/byrsa-ai/posts/?feedView=all" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </div>
   </div>
 </div>
 
@@ -416,6 +545,7 @@ button:focus:not(:focus-visible){outline:none}
     </nav>
     <div class="sb-foot">
       <button class="sb-out" onclick="doLogout()">↩ <span id="sb-out-l">Sign Out</span></button>
+      <div class="sb-credit">Powered by <b style="color:var(--mist)">Byrsa</b> · <a href="https://tritux.com" target="_blank" rel="noopener noreferrer">Tritux Groupe</a></div>
     </div>
   </aside>
 
@@ -424,15 +554,11 @@ button:focus:not(:focus-visible){outline:none}
     <div class="chat-hd">
       <div class="agent-av">🤖<div class="ag-dot"></div></div>
       <div>
-        <div class="ag-nm" id="ag-nm">TOPNET AI Agent</div>
+        <div class="ag-nm" id="ag-nm">Byrsa AI Agent</div>
         <div class="ag-st" id="ag-st">Online · Ready to help</div>
       </div>
       <div class="hd-actions">
         <button class="hd-btn" onclick="clearChat()" title="Clear chat" aria-label="Clear chat">🗑</button>
-        <div class="lang-sw">
-          <button id="cfr" onclick="setLang('fr')">FR</button>
-          <button id="cen" class="on" onclick="setLang('en')">EN</button>
-        </div>
       </div>
     </div>
     <div class="msgs" id="msgs"></div>
@@ -466,7 +592,7 @@ let lang='en', cust=null, busy=false, tkCache=null;
 
 const TX = {
   en:{
-    ltag:'AI-POWERED SUPPORT',lt1:'Welcome to',lt2:'TOPNET Support',
+    ltag:'SMART CUSTOMER CARE',lt1:'Welcome to',lt2:'Byrsa Support',
     lsub:'Sign in with your phone and PIN to get instant AI-powered diagnosis.',
     lflPhone:'Phone Number',lflPin:'PIN Code',lbtn:'Sign In',lbusy:'Signing in…',
     demoHd:'🧪 Test Accounts — click to autofill',
@@ -481,10 +607,26 @@ const TX = {
     ihint:'Enter ↵ send · Shift+Enter new line',
     clearQ:'Clear chat history?',toastOut:'👋 Signed out',toastErr:'⚠ Connection error',
     connOk:'Services Online',connWarn:'Degraded',connErr:'Offline',
-    stBefore:'BEFORE',stAfter:'AFTER'
+    stBefore:'BEFORE',stAfter:'AFTER',
+    bellTitle:'Notifications',bellEmpty:'No notifications yet',bellSub:'Click to see more',bellDelete:'Delete notification',
+    yesBtn:'Yes',noBtn:'No',
+    botAskFix:'Would you like me to fix the problem?',
+    botNoInvestigate:"Okay, let me know if you'd like me to look into it.",
+    botNoFix:"No problem, I won't make any changes. Let me know if you change your mind.",
+    botAlreadyOk:'Good news — your connection looks healthy right now.',
+    newNotif:'🔔 New notification',
+    egateTitle:'Verify your email',egateSubEmail:'Add your email address so we can send you an important account verification code before you continue.',
+    egateFlEmail:'Email Address',egateSend:'Send Code',egateSending:'Sending…',
+    egateCodeTitle:'Enter verification code',egateFlCode:'Verification Code',
+    egateVerify:'Verify',egateVerifying:'Verifying…',
+    egateResend:'Resend code',egateResendWait:'Resend in {s}s',egateChangeEmail:'Use a different email',
+    egateSignOut:'Sign out instead',egateInvalidEmail:'Please enter a valid email address',
+    egateInvalidCode:'Please enter the 6-digit code',
+    egateCodeSent:'Code sent — check your inbox',egateEmailUpdated:'Verification email sent',
+    egateVerified:'✓ Email verified — welcome aboard!'
   },
   fr:{
-    ltag:'SUPPORT INTELLIGENT',lt1:'Bienvenue sur',lt2:'TOPNET Support',
+    ltag:'SUPPORT CLIENT INTELLIGENT',lt1:'Bienvenue sur',lt2:'Byrsa Support',
     lsub:'Connectez-vous pour obtenir une aide instantanée par intelligence artificielle.',
     lflPhone:'Numéro de téléphone',lflPin:'Code PIN',lbtn:'Se connecter',lbusy:'Connexion…',
     demoHd:'🧪 Comptes de test — cliquer pour remplir',
@@ -499,7 +641,23 @@ const TX = {
     ihint:'Entrée ↵ envoyer · Maj+Entrée saut de ligne',
     clearQ:"Effacer l'historique du chat ?",toastOut:'👋 Déconnexion réussie',toastErr:'⚠ Erreur de connexion',
     connOk:'Services actifs',connWarn:'Dégradé',connErr:'Hors ligne',
-    stBefore:'AVANT',stAfter:'APRÈS'
+    stBefore:'AVANT',stAfter:'APRÈS',
+    bellTitle:'Notifications',bellEmpty:'Aucune notification',bellSub:'Cliquez pour en savoir plus',bellDelete:'Supprimer la notification',
+    yesBtn:'Oui',noBtn:'Non',
+    botAskFix:'Souhaitez-vous que je corrige le problème ?',
+    botNoInvestigate:"D'accord, dites-moi si vous souhaitez que j'examine ça.",
+    botNoFix:"Très bien, je n'apporte aucune modification. Dites-moi si vous changez d'avis.",
+    botAlreadyOk:'Bonne nouvelle — votre connexion semble fonctionner normalement.',
+    newNotif:'🔔 Nouvelle notification',
+    egateTitle:'Vérifiez votre email',egateSubEmail:'Ajoutez votre adresse email pour recevoir un code de vérification avant de continuer.',
+    egateFlEmail:'Adresse Email',egateSend:'Envoyer le code',egateSending:'Envoi…',
+    egateCodeTitle:'Entrez le code de vérification',egateFlCode:'Code de vérification',
+    egateVerify:'Vérifier',egateVerifying:'Vérification…',
+    egateResend:'Renvoyer le code',egateResendWait:'Renvoyer dans {s}s',egateChangeEmail:'Utiliser une autre adresse',
+    egateSignOut:'Se déconnecter',egateInvalidEmail:'Veuillez saisir une adresse email valide',
+    egateInvalidCode:'Veuillez saisir le code à 6 chiffres',
+    egateCodeSent:'Code envoyé — vérifiez votre boîte de réception',egateEmailUpdated:'Email de vérification envoyé',
+    egateVerified:'✓ Email vérifié — bienvenue !'
   }
 };
 const QM = {
@@ -510,9 +668,9 @@ const t = k => (TX[lang]||TX.en)[k]||k;
 
 function setLang(l) {
   lang = l;
-  ['lfr','cfr'].forEach(id=>document.getElementById(id)?.classList.toggle('on',l==='fr'));
-  ['len','cen'].forEach(id=>document.getElementById(id)?.classList.toggle('on',l==='en'));
-  applyTx();
+  document.getElementById('lfr')?.classList.toggle('on',l==='fr');
+  document.getElementById('len')?.classList.toggle('on',l==='en');
+  applyTx();renderBellList();
 }
 function applyTx() {
   const map = {
@@ -520,10 +678,17 @@ function applyTx() {
     'lfl-phone':t('lflPhone'),'lfl-pin':t('lflPin'),'lbtn-txt':t('lbtn'),
     'demo-hd':t('demoHd'),'sb-nl':t('sbNl'),
     'nb-chat-l':t('nbChat'),'nb-tk-l':t('nbTk'),'sb-out-l':t('sbOut'),
-    'tk-title':t('tkTitle'),'ihint':t('ihint'),'ag-nm':'TOPNET AI Agent'
+    'tk-title':t('tkTitle'),'ihint':t('ihint'),'ag-nm':'Byrsa AI Agent',
+    'egate-title':t('egateTitle'),'egate-sub-email':t('egateSubEmail'),
+    'egate-fl-email':t('egateFlEmail'),'egate-send-txt':t('egateSend'),
+    'egate-code-title':t('egateCodeTitle'),'egate-fl-code':t('egateFlCode'),
+    'egate-verify-txt':t('egateVerify'),'egate-change-btn':t('egateChangeEmail'),
+    'egate-signout-btn':t('egateSignOut')
   };
   Object.entries(map).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=v;});
   const ui=document.getElementById('userinput');if(ui)ui.placeholder=t('wsub').slice(0,40)+'…';
+  const rb=document.getElementById('egate-resend-btn');
+  if(rb&&!rb.disabled)rb.textContent=t('egateResend');
 }
 
 /* SESSION */
@@ -587,8 +752,11 @@ function showLE(m){
 async function doLogout(){
   try{await fetch('/api/logout',{method:'POST'});}catch{}
   clearSess();tkCache=null;
+  closeEmailGate();
   document.getElementById('app').classList.remove('in');
   document.getElementById('login').classList.remove('out');
+  document.getElementById('bell-wrap').style.display='none';
+  closeBell();
   document.getElementById('linput-phone').value='';
   document.getElementById('linput-pin').value='';
   document.getElementById('lerr').classList.remove('show');
@@ -601,9 +769,121 @@ async function doLogout(){
 function toApp(){
   document.getElementById('login').classList.add('out');
   document.getElementById('app').classList.add('in');
-  populateSB();renderWelcome();loadTKBadge();
+  document.getElementById('bell-wrap').style.display='';
+  populateSB();renderWelcome();loadTKBadge();loadNotifications();
   if(window.innerWidth<=760)document.getElementById('mob-btn').style.display='grid';
+  checkEmailGate();
 }
+
+/* EMAIL VERIFICATION GATE */
+let resendTimer=null;
+function checkEmailGate(){
+  if(!cust||cust.email_verified){closeEmailGate();return;}
+  openEmailGate(cust.email?'code':'email');
+}
+function openEmailGate(step){
+  document.getElementById('app').classList.add('gated');
+  document.getElementById('egate').classList.add('show');
+  if(step==='code'){
+    document.getElementById('egate-email-shown').textContent=cust.email||'';
+    document.getElementById('egate-step-email').classList.remove('on');
+    document.getElementById('egate-step-code').classList.add('on');
+    document.getElementById('egate-input-code').value='';
+    setTimeout(()=>document.getElementById('egate-input-code')?.focus(),50);
+  }else{
+    document.getElementById('egate-step-code').classList.remove('on');
+    document.getElementById('egate-step-email').classList.add('on');
+    setTimeout(()=>document.getElementById('egate-input-email')?.focus(),50);
+  }
+}
+function closeEmailGate(){
+  document.getElementById('app').classList.remove('gated');
+  document.getElementById('egate').classList.remove('show');
+  clearInterval(resendTimer);resendTimer=null;
+}
+function backToEmailStep(){
+  document.getElementById('egate-err-code').classList.remove('show');
+  document.getElementById('egate-sent-ok').style.display='none';
+  clearInterval(resendTimer);resendTimer=null;
+  const rb=document.getElementById('egate-resend-btn');rb.disabled=false;rb.textContent=t('egateResend');
+  openEmailGate('email');
+}
+function egateShowErr(step,msg){
+  document.getElementById(`egate-err-${step}-msg`).textContent=msg;
+  document.getElementById(`egate-err-${step}`).classList.add('show');
+}
+function egateSetBusy(step,busy){
+  const btn=document.getElementById(step==='email'?'egate-send-btn':'egate-verify-btn');
+  const spin=document.getElementById(step==='email'?'egate-send-spin':'egate-verify-spin');
+  const txt=document.getElementById(step==='email'?'egate-send-txt':'egate-verify-txt');
+  btn.disabled=busy;spin.style.display=busy?'block':'none';
+  txt.textContent=busy?t(step==='email'?'egateSending':'egateVerifying'):t(step==='email'?'egateSend':'egateVerify');
+}
+function startResendCooldown(){
+  const rb=document.getElementById('egate-resend-btn');
+  let s=45;rb.disabled=true;rb.textContent=t('egateResendWait').replace('{s}',s);
+  clearInterval(resendTimer);
+  resendTimer=setInterval(()=>{
+    s--;
+    if(s<=0){clearInterval(resendTimer);resendTimer=null;rb.disabled=false;rb.textContent=t('egateResend');}
+    else rb.textContent=t('egateResendWait').replace('{s}',s);
+  },1000);
+}
+async function submitEmail(){
+  const input=document.getElementById('egate-input-email');
+  const email=input.value.trim();
+  document.getElementById('egate-err-email').classList.remove('show');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){egateShowErr('email',t('egateInvalidEmail'));return;}
+  egateSetBusy('email',true);
+  try{
+    const r=await fetch('/api/email/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    if(r.status===401){clearSess();doLogout();return;}
+    const d=await r.json();
+    if(d.success){
+      cust.email=email;cust.email_verified=false;saveSess();
+      openEmailGate('code');
+      document.getElementById('egate-sent-ok-msg').textContent=t('egateCodeSent');
+      document.getElementById('egate-sent-ok').style.display='flex';
+      startResendCooldown();
+    }else egateShowErr('email',d.error||t('toastErr'));
+  }catch{egateShowErr('email',t('toastErr'));}
+  egateSetBusy('email',false);
+}
+async function resendCode(){
+  const rb=document.getElementById('egate-resend-btn');
+  if(rb.disabled)return;
+  document.getElementById('egate-err-code').classList.remove('show');
+  try{
+    const r=await fetch('/api/email/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:cust.email})});
+    if(r.status===401){clearSess();doLogout();return;}
+    const d=await r.json();
+    if(d.success){
+      document.getElementById('egate-sent-ok-msg').textContent=t('egateCodeSent');
+      document.getElementById('egate-sent-ok').style.display='flex';
+      startResendCooldown();
+    }else egateShowErr('code',d.error||t('toastErr'));
+  }catch{egateShowErr('code',t('toastErr'));}
+}
+async function submitCode(){
+  const input=document.getElementById('egate-input-code');
+  const code=input.value.trim();
+  document.getElementById('egate-err-code').classList.remove('show');
+  if(!code){egateShowErr('code',t('egateInvalidCode'));return;}
+  egateSetBusy('code',true);
+  try{
+    const r=await fetch('/api/email/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
+    if(r.status===401){clearSess();doLogout();return;}
+    const d=await r.json();
+    if(d.success){
+      cust.email_verified=true;saveSess();
+      closeEmailGate();
+      toast(t('egateVerified'),'ok');
+    }else egateShowErr('code',d.error||t('toastErr'));
+  }catch{egateShowErr('code',t('toastErr'));}
+  egateSetBusy('code',false);
+}
+document.getElementById('egate-input-email').addEventListener('keydown',e=>{if(e.key==='Enter')submitEmail();});
+document.getElementById('egate-input-code').addEventListener('keydown',e=>{if(e.key==='Enter')submitCode();});
 
 function populateSB(){
   if(!cust)return;
@@ -701,6 +981,146 @@ function addTyping(){
 }
 function rmTyping(){document.getElementById('trow')?.remove();}
 function scrollB(){const m=document.getElementById('msgs');m.scrollTo({top:m.scrollHeight,behavior:'smooth'});}
+
+/* QUICK-REPLY (yes/no) ROWS */
+function addQuickReply(onYes,onNo){
+  document.getElementById('qr-row')?.remove();
+  const msgs=document.getElementById('msgs');
+  const row=document.createElement('div');row.className='qr-row';row.id='qr-row';
+  const bYes=document.createElement('button');bYes.className='qr-btn yes';bYes.textContent=t('yesBtn');
+  const bNo=document.createElement('button');bNo.className='qr-btn no';bNo.textContent=t('noBtn');
+  bYes.onclick=()=>{row.classList.add('disabled');onYes();};
+  bNo.onclick=()=>{row.classList.add('disabled');onNo();};
+  row.appendChild(bYes);row.appendChild(bNo);
+  msgs.appendChild(row);scrollB();
+}
+
+/* NOTIFICATION BELL */
+let bellCache=[];
+let audioCtx=null;
+function playNotifSound(){
+  try{
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    const now=audioCtx.currentTime;
+    [880,1318.5].forEach((freq,i)=>{
+      const osc=audioCtx.createOscillator();
+      const gain=audioCtx.createGain();
+      osc.type='sine';osc.frequency.value=freq;
+      const start=now+i*0.1;
+      gain.gain.setValueAtTime(0,start);
+      gain.gain.linearRampToValueAtTime(0.16,start+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001,start+0.4);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(start);osc.stop(start+0.42);
+    });
+  }catch{}
+}
+async function loadNotifications(){
+  if(!cust)return;
+  try{
+    const r=await fetch('/api/notifications');
+    if(!r.ok)return;
+    const d=await r.json();
+    const prevUnread=bellCache.filter(n=>!n.read).length;
+    bellCache=d.notifications||[];
+    renderBellBadge();renderBellList();
+    const nowUnread=bellCache.filter(n=>!n.read).length;
+    if(nowUnread>prevUnread){
+      const b=document.getElementById('bell-btn');
+      b.classList.remove('ringing');void b.offsetWidth;b.classList.add('ringing');
+      toast(t('newNotif'),'ok');
+      playNotifSound();
+    }
+  }catch{}
+}
+function renderBellBadge(){
+  const c=bellCache.filter(n=>!n.read).length;
+  const b=document.getElementById('bell-badge');
+  b.textContent=c>9?'9+':c;b.classList.toggle('show',c>0);
+}
+function renderBellList(){
+  document.getElementById('bell-dd-hd').textContent=t('bellTitle');
+  const list=document.getElementById('bell-list');
+  if(!bellCache.length){list.innerHTML=`<div class="bell-empty">${t('bellEmpty')}</div>`;return;}
+  const name=(cust?.name||'').split(' ')[0];
+  list.innerHTML='';
+  bellCache.forEach(n=>{
+    const main=lang==='fr'
+      ?`Bonjour <b>${name}</b>, nous avons détecté un problème avec votre routeur`
+      :`Hi <b>${name}</b>, we detected a problem with your router`;
+    const dt=new Date(n.created_at).toLocaleString(lang==='fr'?'fr-FR':'en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    const item=document.createElement('div');
+    item.className='bell-item'+(n.read?'':' unread');
+    const body=document.createElement('button');
+    body.className='bi-body';body.setAttribute('role','menuitem');
+    body.innerHTML=`<div class="bi-main">${main}</div><div class="bi-sub">${t('bellSub')} →</div><div class="bi-time">${dt}</div>`;
+    body.onclick=()=>openNotification(n.id,n.fault_label);
+    const del=document.createElement('button');
+    del.className='bi-del';del.innerHTML='✕';del.setAttribute('aria-label',t('bellDelete'));
+    del.onclick=(e)=>{e.stopPropagation();deleteNotification(n.id);};
+    item.appendChild(body);item.appendChild(del);
+    list.appendChild(item);
+  });
+}
+async function deleteNotification(nid){
+  bellCache=bellCache.filter(n=>n.id!==nid);
+  renderBellBadge();renderBellList();
+  try{await fetch(`/api/notifications/${nid}`,{method:'DELETE'});}catch{}
+}
+function toggleBell(){
+  const dd=document.getElementById('bell-dd');
+  const open=!dd.classList.contains('open');
+  dd.classList.toggle('open',open);
+  if(open)loadNotifications();
+}
+function closeBell(){document.getElementById('bell-dd').classList.remove('open');}
+document.addEventListener('click',e=>{
+  const wrap=document.getElementById('bell-wrap');
+  if(wrap&&!wrap.contains(e.target))closeBell();
+});
+
+/* PROACTIVE BOT FLOW — triggered from a notification click */
+async function openNotification(nid,faultLabel){
+  try{await fetch(`/api/notifications/${nid}/read`,{method:'POST'});}catch{}
+  const n=bellCache.find(x=>x.id===nid);if(n)n.read=true;
+  renderBellBadge();renderBellList();closeBell();
+  showView('chat');
+  const name=(cust?.name||'').split(' ')[0];
+  const greet=lang==='fr'
+    ?`Bonjour${name?' '+name:''}, nous avons détecté une erreur sur votre routeur : **${faultLabel}**. Souhaitez-vous que j'investigue ?`
+    :`Hi${name?' '+name:''}, we detected an error on your router: **${faultLabel}**. Would you like me to investigate?`;
+  addMsg('agent',greet);
+  addQuickReply(()=>flowYes('investigate'),()=>flowNo('investigate'));
+}
+function flowNo(stage){
+  addMsg('user',t('noBtn'));
+  addMsg('agent',stage==='investigate'?t('botNoInvestigate'):t('botNoFix'));
+}
+async function flowYes(stage){
+  addMsg('user',t('yesBtn'));addTyping();setBusy(true);
+  try{
+    if(stage==='investigate'){
+      const r=await fetch('/api/investigate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lang})});
+      if(r.status===401){clearSess();rmTyping();doLogout();return;}
+      const d=await r.json();rmTyping();
+      if(!d.ok){addMsg('agent',d.message||t('toastErr'));setBusy(false);return;}
+      const body=lang==='fr'
+        ?`J'ai terminé l'investigation.\n\n**Description :** ${d.description}\n\n**Cause probable :** ${d.cause}`
+        :`I've completed the investigation.\n\n**Description:** ${d.description}\n\n**Likely cause:** ${d.cause}`;
+      addMsg('agent',body,d.steps||[]);
+      if(d.fixable){addMsg('agent',t('botAskFix'));addQuickReply(()=>flowYes('fix'),()=>flowNo('fix'));}
+      else addMsg('agent',t('botAlreadyOk'));
+    }else{
+      const r=await fetch('/api/fix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lang})});
+      if(r.status===401){clearSess();rmTyping();doLogout();return;}
+      const d=await r.json();rmTyping();
+      addMsg('agent',d.answer||d.error||t('toastErr'),d.steps||[]);
+      loadTKBadge();
+    }
+  }catch{rmTyping();addMsg('agent',t('toastErr'));}
+  setBusy(false);
+}
 
 async function sendMsg(){
   if(busy)return;
@@ -808,6 +1228,7 @@ window.addEventListener('resize',()=>{
 /* INIT */
 (async()=>{
   applyTx();checkStatus();setInterval(checkStatus,30000);
+  setInterval(loadNotifications,15000);
   if(loadSess()){
     try{
       const r=await fetch('/api/tickets',{signal:AbortSignal.timeout(3000)});

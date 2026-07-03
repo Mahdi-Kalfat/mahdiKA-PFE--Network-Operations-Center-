@@ -10,6 +10,10 @@ Key change from v1:
 
 import json
 import time
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
 import requests
 from flask import Flask, render_template, request, jsonify, session
 
@@ -24,6 +28,13 @@ NEO4J_API    = os.getenv("NEO4J_API",    "http://localhost:8000")
 GENIE_API    = os.getenv("GENIE_API",    "http://localhost:8001")
 RADUCE_API   = os.getenv("RADUCE_API",   "http://localhost:8002")
 CUSTOMER_API = os.getenv("CUSTOMER_API", "http://localhost:8003")
+
+GMAIL_USER         = os.getenv("GMAIL_USER", "")
+GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
+GMAIL_SMTP_HOST     = os.getenv("GMAIL_SMTP_HOST", "smtp.gmail.com")
+GMAIL_SMTP_PORT     = int(os.getenv("GMAIL_SMTP_PORT", "587"))
+PUBLIC_APP_URL      = os.getenv("PUBLIC_APP_URL", "http://localhost:5000/app")
+LOGO_PATH           = os.path.join(os.path.dirname(__file__), "static", "logo.png")
 
 # GenieACS + RaDuce are consumed as real MCP servers (tools/call over MCP).
 # NOC admin endpoints (fault injection, fleet) and /health stay REST.
@@ -398,17 +409,198 @@ def get_msg(lang, key, name=""):
     return text
 
 
+# ── Email sending (Gmail SMTP, HTML templates + inline logo) ──────────────────
+
+def _send_email(to_email: str, subject: str, text_body: str, html_body: str = None) -> bool:
+    """Send an email via Gmail SMTP (HTML with plain-text fallback, logo inlined
+    via Content-ID). Falls back to logging the message to the console when no
+    Gmail credentials are configured, so email-dependent flows stay testable
+    before real credentials are dropped in."""
+    if not GMAIL_USER or not GMAIL_APP_PASSWORD:
+        print(f"[email-stub] No GMAIL_USER/GMAIL_APP_PASSWORD configured — "
+              f"email to {to_email} not sent.\nSubject: {subject}\n{text_body}")
+        return True
+
+    msg = MIMEMultipart("related")
+    msg["Subject"] = subject
+    msg["From"]    = GMAIL_USER
+    msg["To"]      = to_email
+
+    alt = MIMEMultipart("alternative")
+    alt.attach(MIMEText(text_body, "plain"))
+    if html_body:
+        alt.attach(MIMEText(html_body, "html"))
+    msg.attach(alt)
+
+    if html_body and os.path.exists(LOGO_PATH):
+        with open(LOGO_PATH, "rb") as f:
+            logo = MIMEImage(f.read())
+        logo.add_header("Content-ID", "<byrsa_logo>")
+        logo.add_header("Content-Disposition", "inline", filename="logo.png")
+        msg.attach(logo)
+
+    try:
+        with smtplib.SMTP(GMAIL_SMTP_HOST, GMAIL_SMTP_PORT, timeout=10) as server:
+            server.starttls()
+            server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
+            server.sendmail(GMAIL_USER, [to_email], msg.as_string())
+        return True
+    except Exception as e:
+        print(f"[email] Failed to send email to {to_email}: {e}")
+        return False
+
+
+def send_verification_email(to_email: str, code: str, name: str, lang: str) -> bool:
+    first = (name or "").split(" ")[0]
+    if lang == "fr":
+        subject = "Votre code de vérification Byrsa"
+        text_body = (f"Bonjour {first},\n\nVotre code de vérification Byrsa est : {code}\n\n"
+                    "Ce code expire dans 10 minutes.\n\n— L'équipe Byrsa")
+        tpl = dict(lang="fr", subject=subject, eyebrow="VÉRIFICATION DE COMPTE",
+                  greeting=f"Bonjour {first},",
+                  intro="Utilisez le code ci-dessous pour vérifier votre adresse email et accéder à votre espace Byrsa Support.",
+                  code=code,
+                  expiry_note="Ce code expire dans 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet email.",
+                  footer_note="Byrsa · Smart Customer Care — Cet email a été envoyé automatiquement, merci de ne pas y répondre.")
+    else:
+        subject = "Your Byrsa verification code"
+        text_body = (f"Hi {first},\n\nYour Byrsa verification code is: {code}\n\n"
+                    "This code expires in 10 minutes.\n\n— The Byrsa Team")
+        tpl = dict(lang="en", subject=subject, eyebrow="ACCOUNT VERIFICATION",
+                  greeting=f"Hi {first},",
+                  intro="Use the code below to verify your email address and unlock your Byrsa Support account.",
+                  code=code,
+                  expiry_note="This code expires in 10 minutes. If you didn't request this, you can safely ignore this email.",
+                  footer_note="Byrsa · Smart Customer Care — This is an automated message, please don't reply.")
+    html_body = render_template("email/verify.html", **tpl)
+    return _send_email(to_email, subject, text_body, html_body)
+
+
+# ── Fault knowledge base — used by the notification bell / proactive bot ──────
+
+FAULT_INFO = {
+    "ppp_auth_failure": {
+        "en": {"title": "PPP Authentication Failure",
+               "description": "Your router failed to authenticate its PPP session with our network.",
+               "cause": "The stored PPP username/password was rejected by the authentication server, or the session token expired."},
+        "fr": {"title": "Échec d'authentification PPP",
+               "description": "Votre routeur n'a pas réussi à authentifier sa session PPP sur notre réseau.",
+               "cause": "L'identifiant/mot de passe PPP enregistré a été rejeté par le serveur d'authentification, ou le jeton de session a expiré."},
+    },
+    "wrong_vlan": {
+        "en": {"title": "VLAN Misconfiguration",
+               "description": "Your router is tagging traffic with an incorrect VLAN ID, so it can't reach our network.",
+               "cause": "A misapplied provisioning profile set the VLAN ID outside the range allowed for your line."},
+        "fr": {"title": "Erreur de configuration VLAN",
+               "description": "Votre routeur étiquette le trafic avec un identifiant VLAN incorrect, ce qui l'empêche d'atteindre notre réseau.",
+               "cause": "Un profil de provisioning mal appliqué a défini un VLAN en dehors de la plage autorisée pour votre ligne."},
+    },
+    "dns_failure": {
+        "en": {"title": "DNS Resolution Failure",
+               "description": "Your router can reach the network but its DNS server settings are invalid.",
+               "cause": "The DNS server address was cleared or set to an unreachable value, so domain names can't be resolved."},
+        "fr": {"title": "Échec de résolution DNS",
+               "description": "Votre routeur accède au réseau mais ses serveurs DNS sont invalides.",
+               "cause": "L'adresse du serveur DNS a été effacée ou pointe vers une valeur injoignable, empêchant la résolution des noms de domaine."},
+    },
+    "weak_signal": {
+        "en": {"title": "Weak Optical Signal",
+               "description": "The optical signal reaching your router is too weak for a stable connection.",
+               "cause": "This is usually caused by a fiber connector issue, a bent cable, or line degradation and needs a physical check."},
+        "fr": {"title": "Signal optique faible",
+               "description": "Le signal optique reçu par votre routeur est trop faible pour une connexion stable.",
+               "cause": "Généralement causé par un connecteur fibre défectueux, un câble plié ou une dégradation de ligne — une intervention physique est nécessaire."},
+    },
+    "hardware_fault": {
+        "en": {"title": "Hardware Fault",
+               "description": "Your router is reporting an abnormally high error rate consistent with a hardware issue.",
+               "cause": "Internal component degradation on the router is corrupting traffic — a technician visit is required."},
+        "fr": {"title": "Panne matérielle",
+               "description": "Votre routeur signale un taux d'erreurs anormalement élevé, révélateur d'un problème matériel.",
+               "cause": "La dégradation d'un composant interne du routeur corrompt le trafic — une visite technique est nécessaire."},
+    },
+    "random_disconnect": {
+        "en": {"title": "Connection Drop",
+               "description": "Your router's PPP session dropped unexpectedly.",
+               "cause": "A transient network-side interruption closed the session without an authentication error."},
+        "fr": {"title": "Coupure de connexion",
+               "description": "La session PPP de votre routeur s'est interrompue de façon inattendue.",
+               "cause": "Une coupure transitoire côté réseau a fermé la session sans erreur d'authentification."},
+    },
+    "healthy": {
+        "en": {"title": "No Fault Detected",
+               "description": "Your connection currently looks healthy.",
+               "cause": "No fault condition matched the live router parameters."},
+        "fr": {"title": "Aucune anomalie détectée",
+               "description": "Votre connexion semble actuellement fonctionner normalement.",
+               "cause": "Aucune condition de panne ne correspond aux paramètres actuels du routeur."},
+    },
+}
+
+
+# ── Notification bell — persisted via the customer MCP server (MongoDB) ───────
+
+PENDING_FIXES: dict = {}     # account_id -> diagnosis awaiting a fix confirmation (in-process, transient)
+
+def send_notification_email(to_email: str, name: str, fault: str, lang: str) -> bool:
+    info = FAULT_INFO.get(fault, FAULT_INFO["healthy"])
+    fi   = info.get(lang, info["en"])
+    first = (name or "").split(" ")[0]
+    if lang == "fr":
+        subject = "Byrsa — Problème détecté sur votre routeur"
+        text_body = (f"Bonjour {first},\n\nNous avons détecté un problème avec votre routeur : {fi['title']}.\n\n"
+                    f"{fi['description']}\n\nConnectez-vous à votre espace Byrsa pour en savoir plus "
+                    "et discuter avec notre assistant.\n\n— L'équipe Byrsa")
+        tpl = dict(lang="fr", subject=subject, eyebrow="ALERTE ROUTEUR",
+                  greeting=f"Bonjour {first},",
+                  intro="Notre système a détecté un problème sur votre connexion. Voici ce que nous avons trouvé :",
+                  fault_label_head="PROBLÈME DÉTECTÉ", fault_title=fi["title"], description=fi["description"],
+                  cta="Ouvrir Byrsa Support", app_url=PUBLIC_APP_URL,
+                  footer_note="Byrsa · Smart Customer Care — Cet email a été envoyé automatiquement, merci de ne pas y répondre.")
+    else:
+        subject = "Byrsa — We detected a problem with your router"
+        text_body = (f"Hi {first},\n\nWe detected a problem with your router: {fi['title']}.\n\n"
+                    f"{fi['description']}\n\nLog in to your Byrsa account to see more details "
+                    "and chat with our assistant.\n\n— The Byrsa Team")
+        tpl = dict(lang="en", subject=subject, eyebrow="ROUTER ALERT",
+                  greeting=f"Hi {first},",
+                  intro="Our system detected a problem on your connection. Here's what we found:",
+                  fault_label_head="ISSUE DETECTED", fault_title=fi["title"], description=fi["description"],
+                  cta="Open Byrsa Support", app_url=PUBLIC_APP_URL,
+                  footer_note="Byrsa · Smart Customer Care — This is an automated message, please don't reply.")
+    html_body = render_template("email/notify.html", **tpl)
+    return _send_email(to_email, subject, text_body, html_body)
+
+
+def add_notification(account_id: str, customer_name: str, fault: str):
+    info = FAULT_INFO.get(fault, FAULT_INFO["healthy"])
+    api("post", f"{CUSTOMER_API}/notifications/create", json={
+        "account_id":     account_id,
+        "customer_name":  customer_name,
+        "fault":          fault,
+        "fault_label_en": info["en"]["title"],
+        "fault_label_fr": info["fr"]["title"],
+    })
+
+    profile, err = api("get", f"{CUSTOMER_API}/customer/profile", params={"account_id": account_id})
+    if not err and profile and profile.get("email_verified") and profile.get("email"):
+        send_notification_email(profile["email"], profile.get("name") or customer_name, fault, "en")
+
+def get_notifications(account_id: str):
+    data, err = api("get", f"{CUSTOMER_API}/notifications", params={"account_id": account_id})
+    if err or not data:
+        return []
+    return data.get("notifications", [])
+
+
 # ── Main support flow ─────────────────────────────────────────────────────────
 
-def handle_problem(customer: dict, problem: str, lang: str):
-    serial     = customer.get("router_serial", "")
-    account_id = customer.get("account_id", "")
-    name       = customer.get("name", "")
-    steps      = []
-    start_time = time.time()
-
-    if not serial and not account_id:
-        return get_msg(lang, "error", name), steps
+def _run_diagnosis(customer: dict):
+    """Layers 1-2b only: read live state, load TR-069 schema, diagnose.
+    Does NOT push any fix. Returns a dict with the diagnostic trace so far."""
+    serial       = customer.get("router_serial", "")
+    account_id   = customer.get("account_id", "")
+    steps        = []
 
     graph_rag_log = customer.get("graph_rag_log") or {
         "source": "Neo4j GraphRAG",
@@ -444,9 +636,9 @@ def handle_problem(customer: dict, problem: str, lang: str):
     })
 
     if err or not state:
-        customer_create_ticket(account_id, problem, "unknown", "open",
-                               full_log=steps, customer=customer)
-        return get_msg(lang, "service_down", name), steps
+        return {"steps": steps, "state_before": state_before,
+                "fault": None, "fix_tool": None, "fix_extra": {},
+                "error": "service_down"}
 
     params = state.get("parameters", {})
     router_model = customer.get("router_model", "")
@@ -519,6 +711,50 @@ def handle_problem(customer: dict, problem: str, lang: str):
         "ok": True
     })
 
+    return {"steps": steps, "state_before": state_before,
+            "fault": fault, "fix_tool": fix_tool, "fix_extra": fix_extra,
+            "error": None}
+
+
+def investigate_problem(customer: dict, lang: str):
+    """Diagnose only (no fix applied) — used by the proactive notification bot."""
+    diag = _run_diagnosis(customer)
+    name = customer.get("name", "")
+    if diag["error"]:
+        return {"ok": False, "message": get_msg(lang, diag["error"], name), "steps": diag["steps"]}
+
+    fault = diag["fault"] or "healthy"
+    info  = FAULT_INFO.get(fault, FAULT_INFO["healthy"])
+    fi    = info.get(lang, info["en"])
+    fixable = fault != "healthy" and diag["fix_tool"] is not None
+
+    return {
+        "ok": True, "fault": fault, "fix_tool": diag["fix_tool"], "fix_extra": diag["fix_extra"],
+        "title": fi["title"], "description": fi["description"], "cause": fi["cause"],
+        "steps": diag["steps"], "state_before": diag["state_before"], "fixable": fixable,
+    }
+
+
+def handle_problem(customer: dict, problem: str, lang: str):
+    serial     = customer.get("router_serial", "")
+    account_id = customer.get("account_id", "")
+    name       = customer.get("name", "")
+    start_time = time.time()
+
+    if not serial and not account_id:
+        return get_msg(lang, "error", name), []
+
+    diag = _run_diagnosis(customer)
+    steps = diag["steps"]
+
+    if diag["error"]:
+        customer_create_ticket(account_id, problem, "unknown", "open",
+                               full_log=steps, customer=customer)
+        return get_msg(lang, diag["error"], name), steps
+
+    fault, fix_tool, fix_extra = diag["fault"], diag["fix_tool"], diag["fix_extra"]
+    state_before = diag["state_before"]
+
     if fault == "healthy" or fix_tool is None:
         duration = round(time.time() - start_time, 2)
         ticket, _ = customer_create_ticket(account_id, problem, "healthy",
@@ -526,6 +762,33 @@ def handle_problem(customer: dict, problem: str, lang: str):
                                full_log=steps, state_before=state_before,
                                resolution_time_s=duration, customer=customer)
         return get_msg(lang, "already_ok", name), steps
+
+    return _apply_fix(customer, problem, fault, fix_tool, fix_extra,
+                       steps, state_before, lang, start_time)
+
+
+def _apply_fix(customer: dict, problem: str, fault: str, fix_tool: str, fix_extra: dict,
+               steps: list, state_before: dict, lang: str, start_time: float):
+    """Layers 3-4: push the fix, verify, create the resulting ticket."""
+    serial     = customer.get("router_serial", "")
+    account_id = customer.get("account_id", "")
+    name       = customer.get("name", "")
+
+    # LAYER 2a rebuild — Neo4j schema is needed here to find TR-069 write paths
+    router_model = customer.get("router_model", "")
+    schema, _ = api("get", f"{NEO4J_API}/tools/get_router_parameters",
+                    params={"model": router_model})
+    neo4j_schema = {}
+    if schema and not schema.get("error"):
+        for category, param_list in (schema.get("categories") or {}).items():
+            for p in param_list:
+                label = (p.get("label") or "").strip()
+                path  = (p.get("path")  or "").strip()
+                if label and path:
+                    neo4j_schema[label.lower()] = {
+                        "label": label, "path": path,
+                        "category": category, "editable": p.get("editable", "unknown")
+                    }
 
     # LAYER 3: RaDuce MCP (port 8002) — push fix to router
     # Find TR-069 write paths for this fix from Neo4j schema
@@ -684,6 +947,11 @@ def get_status():
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @app.route("/")
+def landing():
+    return render_template("landing.html")
+
+
+@app.route("/app")
 def index():
     return render_template("customer.html")
 
@@ -710,6 +978,46 @@ def api_login():
         return jsonify({"success": True, "customer": result})
     return jsonify({"success": False,
                     "error": (result or {}).get("error", "Incorrect phone or PIN")}), 401
+
+
+@app.route("/api/email/start", methods=["POST"])
+def api_email_start():
+    """Save the customer's email and send a fresh 6-digit verification code."""
+    customer = session.get("customer")
+    if not customer:
+        return jsonify({"error": "Not authenticated"}), 401
+    lang  = session.get("lang", "en")
+    email = (request.json or {}).get("email", "").strip()
+    if not email or "@" not in email or "." not in email.split("@")[-1]:
+        return jsonify({"success": False, "error": "Please enter a valid email address"}), 400
+
+    result, err = api("post", f"{CUSTOMER_API}/customer/email",
+                      json={"account_id": customer["account_id"], "email": email})
+    if err or not result or not result.get("success"):
+        return jsonify({"success": False,
+                        "error": (result or {}).get("error") or err or "Failed to save email"}), 503
+
+    emailed = send_verification_email(email, result["code"], customer.get("name", ""), lang)
+    session["customer"]["email"]          = email
+    session["customer"]["email_verified"] = False
+    session.modified = True
+    return jsonify({"success": True, "emailed": emailed})
+
+
+@app.route("/api/email/verify", methods=["POST"])
+def api_email_verify():
+    customer = session.get("customer")
+    if not customer:
+        return jsonify({"error": "Not authenticated"}), 401
+    code = (request.json or {}).get("code", "").strip()
+    result, err = api("post", f"{CUSTOMER_API}/customer/email/verify",
+                      json={"account_id": customer["account_id"], "code": code})
+    if err:
+        return jsonify({"success": False, "error": err}), 503
+    if result and result.get("success"):
+        session["customer"]["email_verified"] = True
+        session.modified = True
+    return jsonify(result)
 
 
 @app.route("/api/logout", methods=["POST"])
@@ -759,6 +1067,95 @@ def api_tickets():
     if err:
         return jsonify({"error": err}), 503
     return jsonify(data)
+
+
+@app.route("/api/notifications")
+def api_notifications():
+    customer = session.get("customer")
+    if not customer:
+        return jsonify({"error": "Not authenticated"}), 401
+    lang  = session.get("lang", "en")
+    items = get_notifications(customer["account_id"])
+    out = [{
+        "id":          n["id"],
+        "fault":       n["fault"],
+        "fault_label": n.get(f"fault_label_{lang}") or n.get("fault_label_en", ""),
+        "read":        n["read"],
+        "created_at":  n["created_at"],
+    } for n in items]
+    return jsonify({"notifications": out, "unread": sum(1 for n in items if not n["read"])})
+
+
+@app.route("/api/notifications/<nid>/read", methods=["POST"])
+def api_notification_read(nid):
+    customer = session.get("customer")
+    if not customer:
+        return jsonify({"error": "Not authenticated"}), 401
+    api("post", f"{CUSTOMER_API}/notifications/{nid}/read")
+    return jsonify({"success": True})
+
+
+@app.route("/api/notifications/<nid>", methods=["DELETE"])
+def api_notification_delete(nid):
+    customer = session.get("customer")
+    if not customer:
+        return jsonify({"error": "Not authenticated"}), 401
+    data, err = api("delete", f"{CUSTOMER_API}/notifications/{nid}",
+                    params={"account_id": customer["account_id"]})
+    if err:
+        return jsonify({"error": err}), 503
+    return jsonify(data)
+
+
+@app.route("/api/investigate", methods=["POST"])
+def api_investigate():
+    """Proactive bot flow, step 1: diagnose the fault without applying any fix."""
+    data     = request.json or {}
+    lang     = session.get("lang", data.get("lang", "en"))
+    customer = session.get("customer")
+    if not customer:
+        return jsonify({"error": "Not authenticated"}), 401
+
+    result = investigate_problem(customer, lang)
+    if result["ok"]:
+        PENDING_FIXES[customer["account_id"]] = {
+            "fault":        result["fault"],
+            "fix_tool":     result["fix_tool"],
+            "fix_extra":    result["fix_extra"],
+            "steps":        result["steps"],
+            "state_before": result["state_before"],
+        }
+    return jsonify(result)
+
+
+@app.route("/api/fix", methods=["POST"])
+def api_fix():
+    """Proactive bot flow, step 2: apply the fix from the last /api/investigate call."""
+    data     = request.json or {}
+    lang     = session.get("lang", data.get("lang", "en"))
+    customer = session.get("customer")
+    if not customer:
+        return jsonify({"error": "Not authenticated"}), 401
+
+    pending = PENDING_FIXES.pop(customer["account_id"], None)
+    if not pending:
+        return jsonify({"error": "No investigation in progress — ask me to investigate first."}), 400
+
+    problem = f"Proactive fault notification: {pending['fault']}"
+    if not pending["fault"] or pending["fault"] == "healthy" or not pending["fix_tool"]:
+        duration = 0.0
+        customer_create_ticket(customer["account_id"], problem, pending["fault"] or "healthy",
+                               "resolved", fix="no_action_needed", full_log=pending["steps"],
+                               state_before=pending["state_before"], resolution_time_s=duration,
+                               customer=customer)
+        return jsonify({"answer": get_msg(lang, "already_ok", customer.get("name", "")),
+                        "steps": pending["steps"]})
+
+    start_time = time.time()
+    msg, steps = _apply_fix(customer, problem, pending["fault"], pending["fix_tool"],
+                            pending["fix_extra"], pending["steps"], pending["state_before"],
+                            lang, start_time)
+    return jsonify({"answer": msg, "steps": steps})
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -818,6 +1215,16 @@ def api_noc_inject():
         return jsonify({"error": "Not authenticated"}), 401
     data, err = api("post", f"{GENIE_API}/noc/inject_fault", json=request.json or {})
     if err: return jsonify({"error": err}), 503
+
+    if data and data.get("success") and data.get("fault_injected") not in (None, "healthy"):
+        fleet, fleet_err = api("get", f"{GENIE_API}/noc/fleet")
+        if not fleet_err and fleet:
+            row = next((r for r in fleet.get("routers", [])
+                       if r.get("serial") == data.get("serial")), None)
+            if row and row.get("account_id"):
+                add_notification(row["account_id"], row.get("customer_name", ""),
+                                 data["fault_injected"])
+
     return jsonify(data)
 
 

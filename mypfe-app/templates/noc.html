@@ -157,8 +157,8 @@ body::after{
 .body{
   flex:1;min-height:0;display:grid;
   grid-template-columns:186px minmax(0,1fr) 330px;
-  grid-template-rows:minmax(0,1fr) 220px;
-  grid-template-areas:"kpis fleet detail" "tickets tickets detail";
+  grid-template-rows:minmax(0,1fr);
+  grid-template-areas:"kpis fleet detail";
   gap:12px;overflow:hidden;
 }
 
@@ -315,179 +315,11 @@ body::after{
 .inj-feedback.ok{background:rgba(0,240,192,.08);color:var(--mint);border-color:rgba(0,240,192,.28)}
 .inj-feedback.err{background:rgba(255,51,85,.08);color:var(--coral);border-color:rgba(255,51,85,.28)}
 
-/* ── Tickets ─────────────────────────────────────────────────────────────── */
-.tickets-row{grid-area:tickets}
-.ticket-tabs{
-  flex-shrink:0;display:flex;align-items:center;gap:6px;
-  padding:10px 14px;border-bottom:1px solid var(--b1);background:rgba(7,16,30,.6);
-}
-.tab-btn{
-  font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
-  padding:7px 12px;border-radius:6px;cursor:pointer;
-  border:1px solid rgba(255,255,255,.07);background:transparent;
-  color:var(--fog);transition:all .15s;
-}
-.tab-btn.active{background:var(--e);color:#001A28;border-color:var(--e);box-shadow:0 0 16px rgba(0,207,255,.3)}
-.tab-btn:hover:not(.active){color:var(--e);border-color:rgba(0,207,255,.3);background:rgba(0,207,255,.06)}
-.tickets-body{flex:1;min-height:0;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:rgba(0,207,255,.3) transparent}
-.tickets-body::-webkit-scrollbar{width:4px}
-.tickets-body::-webkit-scrollbar-thumb{background:rgba(0,207,255,.3);border-radius:2px}
-.ticket-hdr{
-  display:grid;grid-template-columns:90px 110px minmax(140px,1fr) 130px 120px 80px;
-  gap:8px;padding:4px 14px;
-  font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);
-  letter-spacing:.12em;text-transform:uppercase;flex-shrink:0;
-}
-.ticket-row{
-  display:grid;grid-template-columns:90px 110px minmax(140px,1fr) 130px 120px 80px;
-  gap:8px;padding:10px 14px;font-size:10px;
-  background:rgba(11,25,42,.6);border:1px solid var(--b1);border-radius:8px;
-  transition:all .15s;flex-shrink:0;cursor:pointer;
-  border-left:3px solid transparent;
-}
-.ticket-row:hover{background:rgba(0,207,255,.06);border-color:rgba(0,207,255,.24);transform:translateX(2px);box-shadow:0 2px 12px rgba(0,0,0,.2)}
-.ticket-row.tr-resolved{border-left-color:var(--mint)}
-.ticket-row.tr-escalated{border-left-color:var(--gold)}
-.ticket-row.tr-open{border-left-color:var(--e)}
-.tr-status{display:inline-flex}
+/* ── Status badge (reused by KPI popup) ──────────────────────────────────── */
 .st{font-family:var(--mono);font-size:8px;font-weight:800;padding:4px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
 .st-resolved{color:var(--mint);background:rgba(0,240,192,.12)}
 .st-escalated{color:var(--gold);background:rgba(255,179,0,.12)}
 .st-open{color:var(--e);background:rgba(0,207,255,.12)}
-.tr-acct{font-family:var(--mono);font-size:9px;color:var(--mist);align-self:center}
-.tr-problem{color:var(--ice);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:center}
-.tr-fault{font-family:var(--mono);font-size:9px;color:var(--gold);align-self:center}
-.tr-fix{font-family:var(--mono);font-size:9px;color:var(--mint);align-self:center}
-.tr-date{font-family:var(--mono);font-size:9px;color:var(--fog);align-self:center}
-
-/* ── Modal ──────────────────────────────────────────────────────────────── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(16px)}
-.modal-overlay.open{display:flex;animation:fadeIn .18s ease}
-.modal{
-  background:rgba(7,16,30,.98);border:1px solid var(--b2);border-radius:14px;
-  width:860px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;
-  box-shadow:0 48px 120px rgba(0,0,0,.8),0 0 0 1px rgba(0,207,255,.06),0 0 60px rgba(0,207,255,.1);
-}
-.modal-hdr{
-  padding:18px 22px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:12px;
-  flex-shrink:0;background:rgba(7,16,30,.8);
-}
-.modal-title{font-size:14px;font-weight:800;color:#fff;flex:1;letter-spacing:-.2px}
-.modal-close{
-  width:32px;height:32px;border-radius:8px;
-  border:1px solid rgba(255,51,85,.28);background:rgba(255,51,85,.08);
-  color:var(--coral);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;
-}
-.modal-close:hover{background:var(--coral);color:#fff;box-shadow:0 0 16px rgba(255,51,85,.3)}
-.modal-body{flex:1;overflow-y:auto;padding:22px 24px;scrollbar-width:thin;scrollbar-color:rgba(0,207,255,.3) transparent}
-.modal-body::-webkit-scrollbar{width:5px}
-.modal-body::-webkit-scrollbar-thumb{background:rgba(0,207,255,.3);border-radius:2px}
-
-/* ── Step cards in modal ────────────────────────────────────────────────── */
-.step-card{background:rgba(11,25,42,.7);border:1px solid var(--b1);border-radius:10px;margin-bottom:10px;overflow:hidden;transition:border-color .15s}
-.step-card:hover{border-color:var(--b2)}
-.step-card-hdr{
-  display:flex;align-items:center;gap:10px;padding:12px 16px;
-  border-bottom:1px solid var(--b1);background:rgba(7,16,30,.6);
-}
-.step-ok{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;border:1px solid}
-.step-ok.ok{background:rgba(0,240,192,.12);color:var(--mint);border-color:rgba(0,240,192,.3);box-shadow:0 0 12px rgba(0,240,192,.2)}
-.step-ok.warn{background:rgba(255,179,0,.12);color:var(--gold);border-color:rgba(255,179,0,.3)}
-.step-ok.err{background:rgba(255,51,85,.12);color:var(--coral);border-color:rgba(255,51,85,.3);box-shadow:0 0 12px rgba(255,51,85,.15)}
-.step-layer{font-family:var(--mono);font-size:12px;font-weight:800;color:#fff}
-.step-port{font-family:var(--mono);font-size:9px;color:var(--fog);background:rgba(255,255,255,.05);padding:2px 7px;border-radius:4px;border:1px solid var(--b1)}
-.step-tool{font-family:var(--mono);font-size:9px;color:var(--e);font-weight:700}
-.step-num{font-family:var(--mono);font-size:9px;color:var(--fog);margin-left:auto}
-.step-desc{padding:10px 16px;font-size:12px;color:var(--mist);line-height:1.6}
-.step-result{padding:0 16px 14px}
-
-/* ── Ticket log modal elements ──────────────────────────────────────────── */
-.log-summary{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-.log-chip{font-family:var(--mono);font-size:9px;padding:4px 9px;border:1px solid var(--b1);background:rgba(255,255,255,.03);color:var(--mist);border-radius:4px}
-.log-chip-teal{color:var(--mint);border-color:rgba(0,240,192,.26);background:rgba(0,240,192,.07)}
-.log-problem{font-size:12px;color:var(--ice);margin-bottom:14px;padding:12px 16px;background:rgba(0,207,255,.05);border-left:3px solid var(--e);border-radius:0 8px 8px 0;line-height:1.65;font-style:italic}
-.log-verdict-row{display:flex;align-items:stretch;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-.log-verdict-box{flex:1;min-width:160px;padding:14px 16px;border:1px solid var(--b1);border-radius:10px}
-.log-verdict-fault{border-left:3px solid var(--coral);background:rgba(255,51,85,.06)}
-.log-verdict-fix{border-left:3px solid var(--mint);background:rgba(0,240,192,.05)}
-.lvb-label{font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
-.lvb-value{font-size:14px;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-.2px}
-.log-verdict-fix .lvb-value{color:var(--mint)}
-.lvb-desc{font-size:10px;color:var(--mist);line-height:1.55}
-.log-verdict-arrow{font-family:var(--mono);font-size:24px;color:var(--e);display:flex;align-items:center;flex-shrink:0}
-.log-trace-hdr{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:9px;color:var(--fog);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--b1)}
-.log-empty{text-align:center;color:var(--fog);font-size:11px;padding:28px;font-family:var(--mono)}
-
-/* ── Detail blocks in modal ─────────────────────────────────────────────── */
-.detail-block{border:1px solid var(--b1);border-radius:8px;margin-bottom:6px;overflow:hidden}
-.db-title{font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);letter-spacing:.12em;text-transform:uppercase;padding:7px 12px;background:rgba(7,16,30,.6);border-bottom:1px solid var(--b1)}
-.db-rows{padding:2px 8px}
-.db-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 4px;border-bottom:1px solid rgba(64,196,255,.06)}
-.db-row:last-child{border-bottom:none}
-.db-key{font-family:var(--mono);font-size:9px;color:var(--mist);flex-shrink:0;white-space:nowrap}
-.db-val{font-family:var(--mono);font-size:9px;font-weight:700;text-align:right;word-break:break-all;max-width:240px}
-.db-val.ok{color:var(--mint)}.db-val.err{color:var(--coral)}.db-val.warn{color:var(--gold)}.db-val.dim{color:var(--mist)}
-
-/* alert boxes */
-.alert-box{font-family:var(--mono);font-size:10px;font-weight:800;padding:10px 14px;border:1px solid;border-radius:8px;line-height:1.6;margin-bottom:6px}
-.alert-ok{background:rgba(0,240,192,.08);color:var(--mint);border-color:rgba(0,240,192,.28)}
-.alert-warn{background:rgba(255,179,0,.08);color:var(--gold);border-color:rgba(255,179,0,.28)}
-.alert-err{background:rgba(255,51,85,.08);color:var(--coral);border-color:rgba(255,51,85,.28)}
-.alert-box small{font-weight:400;display:block;margin-top:4px;opacity:.72}
-
-/* diagnostic checks */
-.diag-checks{border:1px solid var(--b1);border-radius:8px;overflow:hidden}
-.diag-check{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-bottom:1px solid rgba(64,196,255,.07);transition:background .12s}
-.diag-check:hover{background:rgba(0,207,255,.03)}
-.diag-check:last-child{border-bottom:none}
-.dc-icon{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;margin-top:1px;border:1px solid}
-.diag-check.pass .dc-icon{background:rgba(0,240,192,.12);color:var(--mint);border-color:rgba(0,240,192,.3);box-shadow:0 0 8px rgba(0,240,192,.15)}
-.diag-check.trigger .dc-icon{background:rgba(255,51,85,.12);color:var(--coral);border-color:rgba(255,51,85,.3);box-shadow:0 0 8px rgba(255,51,85,.15)}
-.diag-check.warn .dc-icon{background:rgba(255,179,0,.12);color:var(--gold);border-color:rgba(255,179,0,.3)}
-.diag-check.skip .dc-icon{background:rgba(255,255,255,.04);color:var(--fog);border-color:var(--b1)}
-.dc-body{flex:1;min-width:0}
-.dc-param{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--ice);margin-bottom:2px}
-.dc-path{font-family:var(--mono);font-size:8px;color:var(--fog);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dc-eval{font-size:10px;color:var(--mist);line-height:1.5}
-.diag-check.trigger .dc-eval{color:rgba(255,100,130,.9)}
-.diag-check.warn .dc-eval{color:rgba(255,179,0,.85)}
-.dc-value{font-family:var(--mono);font-size:11px;font-weight:800;flex-shrink:0;text-align:right;min-width:60px}
-.dc-value.pass{color:var(--mint)}.dc-value.trigger{color:var(--coral)}.dc-value.warn{color:var(--gold)}.dc-value.skip{color:var(--fog)}
-
-/* diagnostic verdict */
-.diag-verdict{margin-top:12px;padding:15px;border:1px solid;border-radius:10px}
-.diag-verdict.ok{background:rgba(0,240,192,.07);border-color:rgba(0,240,192,.26)}
-.diag-verdict.err{background:rgba(255,51,85,.07);border-color:rgba(255,51,85,.24)}
-.dv-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.dv-section{flex:1;min-width:120px}
-.dv-label{font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
-.dv-value{font-size:14px;font-weight:800;color:#fff;letter-spacing:-.2px}
-.dv-value.fix{color:var(--mint)}
-.dv-desc{font-size:10px;color:var(--mist);margin-top:4px;line-height:1.5}
-.dv-arrow{font-family:var(--mono);font-size:24px;color:var(--e);flex-shrink:0}
-.dv-params{margin-top:10px;padding-top:10px;border-top:1px solid rgba(64,196,255,.12);display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:9px;color:var(--fog);font-family:var(--mono)}
-.dv-param-chip{font-family:var(--mono);font-size:9px;padding:3px 8px;background:rgba(0,207,255,.09);color:var(--e);border:1px solid rgba(0,207,255,.22);border-radius:4px}
-
-/* TR-069 write paths */
-.write-path{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid rgba(64,196,255,.07);flex-wrap:wrap}
-.write-path:last-child{border-bottom:none}
-.wp-label{font-family:var(--mono);font-size:9px;color:var(--mint);font-weight:800;flex-shrink:0}
-.wp-path{font-family:var(--mono);font-size:8px;color:var(--fog);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wp-cat{font-family:var(--mono);font-size:8px;padding:2px 6px;background:rgba(0,207,255,.08);color:var(--e);border:1px solid rgba(0,207,255,.18);border-radius:4px;flex-shrink:0}
-.schema-pill,.tr069-path{display:inline-block;font-family:var(--mono);font-size:8px;padding:3px 7px;margin:2px;background:rgba(0,207,255,.07);color:var(--e);border:1px solid rgba(0,207,255,.2);border-radius:4px}
-
-/* ── Create ticket form ──────────────────────────────────────────────────── */
-.form-group{margin-bottom:16px}
-.form-label{font-size:10px;font-weight:700;color:var(--mist);display:block;margin-bottom:7px;letter-spacing:.06em;text-transform:uppercase}
-.form-input,.form-select{width:100%;background:rgba(2,8,18,.8);border:1px solid rgba(64,196,255,.18);border-radius:8px;padding:12px 14px;color:var(--ice);font-family:var(--mono);font-size:11px;outline:none;transition:all .18s}
-.form-input:focus,.form-select:focus{border-color:var(--e);box-shadow:0 0 0 3px rgba(0,207,255,.12)}
-.form-input::placeholder{color:var(--fog)}
-.form-select option{background:#070E18;color:var(--ice)}
-.form-btns{display:flex;gap:10px;margin-top:18px}
-.form-btn-submit{flex:1;background:linear-gradient(135deg,var(--e2),var(--mint2));border:none;border-radius:8px;padding:12px;color:#001A28;font-weight:800;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .15s;box-shadow:0 4px 16px rgba(0,207,255,.25)}
-.form-btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,207,255,.35)}
-.form-btn-cancel{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:8px;padding:12px;color:var(--mist);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .15s}
-.form-btn-cancel:hover{border-color:rgba(255,51,85,.3);color:var(--coral)}
 
 /* ── Animations ─────────────────────────────────────────────────────────── */
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -509,7 +341,6 @@ body::after{
 .fleet-panel{animation:panelIn .45s .07s ease both}
 .detail-outer{animation:panelIn .45s .12s ease both}
 .inject-panel{animation:panelIn .45s .16s ease both}
-.tickets-row{animation:panelIn .45s .09s ease both}
 
 /* ── KPI card interactions ───────────────────────────────────────────────── */
 .kpi{cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s}
@@ -559,16 +390,9 @@ body::after{
 .fleet-table tbody tr.row-anim{animation:rowIn .32s ease both}
 @keyframes rowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
 
-/* ── Ticket row popup bounce ─────────────────────────────────────────────── */
-.ticket-row.animate-in{animation:ticketIn .3s cubic-bezier(.34,1.56,.64,1) both}
-@keyframes ticketIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
 
 /* ── Inject btn press ────────────────────────────────────────────────────── */
 .inj-btn:active{transform:scale(.9) translateY(2px)!important;box-shadow:none!important;transition-duration:.06s}
-
-/* ── Modal scale in ──────────────────────────────────────────────────────── */
-.modal-overlay.open .modal{animation:modalIn .26s cubic-bezier(.34,1.56,.64,1)}
-@keyframes modalIn{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:none}}
 
 /* ── Topbar service pill pulse when error ────────────────────────────────── */
 .svc-err{animation:svcErrPulse 2s ease-in-out infinite}
@@ -582,11 +406,11 @@ body::after{
 /* ══════════════════════════════════════════════════════════════════════════ */
 /* Smooth theme switch — only on elements that need it, not body * (too laggy) */
 body{transition:background .3s ease,color .25s ease}
-.topbar,.panel,.kpi,.detail-outer,.inject-panel,.modal,.kpi-popup,
-.fleet-table td,.fleet-table th,.ticket-row,.dp-hdr,.dp-section,.dp-row,
-.dp-bar-track,.step-card,.step-card-hdr,.detail-block,.db-title,
-.tab-btn,.lc,.lc-input,.inj-btn,.form-input,.form-select,.theme-toggle,
-.ticket-tabs,.panel-hdr,.alert-ok,.alert-warn,.alert-err{
+.topbar,.panel,.kpi,.detail-outer,.inject-panel,.kpi-popup,
+.fleet-table td,.fleet-table th,.dp-hdr,.dp-section,.dp-row,
+.dp-bar-track,
+.lc,.lc-input,.inj-btn,.theme-toggle,
+.panel-hdr{
   transition:background .25s ease,border-color .22s ease,color .2s ease,box-shadow .2s ease;
 }
 
@@ -701,42 +525,10 @@ body.light .inj-btn.clear:hover{background:rgba(0,137,106,.18)}
 body.light .inj-feedback.ok{background:rgba(0,137,106,.08);border-color:rgba(0,137,106,.28);color:var(--mint)}
 body.light .inj-feedback.err{background:rgba(204,0,48,.07);border-color:rgba(204,0,48,.26);color:var(--coral)}
 
-/* Ticket tabs & rows */
-body.light .ticket-tabs{background:rgba(230,237,246,.8);border-bottom-color:var(--b1)}
-body.light .tab-btn{border-color:rgba(0,0,0,.10);color:var(--fog)}
-body.light .tab-btn.active{background:var(--e);color:#fff;border-color:var(--e);box-shadow:0 0 16px rgba(0,111,179,.25)}
-body.light .tab-btn:hover:not(.active){color:var(--e);border-color:rgba(0,111,179,.28);background:rgba(0,111,179,.06)}
-body.light .ticket-row{background:rgba(255,255,255,.78);border-color:var(--b1)}
-body.light .ticket-row:hover{background:rgba(0,130,195,.05);border-color:rgba(0,130,195,.22);box-shadow:0 2px 12px rgba(0,0,0,.07)}
+/* Status badge (KPI popup) */
 body.light .st-resolved{color:var(--mint);background:rgba(0,137,106,.10)}
 body.light .st-escalated{color:var(--gold);background:rgba(168,104,0,.10)}
 body.light .st-open{color:var(--e);background:rgba(0,111,179,.10)}
-
-/* Modals */
-body.light .modal-overlay{background:rgba(200,215,230,.55)}
-body.light .modal{background:rgba(255,255,255,.98);border-color:var(--b2);box-shadow:0 48px 120px rgba(0,0,0,.18),0 0 0 1px rgba(0,130,195,.07)}
-body.light .modal-hdr{background:rgba(230,237,246,.9);border-bottom-color:var(--b1)}
-body.light .modal-title{color:#071525}
-body.light .step-card{background:rgba(245,250,255,.85);border-color:var(--b1)}
-body.light .step-card:hover{border-color:var(--b2)}
-body.light .step-card-hdr{background:rgba(225,235,248,.8);border-bottom-color:var(--b1)}
-body.light .step-layer{color:#0A1929}
-body.light .step-desc{color:var(--mist)}
-body.light .detail-block{border-color:var(--b1)}
-body.light .db-title{background:rgba(220,232,246,.7);border-bottom-color:var(--b1)}
-body.light .db-row{border-bottom-color:rgba(0,130,195,.07)}
-body.light .diag-checks{border-color:var(--b1)}
-body.light .diag-check{border-bottom-color:rgba(0,130,195,.08)}
-body.light .diag-check:hover{background:rgba(0,130,195,.04)}
-body.light .diag-verdict.ok{background:rgba(0,137,106,.07);border-color:rgba(0,137,106,.28)}
-body.light .diag-verdict.err{background:rgba(204,0,48,.06);border-color:rgba(204,0,48,.24)}
-body.light .log-problem{background:rgba(0,111,179,.05);border-left-color:var(--e)}
-body.light .log-verdict-fault{background:rgba(204,0,48,.05)}
-body.light .log-verdict-fix{background:rgba(0,137,106,.05)}
-body.light .lvb-value{color:#0A1929}
-body.light .alert-ok{background:rgba(0,137,106,.08);border-color:rgba(0,137,106,.28)}
-body.light .alert-warn{background:rgba(168,104,0,.08);border-color:rgba(168,104,0,.28)}
-body.light .alert-err{background:rgba(204,0,48,.07);border-color:rgba(204,0,48,.26)}
 
 /* KPI popup */
 body.light .kpi-popup{background:rgba(255,255,255,.98);border-color:var(--b2);box-shadow:0 32px 80px rgba(0,0,0,.18),0 0 0 1px rgba(0,130,195,.06)}
@@ -744,19 +536,11 @@ body.light .kpi-popup::before{background:linear-gradient(90deg,transparent,var(-
 body.light .kpi-popup-hdr{background:rgba(230,237,246,.8)}
 body.light .kpi-popup-row:hover{background:rgba(0,130,195,.06);border-color:rgba(0,130,195,.18)}
 
-/* Form */
-body.light .form-input,body.light .form-select{background:rgba(235,243,252,.9);border-color:rgba(0,130,195,.22);color:#071525}
-body.light .form-select option{background:#F2F6FB;color:#071525}
-body.light .form-btn-cancel{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12);color:var(--mist)}
-
 /* Chip tweaks for light bg */
 body.light .fault-chip{background:rgba(168,104,0,.10);border-color:rgba(168,104,0,.28)}
 body.light .chip-up{background:rgba(0,137,106,.10);border-color:rgba(0,137,106,.28)}
 body.light .chip-down{background:rgba(204,0,48,.10);border-color:rgba(204,0,48,.30)}
 body.light .f-model{background:rgba(0,0,0,.06)}
-body.light .schema-pill,.light .tr069-path{background:rgba(0,111,179,.08);border-color:rgba(0,111,179,.22)}
-body.light .dv-param-chip{background:rgba(0,111,179,.09);border-color:rgba(0,111,179,.24)}
-body.light .write-path{border-bottom-color:rgba(0,130,195,.09)}
 body.light .dp-bar-ok .dp-bar-fill{background:linear-gradient(90deg,var(--mint2),var(--mint))}
 body.light .dp-bar-warn .dp-bar-fill{background:linear-gradient(90deg,#8A5A00,var(--gold))}
 body.light .dp-bar-err .dp-bar-fill{background:linear-gradient(90deg,var(--coral2),var(--coral))}
@@ -776,7 +560,7 @@ body.light .theme-toggle:hover{background:rgba(0,0,0,.10)}
 @media (max-width:1200px){
   html,body{overflow:auto}
   #shell{height:auto!important;min-height:100vh}
-  .body{grid-template-columns:1fr;grid-template-rows:auto 520px auto 240px;grid-template-areas:"kpis" "fleet" "detail" "tickets";overflow:visible}
+  .body{grid-template-columns:1fr;grid-template-rows:auto 520px auto;grid-template-areas:"kpis" "fleet" "detail";overflow:visible}
   .kpis{flex-direction:row;flex-wrap:wrap;height:auto}
   .kpi{min-width:140px;min-height:100px}
   .right-col{min-height:500px}
@@ -786,8 +570,6 @@ body.light .theme-toggle:hover{background:rgba(0,0,0,.10)}
   .topbar{height:auto;flex-wrap:wrap;gap:8px}
   .tb-services{flex-basis:100%;order:3}
   .tb-right{order:4;width:100%;justify-content:space-between}
-  .ticket-hdr,.ticket-row{grid-template-columns:80px 100px minmax(120px,1fr)}
-  .ticket-hdr div:nth-child(n+4),.ticket-row div:nth-child(n+4){display:none}
 }
 </style>
 </head>
@@ -942,80 +724,6 @@ body.light .theme-toggle:hover{background:rgba(0,0,0,.10)}
       </div>
     </div>
 
-    <!-- Tickets Row -->
-    <div class="panel tickets-row">
-      <div class="ticket-tabs">
-        <button class="tab-btn active" onclick="loadTickets(null,this)">All</button>
-        <button class="tab-btn" onclick="loadTickets('escalated',this)">Escalated</button>
-        <button class="tab-btn" onclick="loadTickets('resolved',this)">Resolved</button>
-        <button class="tab-btn" onclick="loadTickets('open',this)">Open</button>
-        <button class="ph-btn" onclick="openCreateTicketModal()" style="margin-left:auto">+ New Ticket</button>
-      </div>
-      <div class="ticket-hdr">
-        <div>Status</div><div>Account</div><div>Problem</div>
-        <div>Fault</div><div>Fix</div><div>Date</div>
-      </div>
-      <div class="tickets-body" id="tickets-body">
-        <div style="text-align:center;color:var(--fog);padding:16px;font-size:11px">Loading…</div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- Ticket detail modal -->
-<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-hdr">
-      <span class="modal-title" id="modal-title">Fix Details</span>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-body" id="modal-body"></div>
-  </div>
-</div>
-
-<!-- Create Ticket Modal -->
-<div class="modal-overlay" id="create-ticket-modal" onclick="if(event.target===this)closeCreateTicketModal()">
-  <div class="modal">
-    <div class="modal-hdr">
-      <span class="modal-title">Create Manual Ticket</span>
-      <button class="modal-close" onclick="closeCreateTicketModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Account ID</label>
-        <input type="text" id="ct-account-id" class="form-input" placeholder="e.g., ACC001" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Problem Description</label>
-        <textarea id="ct-problem" class="form-input" placeholder="Describe the customer's issue…" style="resize:none;height:88px"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Fault Type</label>
-        <select id="ct-fault" class="form-select">
-          <option value="manual">Manual Entry</option>
-          <option value="ppp_auth_failure">PPP Auth Failure</option>
-          <option value="wrong_vlan">Wrong VLAN</option>
-          <option value="dns_failure">DNS Failure</option>
-          <option value="weak_signal">Weak Signal</option>
-          <option value="random_disconnect">Random Disconnect</option>
-          <option value="hardware_fault">Hardware Fault</option>
-          <option value="unknown">Unknown</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Status</label>
-        <select id="ct-status" class="form-select">
-          <option value="open">Open</option>
-          <option value="escalated">Escalated</option>
-          <option value="resolved">Resolved</option>
-        </select>
-      </div>
-      <div class="form-btns">
-        <button class="form-btn-cancel" onclick="closeCreateTicketModal()">Cancel</button>
-        <button class="form-btn-submit" onclick="submitCreateTicket()">Create Ticket</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -1086,7 +794,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
 });
 
 function initDashboard(){
-  checkStatus(); loadFleet(); loadTickets(null,document.querySelector('.tab-btn')); loadTicketStats();
+  checkStatus(); loadFleet(); loadTicketStats();
   setInterval(checkStatus,15000); setInterval(loadFleet,30000); setInterval(loadTicketStats,20000);
 }
 
@@ -1257,35 +965,6 @@ function showFb(msg,ok){
   clearTimeout(el._t); el._t=setTimeout(()=>el.style.display='none',4000);
 }
 
-async function loadTickets(status,tabEl){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  if(tabEl) tabEl.classList.add('active');
-  const url=status?`/api/noc/tickets?status=${status}`:'/api/noc/tickets';
-  const body=document.getElementById('tickets-body');
-  body.innerHTML='<div style="text-align:center;color:var(--fog);padding:12px;font-size:11px">Loading…</div>';
-  try{
-    const r=await fetch(url); const d=await r.json();
-    if(!d.tickets?.length){body.innerHTML='<div style="text-align:center;color:var(--fog);padding:16px;font-size:11px">No tickets</div>';return;}
-    body.innerHTML='';
-    d.tickets.forEach(t=>{
-      const cls={resolved:'st-resolved',escalated:'st-escalated',open:'st-open'}[t.status]||'';
-      const rowCls={resolved:'tr-resolved',escalated:'tr-escalated',open:'tr-open'}[t.status]||'';
-      const date=t.created_at?new Date(t.created_at).toLocaleDateString('en-GB'):'—';
-      const div=document.createElement('div');
-      div.className=`ticket-row animate-in ${rowCls}`;
-      div.onclick=()=>openTicketModal(t);
-      div.innerHTML=`
-        <div class="tr-status"><span class="st ${cls}">${t.status}</span></div>
-        <div class="tr-acct">${t.account_id||'—'}</div>
-        <div class="tr-problem">${(t.problem_description||'').slice(0,55)}</div>
-        <div class="tr-fault">${(t.fault_detected||'—').replace(/_/g,' ')}</div>
-        <div class="tr-fix">${(t.fix_applied||'—').replace(/_/g,' ')}</div>
-        <div class="tr-date">${date}</div>`;
-      body.appendChild(div);
-    });
-  }catch(e){body.innerHTML=`<div style="color:var(--coral);padding:12px;font-size:11px">Error: ${e}</div>`;}
-}
-
 // ── Fault / Fix label dictionaries ────────────────────────────────────────
 const FAULT_LABELS={
   ppp_auth_failure:  {label:'PPP Authentication Failure', desc:'Router cannot authenticate with the ISP — wrong credentials or auth server error'},
@@ -1306,381 +985,6 @@ const FIX_LABELS={
   escalate_to_technician:   {label:'Escalate to Technician', desc:'Issue requires physical on-site intervention — ticket created for field team'},
   no_action_needed:         {label:'No Action Needed',        desc:'Router was already in a healthy state at the time of the call'},
 };
-
-// ── Helpers ────────────────────────────────────────────────────────────────
-function dbRow(k,v,cls='dim'){
-  return `<div class="db-row"><span class="db-key">${k}</span><span class="db-val ${cls}">${v??'—'}</span></div>`;
-}
-
-// ── Per-layer renderers ────────────────────────────────────────────────────
-function renderGraphRAGStep(s){
-  const res=s.result||{};
-  const meta=res.router_meta||{};
-  const rows=[
-    res.router_model?dbRow('Input Model',res.router_model,'dim'):'',
-    meta.id?dbRow('Graph Node ID',meta.id,'ok'):'',
-    meta.product_class?dbRow('Product Class',meta.product_class,'ok'):'',
-    meta.sheet_name?dbRow('Schema Sheet',meta.sheet_name,'dim'):'',
-    res.router_serial?dbRow('Serial',res.router_serial,'dim'):'',
-    res.subscription_plan?dbRow('Subscription Plan',res.subscription_plan,'dim'):'',
-    res.source?dbRow('Source',res.source,'dim'):'',
-  ].filter(Boolean).join('');
-  if(!rows) return '<div class="log-empty">No metadata returned</div>';
-  return `<div class="detail-block"><div class="db-title">Router Resolved from Graph</div><div class="db-rows">${rows}</div></div>
-  <div style="font-size:9px;color:var(--fog);margin-top:6px;font-family:var(--mono)">Neo4j GraphRAG cross-references the router model to load the correct TR-069 parameter schema sheet for diagnostics.</div>`;
-}
-
-function renderGenieReadStep(s){
-  const res=s.result||{};
-  if(res.error) return `<div class="alert-box alert-err">✗ ACS unreachable — ${res.error}<br><small>Cannot read live router parameters. Ticket opened as "open" for manual review.</small></div>`;
-  const params=res.parameters||{};
-  const statusCls=res.status==='UP'?'ok':'err';
-  let html=`<div class="detail-block"><div class="db-title">Live Router State</div><div class="db-rows">
-    ${dbRow('Status',res.status||'—',statusCls)}
-    ${(res.fault&&res.fault!=='healthy')?dbRow('Active Fault',res.fault.replace(/_/g,' '),'err'):dbRow('Active Fault','none','ok')}
-  </div></div>`;
-  if(Object.keys(params).length){
-    const PARAM_MAP=[
-      ['PPPStatus','PPP Status',v=>v==='Connected'?'ok':'err'],
-      ['ConnectionStatus','WAN Connection',v=>v==='Connected'?'ok':v==='Unconfigured'?'err':'warn'],
-      ['VLANId','VLAN ID',v=>(v==0||v==100)?'ok':'warn',v=>v!=null?String(v):'—'],
-      ['ExternalIPAddress','External IP',()=>'dim'],
-      ['Uptime','Uptime',()=>'dim',v=>formatUptime(v)],
-      ['RXPower','RX Optical Power',v=>parseFloat(v)>=-27?'ok':'err',v=>v!=null?`${v} dBm`:'—'],
-      ['TXPower','TX Power',()=>'dim',v=>v!=null?`${v} dBm`:'—'],
-      ['Temperature','Temperature',v=>parseFloat(v)<80?'ok':parseFloat(v)<90?'warn':'err',v=>v!=null?`${v} °C`:'—'],
-      ['SignalLoss','Signal Loss',v=>!v?'ok':'err',v=>v?'YES':'NO'],
-      ['ErrorCount','Error Count',v=>parseInt(v)<=100?'ok':parseInt(v)<=200?'warn':'err'],
-      ['LastConnectionError','Last Connection Error',v=>(!v||v==='None')?'ok':'warn'],
-      ['DNSServer','DNS Server',v=>(v&&v!=='0.0.0.0')?'ok':'err'],
-      ['DNSStatus','DNS Status',v=>v==='Active'?'ok':'err'],
-    ];
-    let rows='';
-    PARAM_MAP.forEach(([key,label,clsFn,fmtFn])=>{
-      if(params[key]===undefined) return;
-      const raw=params[key];
-      const display=fmtFn?fmtFn(raw):(raw!=null?String(raw):'—');
-      rows+=dbRow(label,display,clsFn?clsFn(raw):'dim');
-    });
-    html+=`<div class="detail-block" style="margin-top:7px"><div class="db-title">Key Parameters Read (${Object.keys(params).length} total)</div><div class="db-rows">${rows}</div></div>`;
-    html+=`<div style="font-size:9px;color:var(--fog);margin-top:6px;font-family:var(--mono)">Thresholds: RX ≥ -27 dBm · VLAN ∈ {0,100} · ErrorCount ≤ 100 · Temperature < 80 °C</div>`;
-  }
-  return html;
-}
-
-function renderNeo4jStep(s){
-  const res=s.result||{};
-  let html='';
-  if(res.error){
-    html+=`<div class="alert-box alert-err">✗ Neo4j MCP service unreachable — ${res.error}<br><small>Diagnostic engine will fall back to role-based path resolution without schema context.</small></div>`;
-  } else if(res.warning){
-    html+=`<div class="alert-box alert-warn">⚠ Router model not in graph — "${res.warning}"<br><small>No TR-069 schema loaded for this model. Diagnostic continues using built-in role→path mappings.</small></div>`;
-  } else {
-    html+=`<div class="alert-box alert-ok">✓ TR-069 parameter schema loaded — ${res.total_params||0} parameters indexed across ${(res.categories||[]).length} categories</div>`;
-  }
-  if(res.total_params>0||res.parsed_params>0){
-    html+=`<div class="detail-block" style="margin-top:7px"><div class="db-title">Schema Statistics</div><div class="db-rows">
-      ${dbRow('Raw Parameters in DB',res.total_params,'ok')}
-      ${dbRow('Parsed into Role Index',res.parsed_params,'ok')}
-    </div></div>`;
-  }
-  if(res.categories?.length){
-    html+=`<div class="detail-block" style="margin-top:7px">
-      <div class="db-title">Parameter Categories (${res.categories.length} groups)</div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px">${res.categories.map(c=>`<span class="schema-pill">${c}</span>`).join('')}</div>
-      <div style="font-size:9px;color:var(--fog);padding:0 10px 8px;font-family:var(--mono)">Each category maps to a sub-tree of the TR-069 object model (e.g., WANDevice, LANDevice, DeviceInfo).</div>
-    </div>`;
-  }
-  const paths=res.tr069_paths_read||[];
-  if(paths.length){
-    html+=`<div class="detail-block" style="margin-top:7px">
-      <div class="db-title">TR-069 Paths Consulted for Diagnosis (${paths.length})</div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;padding:8px 10px">${paths.slice(0,14).map(p=>`<span class="tr069-path" title="${p.path||''}">${p.label}</span>`).join('')}${paths.length>14?`<span style="font-size:9px;color:var(--fog);padding:3px 0">+${paths.length-14} more</span>`:''}</div>
-    </div>`;
-  }
-  return html;
-}
-
-function buildDiagChecks(paths){
-  return paths.map(p=>{
-    const role=(p.role||p.label||'').toLowerCase();
-    const val=p.value;
-    const path=p.path||'';
-    let param=role, displayValue=String(val??'—'), status='skip', evaluation='No threshold applied';
-    if(role.includes('rx')||role.includes('optical receive')||role.includes('receive power')){
-      param='RX Optical Power'; displayValue=val!=null?`${val} dBm`:'—';
-      const n=parseFloat(val);
-      if(!isNaN(n)){
-        if(n<-27){status='trigger';evaluation=`${val} dBm is below the -27 dBm minimum threshold → signal too weak for reliable communication`;}
-        else{status='pass';evaluation=`${val} dBm is above the -27 dBm threshold → optical level is acceptable`;}
-      } else {status='skip';evaluation='Value unavailable — check skipped';}
-    } else if(role.includes('signal')&&role.includes('loss')){
-      param='Signal Loss Flag'; displayValue=val?'TRUE':'false';
-      if(val){status='trigger';evaluation='Signal loss flag is asserted → fiber break, dirty connector, or SFP failure';}
-      else{status='pass';evaluation='No signal loss reported by the ONU';}
-    } else if(role.includes('error')||role.includes('count')||role.includes('crc')){
-      param='Error / CRC Count'; displayValue=String(val??'—');
-      const n=parseInt(val);
-      if(!isNaN(n)){
-        if(n>100){status='trigger';evaluation=`${val} errors exceeds the 100-error threshold → hardware degradation or bad line`;}
-        else{status='pass';evaluation=`${val} errors — within the 100-error threshold`;}
-      }
-    } else if(role.includes('ppp')&&(role.includes('status')||role.includes('state'))){
-      param='PPP Session Status'; displayValue=String(val??'—');
-      const lower=String(val||'').toLowerCase();
-      if(lower.includes('disconnect')||lower.includes('error')){status='trigger';evaluation=`PPP status is "${val}" — session is not established`;}
-      else if(lower.includes('connect')){status='pass';evaluation=`PPP status "${val}" — session is active and authenticated`;}
-      else{status='warn';evaluation=`PPP status "${val}" — unexpected or transitional state`;}
-    } else if(role.includes('connection')&&role.includes('status')){
-      param='WAN Connection Status'; displayValue=String(val??'—');
-      const lower=String(val||'').toLowerCase();
-      if(lower.includes('unconfigured')){status='trigger';evaluation=`"${val}" — WAN interface cannot connect: missing or wrong VLAN configuration`;}
-      else if(lower.includes('connected')){status='pass';evaluation=`"${val}" — WAN is connected and passing traffic`;}
-      else{status='warn';evaluation=`"${val}" — intermediate state (connecting or error)`;}
-    } else if(role.includes('vlan')||role.includes('vid')){
-      param='VLAN ID'; displayValue=String(val??'—');
-      const n=parseInt(val);
-      if(!isNaN(n)){
-        if(n!==0&&n!==100){status='trigger';evaluation=`VLAN ${val} is not in the allowed set {0, 100} — traffic will be dropped by the ISP uplink`;}
-        else{status='pass';evaluation=`VLAN ${val} is correct (allowed: 0 or 100)`;}
-      }
-    } else if(role.includes('dns')&&(role.includes('server')||role.includes('domain'))){
-      param='DNS Server Address'; displayValue=String(val??'—');
-      if(val==='0.0.0.0'||!val){status='trigger';evaluation=`DNS server is "${val}" — unset or unreachable, all name resolution will fail`;}
-      else{status='pass';evaluation=`DNS server "${val}" is set and reachable`;}
-    } else if(role.includes('dns')&&role.includes('status')){
-      param='DNS Service Status'; displayValue=String(val??'—');
-      const lower=String(val||'').toLowerCase();
-      if(lower.includes('error')||lower.includes('fail')||lower.includes('inactive')){status='trigger';evaluation=`DNS status "${val}" — resolution is failing`;}
-      else{status='pass';evaluation=`DNS status "${val}"`;}
-    } else if(role.includes('last')&&role.includes('error')){
-      param='Last Connection Error'; displayValue=String(val||'None');
-      const lower=String(val||'').toLowerCase();
-      if(lower.includes('authentication')||lower.includes('auth')){status='trigger';evaluation=`"${val}" — authentication error confirms PPP credential mismatch`;}
-      else if(!val||val==='None'){status='pass';evaluation='No recent connection errors recorded';}
-      else{status='warn';evaluation=`"${val}" — a connection error is present`;}
-    } else if(role.includes('ppp_auth_failure')||role.includes('auth failure')){
-      param='PPP Auth Failure (diagnostic rule)'; displayValue=String(val||'—');
-      status='trigger'; evaluation=`Correlation rule fired: ${val}`;
-    } else {
-      param=p.role||p.label||role; displayValue=String(val??'—'); status='skip'; evaluation='Supporting parameter — no independent threshold check';
-    }
-    return {param,path,status,displayValue,evaluation};
-  });
-}
-
-function renderDiagStep(s){
-  const res=s.result||{};
-  const paths=res.tr069_paths_read||[];
-  const fault=res.fault_detected;
-  const fixTool=res.fix_tool;
-  const fixParams=res.fix_params||{};
-  let html='';
-  if(paths.length){
-    const checks=buildDiagChecks(paths);
-    html+=`<div class="detail-block"><div class="db-title">Diagnostic Decision Log — ${paths.length} TR-069 paths evaluated</div><div class="diag-checks">`;
-    checks.forEach(c=>{
-      const icon=c.status==='pass'?'✓':c.status==='trigger'?'✗':c.status==='warn'?'⚠':'·';
-      html+=`<div class="diag-check ${c.status}">
-        <div class="dc-icon">${icon}</div>
-        <div class="dc-body">
-          <div class="dc-param">${c.param}</div>
-          ${c.path?`<div class="dc-path" title="${c.path}">${c.path}</div>`:''}
-          <div class="dc-eval">${c.evaluation}</div>
-        </div>
-        <div class="dc-value ${c.status}">${c.displayValue}</div>
-      </div>`;
-    });
-    html+=`</div></div>`;
-  }
-  const faultInfo=FAULT_LABELS[fault]||{label:fault||'Unknown',desc:''};
-  const fixInfo=FIX_LABELS[fixTool]||{label:fixTool||'N/A',desc:''};
-  const verdictCls=fault==='healthy'?'ok':'err';
-  html+=`<div class="diag-verdict ${verdictCls}" style="margin-top:10px">
-    <div class="dv-row">
-      <div class="dv-section">
-        <div class="dv-label">Fault Identified</div>
-        <div class="dv-value">${faultInfo.label}</div>
-        <div class="dv-desc">${faultInfo.desc}</div>
-      </div>
-      ${fixTool?`<div class="dv-arrow">→</div>
-      <div class="dv-section">
-        <div class="dv-label">Remediation Selected</div>
-        <div class="dv-value fix">${fixInfo.label}</div>
-        <div class="dv-desc">${fixInfo.desc}</div>
-      </div>`:''}
-    </div>
-    ${Object.keys(fixParams).length?`<div class="dv-params">Parameters: ${Object.entries(fixParams).map(([k,v])=>`<span class="dv-param-chip">${k} = ${v}</span>`).join('')}</div>`:''}
-  </div>`;
-  return html;
-}
-
-function renderRaDuceStep(s){
-  const res=s.result||{};
-  const args={...s.args||{}}; delete args.serial;
-  const writePaths=s.tr069_paths_written||[];
-  let html='';
-  if(Object.keys(args).length){
-    html+=`<div class="detail-block"><div class="db-title">Parameters Sent to Router</div><div class="db-rows">
-      ${Object.entries(args).map(([k,v])=>dbRow(k,String(v),'dim')).join('')}
-    </div></div>`;
-  }
-  if(writePaths.length){
-    html+=`<div class="detail-block" style="margin-top:7px">
-      <div class="db-title">TR-069 Paths Written via SetParameterValues (${writePaths.length})</div>
-      <div style="font-size:9px;color:var(--fog);padding:5px 10px;font-family:var(--mono)">These OID paths were written on the CPE through the ACS session:</div>
-      ${writePaths.map(p=>`<div class="write-path"><span class="wp-label">${p.label}</span><span class="wp-path">${p.path}</span>${p.category?`<span class="wp-cat">${p.category}</span>`:''}</div>`).join('')}
-    </div>`;
-  }
-  if(res.success===true){
-    html+=`<div class="alert-box alert-ok" style="margin-top:7px">✓ ${res.message||'Fix applied successfully — ACS confirmed write'}</div>`;
-  } else if(res.error){
-    html+=`<div class="alert-box alert-err" style="margin-top:7px">✗ ${res.error}<br><small>Router may be offline or ACS could not reach the CPE. Manual escalation may be required.</small></div>`;
-  } else if(res.ticket_id||res.short_id){
-    html+=`<div class="alert-box alert-warn" style="margin-top:7px">⚠ Escalation ticket created — #${res.short_id||res.ticket_id}</div>`;
-  }
-  return html||renderGenericKV(s.result);
-}
-
-function renderGenieVerifyStep(s){
-  const res=s.result||{};
-  const params=res.parameters||{};
-  if(!Object.keys(res).length) return `<div class="alert-box alert-warn">⚠ No post-fix state returned from ACS</div>`;
-  const status=res.status||'—';
-  const fault=res.fault||'healthy';
-  let html='';
-  if(s.ok){
-    html+=`<div class="alert-box alert-ok">✓ Router confirmed ONLINE after fix — recovery successful</div>`;
-  } else {
-    html+=`<div class="alert-box alert-err">✗ Router still unreachable or DOWN after fix — automatic escalation triggered<br><small>A field technician ticket will be created for on-site intervention.</small></div>`;
-  }
-  html+=`<div class="detail-block" style="margin-top:7px"><div class="db-title">Post-Fix Parameter Verification</div><div class="db-rows">
-    ${dbRow('Status After Fix',status,status==='UP'?'ok':'err')}
-    ${dbRow('Fault After Fix',(fault&&fault!=='healthy')?fault.replace(/_/g,' '):'none',(!fault||fault==='healthy')?'ok':'err')}
-    ${params.PPPStatus?dbRow('PPP Status',params.PPPStatus,params.PPPStatus==='Connected'?'ok':'err'):''}
-    ${params.DNSServer?dbRow('DNS Server',params.DNSServer,params.DNSServer&&params.DNSServer!=='0.0.0.0'?'ok':'err'):''}
-    ${params.VLANId!=null?dbRow('VLAN ID',String(params.VLANId),(params.VLANId==0||params.VLANId==100)?'ok':'warn'):''}
-    ${params.ExternalIPAddress?dbRow('External IP',params.ExternalIPAddress,'dim'):''}
-  </div></div>`;
-  return html;
-}
-
-function renderGenericKV(obj){
-  if(!obj||!Object.keys(obj).length) return '';
-  const skip=new Set(['full_log','router_state_before','router_state_after']);
-  const rows=Object.entries(obj).filter(([k])=>!skip.has(k)).slice(0,14).map(([k,v])=>{
-    if(v===null||v===undefined||v==='') return '';
-    const vs=typeof v==='object'?JSON.stringify(v).slice(0,140):String(v).slice(0,140);
-    let cls='';
-    if(k==='error'||(k==='ok'&&v===false)) cls='err';
-    else if(k==='ok'&&v===true) cls='ok';
-    else if(k.toLowerCase().includes('warning')) cls='warn';
-    return dbRow(k,vs,cls);
-  }).filter(Boolean).join('');
-  return rows?`<div class="detail-block"><div class="db-rows">${rows}</div></div>`:'';
-}
-
-// ── Main modal entry ───────────────────────────────────────────────────────
-function openTicketModal(ticket){
-  const steps=ticket.full_log||[];
-  const stCls={resolved:'st-resolved',escalated:'st-escalated',open:'st-open'}[ticket.status]||'';
-  document.getElementById('modal-title').textContent=
-    `${(ticket.fault_detected||'?').replace(/_/g,' ')} → ${(ticket.fix_applied||'escalated').replace(/_/g,' ')} · #${ticket.short_id||ticket._id?.slice(-6)||'?'}`;
-  let html='';
-  html+=`<div class="log-summary">
-    <span class="st ${stCls}" style="font-size:11px">${(ticket.status||'').toUpperCase()}</span>
-    ${ticket.customer_name?`<span class="log-chip">👤 ${ticket.customer_name}</span>`:''}
-    ${ticket.router_serial?`<span class="log-chip">📡 ${ticket.router_serial}</span>`:''}
-    ${ticket.router_model?`<span class="log-chip">📋 ${ticket.router_model}</span>`:''}
-    ${ticket.resolution_time_s!=null?`<span class="log-chip log-chip-teal">⏱ ${ticket.resolution_time_s}s resolution</span>`:''}
-    ${ticket.created_at?`<span class="log-chip">🗓 ${new Date(ticket.created_at).toLocaleString('en-GB')}</span>`:''}
-  </div>`;
-  if(ticket.problem_description){
-    html+=`<div class="log-problem">"${ticket.problem_description}"</div>`;
-  }
-  const fd=ticket.fault_detected,fa=ticket.fix_applied;
-  if(fd&&fd!=='unknown'){
-    const fi=FAULT_LABELS[fd]||{label:fd.replace(/_/g,' '),desc:''};
-    const xi=FIX_LABELS[fa]||{label:(fa||'N/A').replace(/_/g,' '),desc:''};
-    html+=`<div class="log-verdict-row">
-      <div class="log-verdict-box log-verdict-fault">
-        <div class="lvb-label">Fault Detected</div>
-        <div class="lvb-value">${fi.label}</div>
-        <div class="lvb-desc">${fi.desc}</div>
-      </div>
-      <div class="log-verdict-arrow">→</div>
-      <div class="log-verdict-box log-verdict-fix">
-        <div class="lvb-label">Fix Applied</div>
-        <div class="lvb-value">${xi.label}</div>
-        <div class="lvb-desc">${xi.desc}</div>
-      </div>
-    </div>`;
-  }
-  if(!steps.length){
-    html+='<div class="log-empty">No diagnostic trace recorded for this ticket.</div>';
-  } else {
-    html+=`<div class="log-trace-hdr"><span>Diagnostic Trace</span><span>${steps.length} steps</span></div>`;
-    steps.forEach((s,i)=>{
-      const layer=s.layer||'';
-      const isGraphRAG=layer.includes('GraphRAG');
-      const isNeo4j=layer.includes('Neo4j');
-      const isDiag=layer.includes('Diagnostic');
-      const isRaDuce=layer.includes('RaDuce');
-      const isGenie=layer.includes('GenieACS');
-      const isVerify=isGenie&&(s.description||'').toLowerCase().includes('verify');
-      let statusClass=s.ok!==false?'ok':'err';
-      let statusIcon=s.ok!==false?'✓':'✗';
-      if(isNeo4j&&s.result?.warning){statusClass='warn';statusIcon='⚠';}
-      let innerHtml='';
-      if(isGraphRAG)     innerHtml=renderGraphRAGStep(s);
-      else if(isNeo4j)   innerHtml=renderNeo4jStep(s);
-      else if(isDiag)    innerHtml=renderDiagStep(s);
-      else if(isRaDuce)  innerHtml=renderRaDuceStep(s);
-      else if(isVerify)  innerHtml=renderGenieVerifyStep(s);
-      else if(isGenie)   innerHtml=renderGenieReadStep(s);
-      else               innerHtml=renderGenericKV(s.result);
-      html+=`<div class="step-card">
-        <div class="step-card-hdr">
-          <div class="step-ok ${statusClass}">${statusIcon}</div>
-          <span class="step-layer">${layer||'Step '+(i+1)}</span>
-          <span class="step-port">:${s.port||'?'}</span>
-          <span class="step-tool">${s.tool||''}</span>
-          <span class="step-num">#${i+1}/${steps.length}</span>
-        </div>
-        <div class="step-desc">${s.description||''}</div>
-        <div class="step-result">${innerHtml}</div>
-      </div>`;
-    });
-  }
-  document.getElementById('modal-body').innerHTML=html;
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
-
-function openCreateTicketModal(){
-  document.getElementById('create-ticket-modal').classList.add('open');
-  document.getElementById('ct-account-id').focus();
-}
-function closeCreateTicketModal(){
-  document.getElementById('create-ticket-modal').classList.remove('open');
-  document.getElementById('ct-account-id').value='';
-  document.getElementById('ct-problem').value='';
-  document.getElementById('ct-fault').value='manual';
-  document.getElementById('ct-status').value='open';
-}
-async function submitCreateTicket(){
-  const accountId=document.getElementById('ct-account-id').value.trim();
-  const problem=document.getElementById('ct-problem').value.trim();
-  const fault=document.getElementById('ct-fault').value;
-  const status=document.getElementById('ct-status').value;
-  if(!accountId||!problem){alert('Please fill in all required fields');return;}
-  try{
-    const r=await fetch('/api/noc/tickets/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({account_id:accountId,problem:problem,fault:fault,status:status})});
-    const d=await r.json();
-    if(d.success){closeCreateTicketModal();loadTickets(null,document.querySelector('.tab-btn'));alert('✓ Ticket #'+d.short_id+' created');}
-    else alert('Error: '+(d.error||'Unknown error'));
-  }catch(e){alert('Connection error: '+e);}
-}
 
 // ── Theme toggle ──────────────────────────────────────────────────────────
 function toggleTheme(){

@@ -18,8 +18,10 @@ Port: 8003
 """
 
 import os
+import random
+import string
 import contextlib
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import bcrypt
 import requests
@@ -150,6 +152,8 @@ def logic_authenticate_customer(phone: str, pin: str) -> dict:
         return {"authenticated": False, "error": "Incorrect phone or PIN"}
     cust.pop("_id", None)
     cust.pop("pin_hash", None)
+    cust.pop("email_verify_code", None)
+    cust.pop("email_verify_expires", None)
     cust["created_at"] = _iso(cust.get("created_at"))
     cust["authenticated"] = True
     return _enrich_customer_profile(cust)
@@ -185,6 +189,117 @@ def logic_get_customer_tickets(account_id: str) -> dict:
     )
     return {"account_id": account_id, "total": len(tickets),
             "tickets": [_clean_ticket(t) for t in tickets]}
+
+
+def _clean_notification(doc: dict) -> dict:
+    doc = dict(doc)
+    _id = doc.pop("_id", None)
+    if _id is not None:
+        doc["id"] = str(_id)
+    doc["created_at"] = _iso(doc.get("created_at"))
+    return doc
+
+
+def logic_create_notification(account_id: str, customer_name: str, fault: str,
+                              fault_label_en: str, fault_label_fr: str) -> dict:
+    """Persist a proactive fault notification for a customer account."""
+    doc = {
+        "account_id":     account_id,
+        "customer_name":  customer_name,
+        "fault":          fault,
+        "fault_label_en": fault_label_en,
+        "fault_label_fr": fault_label_fr,
+        "read":           False,
+        "created_at":     datetime.utcnow(),
+    }
+    res = db.notifications.insert_one(doc)
+    doc["_id"] = res.inserted_id
+    return {"success": True, "notification": _clean_notification(doc)}
+
+
+def logic_get_notifications(account_id: str) -> dict:
+    """List a customer's notifications, newest first."""
+    items = [_clean_notification(n) for n in
+             db.notifications.find({"account_id": account_id})
+             .sort("created_at", -1).limit(50)]
+    return {"account_id": account_id, "total": len(items),
+            "unread": sum(1 for n in items if not n["read"]),
+            "notifications": items}
+
+
+def logic_mark_notification_read(notification_id: str) -> dict:
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    try:
+        oid = ObjectId(notification_id)
+    except InvalidId:
+        return {"success": False, "error": "Invalid notification id"}
+    res = db.notifications.update_one({"_id": oid}, {"$set": {"read": True}})
+    return {"success": res.matched_count > 0}
+
+
+def logic_delete_notification(notification_id: str, account_id: str) -> dict:
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    try:
+        oid = ObjectId(notification_id)
+    except InvalidId:
+        return {"success": False, "error": "Invalid notification id"}
+    res = db.notifications.delete_one({"_id": oid, "account_id": account_id})
+    return {"success": res.deleted_count > 0}
+
+
+def logic_get_customer_profile(account_id: str) -> dict:
+    """Minimal profile lookup (name + verified email) for server-to-server use,
+    e.g. app.py deciding whether to email a proactive fault notification."""
+    cust = db.customers.find_one({"account_id": account_id},
+                                  {"_id": 0, "name": 1, "email": 1, "email_verified": 1})
+    if not cust:
+        return {"error": "Customer not found"}
+    return {
+        "account_id":     account_id,
+        "name":           cust.get("name", ""),
+        "email":          cust.get("email"),
+        "email_verified": bool(cust.get("email_verified")),
+    }
+
+
+def _gen_email_code() -> str:
+    return "".join(random.choices(string.digits, k=6))
+
+
+def logic_set_customer_email(account_id: str, email: str) -> dict:
+    """Save a customer's email and issue a fresh 10-minute verification code."""
+    cust = db.customers.find_one({"account_id": account_id})
+    if not cust:
+        return {"success": False, "error": "Customer not found"}
+    code = _gen_email_code()
+    db.customers.update_one({"account_id": account_id}, {"$set": {
+        "email":               email,
+        "email_verified":      False,
+        "email_verify_code":   code,
+        "email_verify_expires": datetime.utcnow() + timedelta(minutes=10),
+    }})
+    return {"success": True, "email": email, "code": code}
+
+
+def logic_verify_customer_email(account_id: str, code: str) -> dict:
+    """Confirm the verification code sent to a customer's email."""
+    cust = db.customers.find_one({"account_id": account_id})
+    if not cust:
+        return {"success": False, "error": "Customer not found"}
+    if not cust.get("email"):
+        return {"success": False, "error": "No email on file"}
+    expires = cust.get("email_verify_expires")
+    if not expires or datetime.utcnow() > expires:
+        return {"success": False, "error": "Code expired — please resend"}
+    if str(cust.get("email_verify_code") or "") != str(code or "").strip():
+        return {"success": False, "error": "Incorrect code"}
+    db.customers.update_one({"account_id": account_id}, {
+        "$set":   {"email_verified": True},
+        "$unset": {"email_verify_code": "", "email_verify_expires": ""},
+    })
+    return {"success": True}
 
 
 def logic_admin_authenticate(username: str, password: str) -> dict:
@@ -338,6 +453,52 @@ async def rest_create_ticket(request: Request):
     fault      = body.pop("fault_detected", "")
     status     = body.pop("status", "open")
     return logic_create_ticket(account_id, problem, fault, status, **body)
+
+
+# -- EMAIL VERIFICATION ROUTES (mandatory first-login gate — REST) -------------
+
+@app.get("/customer/profile")
+def rest_get_customer_profile(account_id: str):
+    return logic_get_customer_profile(account_id)
+
+
+@app.post("/customer/email")
+async def rest_set_customer_email(request: Request):
+    body = await request.json()
+    return logic_set_customer_email(body.get("account_id", ""), (body.get("email") or "").strip())
+
+
+@app.post("/customer/email/verify")
+async def rest_verify_customer_email(request: Request):
+    body = await request.json()
+    return logic_verify_customer_email(body.get("account_id", ""), body.get("code", ""))
+
+
+# -- NOTIFICATION ROUTES (customer proactive-fault bell — REST) ----------------
+
+@app.post("/notifications/create")
+async def rest_create_notification(request: Request):
+    body = await request.json()
+    return logic_create_notification(
+        body.get("account_id", ""), body.get("customer_name", ""),
+        body.get("fault", ""), body.get("fault_label_en", ""),
+        body.get("fault_label_fr", ""),
+    )
+
+
+@app.get("/notifications")
+def rest_get_notifications(account_id: str):
+    return logic_get_notifications(account_id)
+
+
+@app.post("/notifications/{notification_id}/read")
+def rest_mark_notification_read(notification_id: str):
+    return logic_mark_notification_read(notification_id)
+
+
+@app.delete("/notifications/{notification_id}")
+def rest_delete_notification(notification_id: str, account_id: str):
+    return logic_delete_notification(notification_id, account_id)
 
 
 # -- ADMIN ROUTES (NOC dashboard — REST) ---------------------------------------
