@@ -3,405 +3,960 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NOC — MyPFE</title>
+<title>NOC · MyPFE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:      #060A10;
-  --bg2:     #0B1018;
-  --bg3:     #111820;
-  --bg4:     #182030;
-  --border:  #1C2A3C;
-  --border2: #233450;
-  --teal:    #00E5BE;
-  --teal2:   #00B896;
-  --teal-bg: rgba(0,229,190,.07);
-  --blue:    #4D9EFF;
-  --blue-bg: rgba(77,158,255,.08);
-  --amber:   #FFB940;
-  --amber-bg:rgba(255,185,64,.08);
-  --red:     #FF5465;
-  --red-bg:  rgba(255,84,101,.08);
-  --purple:  #9B7BFF;
-  --green:   #2FD896;
-  --text:    #B8CDE0;
-  --text2:   #4E6A88;
-  --text3:   #263C58;
-  --white:   #FFFFFF;
-  --mono:    'IBM Plex Mono', monospace;
-  --sans:    'DM Sans', sans-serif;
+  --bg:#020810;
+  --s1:#07101E;
+  --s2:#0B1929;
+  --s3:#0F2238;
+  --glass:rgba(8,18,32,.88);
+  --glass2:rgba(11,25,42,.72);
+  --b1:rgba(64,196,255,.13);
+  --b2:rgba(64,196,255,.26);
+  --b3:rgba(64,196,255,.44);
+  --e:#00CFFF;
+  --e2:#0098CC;
+  --mint:#00F0C0;
+  --mint2:#00BF96;
+  --coral:#FF3355;
+  --coral2:#CC1A3D;
+  --gold:#FFB300;
+  --violet:#8B5CF6;
+  --ice:#E6F8FF;
+  --mist:#6B9AB8;
+  --fog:#3A607C;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Inter',sans-serif;
+  --r:6px;
 }
-html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow:hidden}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ice);-webkit-font-smoothing:antialiased;overflow:hidden}
 
-/* scan-line overlay */
-body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);pointer-events:none;z-index:999}
+/* ── Background ─────────────────────────────────────────────────────────── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% -10%,rgba(139,92,246,.22) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 90%,rgba(0,207,255,.18) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(0,240,192,.06) 0%,transparent 60%),
+    linear-gradient(180deg,#020810 0%,#030C1A 50%,#020810 100%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(64,196,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(64,196,255,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+}
 
-/* ── Login ── */
+/* ── Login ──────────────────────────────────────────────────────────────── */
 #login-overlay{
-  position:fixed;inset:0;
-  background:radial-gradient(ellipse 70% 50% at 50% 30%, rgba(0,229,190,.05) 0%, transparent 60%);
-  display:flex;align-items:center;justify-content:center;z-index:200
+  position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;
 }
 .lc{
-  background:var(--bg2);border:1px solid var(--border2);border-radius:16px;
-  padding:40px;width:360px;
-  box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 1px var(--border)
+  position:relative;width:440px;max-width:100%;padding:44px 40px;
+  background:rgba(7,16,30,.96);
+  border:1px solid var(--b2);
+  border-radius:16px;
+  box-shadow:0 0 0 1px rgba(0,207,255,.06),0 48px 120px rgba(0,0,0,.8),0 0 100px rgba(0,207,255,.14),inset 0 1px 0 rgba(255,255,255,.06);
+  overflow:hidden;
 }
-.lc-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  font-family:var(--mono);font-size:9px;font-weight:600;
-  color:var(--teal);background:var(--teal-bg);
-  border:1px solid rgba(0,229,190,.2);padding:4px 12px;border-radius:20px;
-  letter-spacing:.12em;margin-bottom:18px
+.lc::before{
+  content:'';position:absolute;inset:0;border-radius:16px;
+  background:linear-gradient(135deg,rgba(0,207,255,.08) 0%,transparent 50%);
+  pointer-events:none;
 }
-.lc-title{font-size:22px;font-weight:700;color:var(--white);letter-spacing:-.03em;margin-bottom:4px}
-.lc-sub{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.5}
-.lc-field{margin-bottom:12px}
+.lc::after{
+  content:'';position:absolute;top:-1px;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--e),transparent);
+}
+.lc-icon{
+  width:52px;height:52px;border-radius:12px;background:rgba(0,207,255,.1);border:1px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:24px;
+  box-shadow:0 0 24px rgba(0,207,255,.2);
+}
+.lc-title{font-size:28px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:-.5px}
+.lc-sub{font-size:13px;color:var(--mist);margin-bottom:30px;line-height:1.6}
+.lc-label{font-size:11px;font-weight:600;color:var(--mist);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;display:block}
+.lc-field{margin-bottom:14px}
 .lc-input{
-  width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;
-  padding:11px 14px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;
-  transition:border-color .2s
+  width:100%;background:rgba(2,8,18,.8);border:1px solid rgba(64,196,255,.18);border-radius:8px;
+  padding:13px 15px;color:var(--ice);font-family:var(--mono);font-size:13px;outline:none;transition:all .18s;
 }
-.lc-input:focus{border-color:var(--teal)}
-.lc-input::placeholder{color:var(--text3)}
+.lc-input:focus{border-color:var(--e);box-shadow:0 0 0 3px rgba(0,207,255,.14),0 0 20px rgba(0,207,255,.08)}
+.lc-input::placeholder{color:var(--fog)}
 .lc-btn{
-  width:100%;padding:12px;background:var(--teal);border:none;border-radius:8px;
-  color:var(--bg);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--sans);
-  transition:all .2s;margin-top:4px;letter-spacing:-.01em
+  width:100%;padding:14px;margin-top:8px;
+  background:linear-gradient(135deg,var(--e2),var(--mint2));
+  border:none;border-radius:8px;color:#001A28;font-weight:800;font-size:13px;
+  cursor:pointer;font-family:var(--sans);transition:all .2s;letter-spacing:.02em;
+  box-shadow:0 8px 24px rgba(0,207,255,.3);
 }
-.lc-btn:hover{opacity:.9;transform:translateY(-1px)}
-.lc-creds{margin-top:18px;padding:12px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)}
-.lc-creds-title{font-size:9px;font-weight:600;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
-.lc-cred-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;color:var(--text2)}
-.lc-cred-row span:last-child{font-family:var(--mono);color:var(--teal)}
-.lc-err{font-size:11px;color:var(--red);margin-top:10px;display:none}
+.lc-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,207,255,.4)}
+.lc-creds{margin-top:22px;padding:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px}
+.lc-creds-title{font-size:10px;font-weight:700;color:var(--fog);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.lc-cred-row{display:flex;justify-content:space-between;gap:12px;font-size:11px;padding:5px 0;color:var(--mist);border-bottom:1px solid rgba(255,255,255,.04)}
+.lc-cred-row:last-child{border-bottom:none;padding-bottom:0}
+.lc-cred-row span:last-child{font-family:var(--mono);color:var(--mint);font-size:10px}
+.lc-err{font-family:var(--mono);font-size:11px;color:var(--coral);margin-top:12px;display:none;padding:10px;background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.24);border-radius:6px}
 
-/* ── Shell ── */
-#shell{display:none;height:100vh;flex-direction:column}
+/* ── Shell ──────────────────────────────────────────────────────────────── */
+#shell{display:none;height:100vh;position:relative;z-index:1;padding:14px;gap:12px;flex-direction:column}
 
-/* ── Topbar ── */
+/* ── Topbar ─────────────────────────────────────────────────────────────── */
 .topbar{
-  height:48px;background:var(--bg2);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0
+  flex-shrink:0;display:flex;align-items:center;gap:16px;padding:0 20px;height:60px;
+  background:rgba(7,16,30,.9);backdrop-filter:blur(20px);
+  border:1px solid var(--b1);border-radius:12px;
+  box-shadow:0 4px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);
 }
-.tb-logo{
-  display:flex;align-items:center;gap:7px;
-  font-family:var(--mono);font-size:12px;font-weight:600;color:var(--teal);letter-spacing:.1em
+.tb-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.tb-pulse{
+  width:10px;height:10px;border-radius:50%;background:var(--mint);flex-shrink:0;
+  box-shadow:0 0 14px var(--mint),0 0 0 5px rgba(0,240,192,.12);
+  animation:heartbeat 2s ease-in-out infinite;
 }
-.tb-logo-pulse{
-  width:7px;height:7px;border-radius:50%;background:var(--teal);
-  box-shadow:0 0 0 0 rgba(0,229,190,.5);
-  animation:pulse 2s infinite
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(.6);opacity:.6}}
+.tb-logo{font-family:var(--mono);font-size:14px;font-weight:800;color:#fff;letter-spacing:.2em}
+.tb-slash{color:var(--fog);font-weight:300;font-size:14px}
+.tb-sys{font-size:12px;font-weight:600;color:var(--mist)}
+.tb-divider{width:1px;height:24px;background:linear-gradient(transparent,var(--b2),transparent);flex-shrink:0}
+.tb-services{display:flex;gap:8px;align-items:center;flex:1;min-width:0;flex-wrap:wrap}
+.svc-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;
+  padding:5px 9px;border-radius:20px;border:1px solid;text-transform:uppercase;transition:all .2s;
 }
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,229,190,.5)}70%{box-shadow:0 0 0 6px rgba(0,229,190,0)}100%{box-shadow:0 0 0 0 rgba(0,229,190,0)}}
-.tb-sep{width:1px;height:16px;background:var(--border2);margin:0 3px}
-.tb-title{font-size:11px;color:var(--text2)}
-.tb-pills{display:flex;gap:5px;margin-left:14px}
-.pill{
-  font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.06em;
-  padding:2px 8px;border-radius:20px;border:1px solid;transition:all .3s
+.svc-pill .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.svc-ok{color:var(--mint);border-color:rgba(0,240,192,.28);background:rgba(0,240,192,.07)}
+.svc-ok .dot{background:var(--mint);box-shadow:0 0 8px var(--mint)}
+.svc-err{color:var(--coral);border-color:rgba(255,51,85,.28);background:rgba(255,51,85,.07)}
+.svc-err .dot{background:var(--coral)}
+.svc-dim{color:var(--fog);border-color:var(--b1);background:transparent}
+.svc-dim .dot{background:var(--fog)}
+.tb-right{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.tb-tickets-link{
+  font-family:var(--mono);font-size:10px;font-weight:700;color:var(--mint);
+  background:rgba(0,240,192,.08);border:1px solid rgba(0,240,192,.24);border-radius:6px;
+  padding:6px 12px;text-decoration:none;transition:all .15s;letter-spacing:.05em;
 }
-.pill-ok{color:var(--teal);border-color:rgba(0,229,190,.3);background:rgba(0,229,190,.06)}
-.pill-err{color:var(--red);border-color:rgba(255,84,101,.3);background:rgba(255,84,101,.06)}
-.pill-dim{color:var(--text2);border-color:var(--border)}
-.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.tb-clock{font-family:var(--mono);font-size:11px;color:var(--text2)}
-.tb-admin{font-size:11px;color:var(--text2)}
+.tb-tickets-link:hover{background:rgba(0,240,192,.16);box-shadow:0 0 16px rgba(0,240,192,.2)}
+.tb-clock{font-family:var(--mono);font-size:17px;font-weight:800;color:var(--e);text-shadow:0 0 20px rgba(0,207,255,.5);letter-spacing:.05em}
+.tb-user{font-size:11px;font-weight:600;color:var(--mist);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tb-logout{
-  font-family:var(--mono);font-size:9px;color:var(--text2);
-  background:transparent;border:1px solid var(--border2);border-radius:4px;
-  padding:3px 9px;cursor:pointer;transition:all .15s;letter-spacing:.05em
+  font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.08em;
+  color:var(--coral);background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.24);
+  border-radius:6px;padding:7px 11px;cursor:pointer;transition:all .15s;
 }
-.tb-logout:hover{border-color:var(--red);color:var(--red)}
+.tb-logout:hover{background:var(--coral);color:#fff;box-shadow:0 0 16px rgba(255,51,85,.3)}
 
-/* ── Body layout ── */
-.body{flex:1;display:grid;grid-template-columns:1fr 300px;grid-template-rows:auto 1fr 210px;overflow:hidden;min-height:0}
-
-/* ── Stats row ── */
-.stats-row{grid-column:1/3;display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
-.stat-card{flex:1;padding:14px 20px;border-right:1px solid var(--border);display:flex;align-items:center;gap:12px}
-.stat-card:last-child{border-right:none}
-.sc-icon{width:36px;height:36px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
-.sc-icon.teal{background:var(--teal-bg);border:1px solid rgba(0,229,190,.2)}
-.sc-icon.green{background:rgba(47,216,150,.08);border:1px solid rgba(47,216,150,.2)}
-.sc-icon.red{background:var(--red-bg);border:1px solid rgba(255,84,101,.2)}
-.sc-icon.amber{background:var(--amber-bg);border:1px solid rgba(255,185,64,.2)}
-.sc-icon.blue{background:var(--blue-bg);border:1px solid rgba(77,158,255,.2)}
-.sc-val{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1;color:var(--white)}
-.sc-val.teal{color:var(--teal)}.sc-val.green{color:var(--green)}.sc-val.red{color:var(--red)}.sc-val.amber{color:var(--amber)}.sc-val.blue{color:var(--blue)}
-.sc-label{font-size:11px;color:var(--text2);margin-top:2px}
-.sc-sub{font-size:10px;color:var(--text3);margin-top:1px;font-family:var(--mono)}
-
-/* ── Fleet panel ── */
-.fleet-panel{grid-column:1;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0}
-.panel-hdr{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--bg2)}
-.ph-title{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--text2);letter-spacing:.12em;text-transform:uppercase}
-.ph-count{font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto}
-.ph-btn{font-family:var(--mono);font-size:9px;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:4px;padding:3px 9px;cursor:pointer;transition:all .15s}
-.ph-btn:hover{border-color:var(--teal);color:var(--teal)}
-.fleet-scroll{flex:1;overflow-y:auto;min-height:0}
-.fleet-scroll::-webkit-scrollbar{width:3px}
-.fleet-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-
-.fleet-table{width:100%;border-collapse:collapse}
-.fleet-table thead{position:sticky;top:0;z-index:2}
-.fleet-table th{padding:9px 14px;background:var(--bg3);font-family:var(--mono);font-size:8px;font-weight:600;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
-.fleet-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text);white-space:nowrap;transition:background .1s}
-.fleet-table tr:hover td{background:var(--bg2);cursor:pointer}
-.fleet-table tr.sel td{background:var(--teal-bg)!important}
-.fleet-table tr.flashing td{animation:flash 0.6s ease 3}
-@keyframes flash{0%,100%{background:transparent}50%{background:rgba(255,84,101,.15)}}
-
-.chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-family:var(--mono);font-size:9px;font-weight:600}
-.chip-up{color:var(--teal);background:var(--teal-bg);border:1px solid rgba(0,229,190,.2)}
-.chip-down{color:var(--red);background:var(--red-bg);border:1px solid rgba(255,84,101,.2)}
-.fault-chip{color:var(--amber);background:var(--amber-bg);border:1px solid rgba(255,185,64,.2);font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:2px}
-
-/* ── Right column ── */
-.right-col{border-left:0;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:var(--bg2)}
-.detail-panel{flex:1;overflow-y:auto;min-height:0}
-.detail-panel::-webkit-scrollbar{width:3px}
-.detail-panel::-webkit-scrollbar-thumb{background:var(--border2)}
-.detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--text2);font-size:11px;text-align:center;padding:24px}
-.detail-empty .icon{font-size:28px;opacity:.4}
-.dp-hdr{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;background:var(--bg2);flex-shrink:0}
-.dp-serial{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--teal)}
-.dp-body{padding:10px 14px}
-.dp-section{font-family:var(--mono);font-size:8px;font-weight:600;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:10px 0 5px}
-.dp-section:first-child{margin-top:0}
-.dp-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(28,42,60,.6);font-size:10px}
-.dp-row:last-child{border-bottom:none}
-.dp-key{color:var(--text2);font-family:var(--mono);font-size:9px}
-.dp-val{font-family:var(--mono);font-size:9px;max-width:150px;text-align:right;overflow:hidden;text-overflow:ellipsis}
-.dp-val.ok{color:var(--teal)}.dp-val.err{color:var(--red)}.dp-val.warn{color:var(--amber)}.dp-val.dim{color:var(--text2)}
-
-/* ── Neo4j schema panel (inside detail) ── */
-.schema-section{margin-top:8px}
-.schema-pill{
-  display:inline-block;font-family:var(--mono);font-size:8px;
-  padding:1px 6px;border-radius:2px;margin:1px 2px 1px 0;
-  background:rgba(77,158,255,.08);color:var(--blue);border:1px solid rgba(77,158,255,.2)
+/* ── Body Grid ──────────────────────────────────────────────────────────── */
+.body{
+  flex:1;min-height:0;display:grid;
+  grid-template-columns:186px minmax(0,1fr) 330px;
+  grid-template-rows:minmax(0,1fr) 220px;
+  grid-template-areas:"kpis fleet detail" "tickets tickets detail";
+  gap:12px;overflow:hidden;
 }
-.schema-count{font-family:var(--mono);font-size:9px;color:var(--text2)}
 
-/* ── Inject panel ── */
-.inject-panel{border-top:1px solid var(--border);padding:12px 14px;flex-shrink:0;background:var(--bg3)}
-.ip-title{font-family:var(--mono);font-size:8px;font-weight:600;color:var(--text2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}
-.ip-target{font-size:10px;color:var(--text2);margin-bottom:8px;font-family:var(--mono)}
-.ip-target .t{color:var(--teal)}
-.inject-btns{display:flex;flex-wrap:wrap;gap:4px}
-.inj-btn{font-family:var(--mono);font-size:8px;padding:4px 8px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.04em}
-.inj-btn:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
-.inj-btn.random{border-color:var(--purple);color:var(--purple);background:rgba(155,123,255,.08)}
-.inj-btn.clear{border-color:var(--teal);color:var(--teal);background:var(--teal-bg)}
-.inj-feedback{margin-top:7px;font-size:10px;padding:5px 9px;border-radius:5px;font-family:var(--mono);display:none}
-.inj-feedback.ok{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(0,229,190,.2)}
-.inj-feedback.err{background:var(--red-bg);color:var(--red);border:1px solid rgba(255,84,101,.2)}
+/* ── KPI Column ─────────────────────────────────────────────────────────── */
+.kpis{grid-area:kpis;display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden}
+.kpi{
+  flex:1;position:relative;display:flex;flex-direction:column;justify-content:space-between;
+  padding:14px 16px 12px;overflow:hidden;
+  background:var(--glass);backdrop-filter:blur(20px);
+  border:1px solid var(--b1);border-radius:10px;
+  transition:border-color .2s;
+}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:10px 10px 0 0}
+.kpi.k-teal::before{background:linear-gradient(90deg,transparent,var(--mint),transparent)}
+.kpi.k-green::before{background:linear-gradient(90deg,transparent,#4ADE80,transparent)}
+.kpi.k-red::before{background:linear-gradient(90deg,transparent,var(--coral),transparent)}
+.kpi.k-amber::before{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.kpi.k-blue::before{background:linear-gradient(90deg,transparent,var(--e),transparent)}
+.kpi::after{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;opacity:.08}
+.kpi.k-teal::after{background:var(--mint)}
+.kpi.k-green::after{background:#4ADE80}
+.kpi.k-red::after{background:var(--coral)}
+.kpi.k-amber::after{background:var(--gold)}
+.kpi.k-blue::after{background:var(--e)}
+.kpi-label{font-size:9px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:.1em;position:relative;z-index:1}
+.kpi-val{font-family:var(--mono);font-weight:900;line-height:1;position:relative;z-index:1;margin:auto 0}
+.kpi-icon{position:absolute;top:11px;right:13px;z-index:2;width:30px;height:30px;opacity:.55;pointer-events:none}
+.kpi-icon svg{width:100%;height:100%;stroke-width:1.6}
+.kpi.k-teal .kpi-icon{color:var(--mint)}
+.kpi.k-green .kpi-icon{color:#4ADE80}
+.kpi.k-red .kpi-icon{color:var(--coral)}
+.kpi.k-amber .kpi-icon{color:var(--gold)}
+.kpi.k-blue .kpi-icon{color:var(--e)}
+.kpi.k-teal .kpi-val{font-size:38px;color:var(--mint);text-shadow:0 0 30px rgba(0,240,192,.5)}
+.kpi.k-green .kpi-val{font-size:38px;color:#4ADE80;text-shadow:0 0 30px rgba(74,222,128,.5)}
+.kpi.k-red .kpi-val{font-size:38px;color:var(--coral);text-shadow:0 0 30px rgba(255,51,85,.5)}
+.kpi.k-amber .kpi-val{font-size:38px;color:var(--gold);text-shadow:0 0 30px rgba(255,179,0,.5)}
+.kpi.k-blue .kpi-val{font-size:38px;color:var(--e);text-shadow:0 0 30px rgba(0,207,255,.5)}
+.kpi-sub{font-family:var(--mono);font-size:9px;color:var(--fog);position:relative;z-index:1}
 
-/* ── Tickets row ── */
-.tickets-row{grid-column:1/3;border-top:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0}
-.ticket-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2)}
-.tab-btn{padding:8px 14px;font-family:var(--mono);font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:none;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;border-bottom:2px solid transparent;transition:all .15s}
-.tab-btn.active{color:var(--teal);border-bottom-color:var(--teal)}
-.tab-btn:hover:not(.active){color:var(--text)}
-.tickets-body{flex:1;overflow-y:auto;padding:8px 14px;display:flex;flex-direction:column;gap:5px;min-height:0}
-.tickets-body::-webkit-scrollbar{width:3px}
-.tickets-body::-webkit-scrollbar-thumb{background:var(--border2)}
-.ticket-hdr{display:grid;grid-template-columns:80px 110px 1fr 130px 120px 80px;gap:8px;padding:5px 11px;font-family:var(--mono);font-size:8px;font-weight:600;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
-.ticket-row{display:grid;grid-template-columns:80px 110px 1fr 130px 120px 80px;gap:8px;padding:8px 11px;border-radius:5px;font-size:10px;border:1px solid transparent;transition:all .15s;align-items:center;flex-shrink:0}
-.ticket-row:hover{background:var(--bg2);border-color:var(--border);cursor:pointer}
+/* ── Panel base ─────────────────────────────────────────────────────────── */
+.panel{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--b1);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);min-height:0;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.panel-hdr{
+  flex-shrink:0;display:flex;align-items:center;gap:10px;
+  padding:13px 16px;border-bottom:1px solid var(--b1);
+  background:rgba(7,16,30,.6);
+}
+.ph-title{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--e);letter-spacing:.14em;text-transform:uppercase}
+.ph-count{font-family:var(--mono);font-size:10px;color:var(--fog);margin-left:auto}
+.ph-btn{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  color:var(--e);background:rgba(0,207,255,.07);
+  border:1px solid rgba(0,207,255,.22);border-radius:6px;
+  padding:6px 10px;cursor:pointer;letter-spacing:.06em;transition:all .15s;
+}
+.ph-btn:hover{background:rgba(0,207,255,.16);box-shadow:0 0 12px rgba(0,207,255,.2)}
+
+/* ── Fleet ──────────────────────────────────────────────────────────────── */
+.fleet-panel{grid-area:fleet}
+.fleet-scroll{flex:1;min-height:0;overflow-y:auto;padding:10px;scrollbar-width:thin;scrollbar-color:rgba(0,207,255,.3) transparent}
+.fleet-scroll::-webkit-scrollbar{width:4px}
+.fleet-scroll::-webkit-scrollbar-thumb{background:rgba(0,207,255,.3);border-radius:2px}
+.fleet-table{width:100%;border-collapse:separate;border-spacing:0 6px}
+.fleet-table thead tr{position:sticky;top:-10px;z-index:2}
+.fleet-table th{
+  padding:8px 12px;background:var(--s1);
+  font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);
+  letter-spacing:.14em;text-transform:uppercase;text-align:left;
+  border-bottom:1px solid var(--b1);
+}
+.fleet-table th:first-child{border-radius:6px 0 0 6px}
+.fleet-table th:last-child{border-radius:0 6px 6px 0}
+.fleet-table td{
+  padding:11px 12px;font-size:11px;color:var(--ice);
+  background:rgba(11,25,42,.6);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);
+  transition:all .15s;white-space:nowrap;
+}
+.fleet-table td:first-child{border-left:1px solid var(--b1);border-radius:8px 0 0 8px;padding-left:10px}
+.fleet-table td:last-child{border-right:1px solid var(--b1);border-radius:0 8px 8px 0}
+.fleet-table tr:hover td{background:rgba(0,207,255,.07);border-color:rgba(0,207,255,.26);cursor:pointer}
+.fleet-table tr.sel td{background:rgba(0,240,192,.09)!important;border-color:rgba(0,240,192,.3)}
+.fleet-table tr.sel td:first-child{border-left:3px solid var(--mint)}
+.fleet-table tr.flashing td{animation:rowflash .55s ease 3}
+@keyframes rowflash{0%,100%{background:rgba(11,25,42,.6)}50%{background:rgba(255,51,85,.14)}}
+.f-name{font-weight:600;font-size:12px}
+.f-phone{font-family:var(--mono);font-size:10px;color:var(--mist)}
+.f-model{font-family:var(--mono);font-size:9px;background:rgba(255,255,255,.05);padding:3px 7px;border-radius:4px;color:var(--mist)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:20px;font-family:var(--mono);font-size:8px;font-weight:800;text-transform:uppercase;border:1px solid}
+.chip::before{content:'';width:5px;height:5px;border-radius:50%}
+.chip-up{color:var(--mint);background:rgba(0,240,192,.1);border-color:rgba(0,240,192,.26)}
+.chip-up::before{background:var(--mint);box-shadow:0 0 6px var(--mint)}
+.chip-down{color:var(--coral);background:rgba(255,51,85,.1);border-color:rgba(255,51,85,.28)}
+.chip-down::before{background:var(--coral)}
+.fault-chip{color:var(--gold);background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.26);font-family:var(--mono);font-size:8px;padding:3px 7px;font-weight:800;text-transform:uppercase;border-radius:4px}
+
+/* ── Right column ───────────────────────────────────────────────────────── */
+.right-col{grid-area:detail;display:flex;flex-direction:column;gap:0}
+
+/* ── Detail panel ───────────────────────────────────────────────────────── */
+.detail-outer{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--b1);border-radius:10px 10px 0 0;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.detail-panel{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,207,255,.3) transparent}
+.detail-panel::-webkit-scrollbar{width:4px}
+.detail-panel::-webkit-scrollbar-thumb{background:rgba(0,207,255,.3);border-radius:2px}
+.detail-empty{height:100%;display:grid;place-items:center;align-content:center;gap:14px;color:var(--fog);text-align:center;padding:32px}
+.detail-empty .de-icon{font-size:48px;filter:drop-shadow(0 0 20px rgba(0,207,255,.3))}
+.detail-empty .de-text{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--fog)}
+.dp-hdr{flex-shrink:0;padding:14px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;background:rgba(7,16,30,.7)}
+.dp-serial{font-family:var(--mono);font-size:11px;font-weight:800;color:var(--e);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dp-body{padding:0}
+.dp-section{
+  font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);
+  letter-spacing:.16em;text-transform:uppercase;
+  padding:10px 16px 6px;
+  border-bottom:1px solid var(--b1);
+  background:rgba(7,16,30,.4);
+}
+.dp-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid rgba(64,196,255,.06);transition:background .1s}
+.dp-row:hover{background:rgba(0,207,255,.03)}
+.dp-key{font-size:10px;color:var(--mist);font-weight:500;white-space:nowrap}
+.dp-val{font-family:var(--mono);font-size:10px;font-weight:700;text-align:right;overflow:hidden;text-overflow:ellipsis;max-width:175px}
+.dp-val.ok{color:var(--mint)}.dp-val.err{color:var(--coral)}.dp-val.warn{color:var(--gold)}.dp-val.dim{color:var(--mist)}
+.dp-bar-row{padding:7px 16px 9px;border-bottom:1px solid rgba(64,196,255,.06)}
+.dp-bar-label{display:flex;justify-content:space-between;margin-bottom:5px}
+.dp-bar-label span:first-child{font-size:10px;color:var(--mist);font-weight:500}
+.dp-bar-label span:last-child{font-family:var(--mono);font-size:10px;font-weight:700}
+.dp-bar-track{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.dp-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.dp-bar-ok .dp-bar-fill{background:linear-gradient(90deg,var(--mint2),var(--mint))}
+.dp-bar-warn .dp-bar-fill{background:linear-gradient(90deg,#D97706,var(--gold))}
+.dp-bar-err .dp-bar-fill{background:linear-gradient(90deg,var(--coral2),var(--coral))}
+
+/* ── Inject panel ───────────────────────────────────────────────────────── */
+.inject-panel{
+  flex-shrink:0;padding:14px 16px;
+  border:1px solid var(--b1);border-top:none;border-radius:0 0 10px 10px;
+  background:rgba(7,16,30,.9);backdrop-filter:blur(20px);
+}
+.ip-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ip-title{font-family:var(--mono);font-size:9px;font-weight:800;color:var(--coral);letter-spacing:.16em;text-transform:uppercase}
+.ip-target{font-family:var(--mono);font-size:9px;color:var(--fog)}
+.ip-target .t{color:var(--e);font-weight:800}
+.inject-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.inj-btn{
+  font-family:var(--mono);font-size:8px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  padding:8px 6px;border-radius:6px;cursor:pointer;transition:all .15s;border:1px solid;
+  background:rgba(255,255,255,.04);color:var(--mist);border-color:rgba(255,255,255,.08);
+}
+.inj-btn:hover{background:rgba(255,179,0,.15);color:var(--gold);border-color:rgba(255,179,0,.4);transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,179,0,.15)}
+.inj-btn.random{color:var(--violet);border-color:rgba(139,92,246,.28);background:rgba(139,92,246,.08)}
+.inj-btn.random:hover{background:rgba(139,92,246,.2);box-shadow:0 4px 12px rgba(139,92,246,.2)}
+.inj-btn.clear{color:var(--mint);border-color:rgba(0,240,192,.28);background:rgba(0,240,192,.07)}
+.inj-btn.clear:hover{background:rgba(0,240,192,.18);box-shadow:0 4px 12px rgba(0,240,192,.2)}
+.inj-feedback{margin-top:8px;font-family:var(--mono);font-size:10px;font-weight:700;padding:8px 12px;border-radius:6px;border:1px solid;display:none}
+.inj-feedback.ok{background:rgba(0,240,192,.08);color:var(--mint);border-color:rgba(0,240,192,.28)}
+.inj-feedback.err{background:rgba(255,51,85,.08);color:var(--coral);border-color:rgba(255,51,85,.28)}
+
+/* ── Tickets ─────────────────────────────────────────────────────────────── */
+.tickets-row{grid-area:tickets}
+.ticket-tabs{
+  flex-shrink:0;display:flex;align-items:center;gap:6px;
+  padding:10px 14px;border-bottom:1px solid var(--b1);background:rgba(7,16,30,.6);
+}
+.tab-btn{
+  font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  padding:7px 12px;border-radius:6px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.07);background:transparent;
+  color:var(--fog);transition:all .15s;
+}
+.tab-btn.active{background:var(--e);color:#001A28;border-color:var(--e);box-shadow:0 0 16px rgba(0,207,255,.3)}
+.tab-btn:hover:not(.active){color:var(--e);border-color:rgba(0,207,255,.3);background:rgba(0,207,255,.06)}
+.tickets-body{flex:1;min-height:0;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:rgba(0,207,255,.3) transparent}
+.tickets-body::-webkit-scrollbar{width:4px}
+.tickets-body::-webkit-scrollbar-thumb{background:rgba(0,207,255,.3);border-radius:2px}
+.ticket-hdr{
+  display:grid;grid-template-columns:90px 110px minmax(140px,1fr) 130px 120px 80px;
+  gap:8px;padding:4px 14px;
+  font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);
+  letter-spacing:.12em;text-transform:uppercase;flex-shrink:0;
+}
+.ticket-row{
+  display:grid;grid-template-columns:90px 110px minmax(140px,1fr) 130px 120px 80px;
+  gap:8px;padding:10px 14px;font-size:10px;
+  background:rgba(11,25,42,.6);border:1px solid var(--b1);border-radius:8px;
+  transition:all .15s;flex-shrink:0;cursor:pointer;
+  border-left:3px solid transparent;
+}
+.ticket-row:hover{background:rgba(0,207,255,.06);border-color:rgba(0,207,255,.24);transform:translateX(2px);box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.ticket-row.tr-resolved{border-left-color:var(--mint)}
+.ticket-row.tr-escalated{border-left-color:var(--gold)}
+.ticket-row.tr-open{border-left-color:var(--e)}
 .tr-status{display:inline-flex}
-.st{font-family:var(--mono);font-size:8px;font-weight:600;padding:2px 6px;border-radius:2px}
-.st-resolved{color:var(--teal);background:var(--teal-bg)}
-.st-escalated{color:var(--amber);background:var(--amber-bg)}
-.st-open{color:var(--blue);background:var(--blue-bg)}
-.tr-acct{font-family:var(--mono);font-size:9px;color:var(--text2)}
-.tr-problem{color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tr-fault{font-family:var(--mono);font-size:9px;color:var(--amber)}
-.tr-fix{font-family:var(--mono);font-size:9px;color:var(--teal)}
-.tr-date{font-family:var(--mono);font-size:9px;color:var(--text3)}
+.st{font-family:var(--mono);font-size:8px;font-weight:800;padding:4px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
+.st-resolved{color:var(--mint);background:rgba(0,240,192,.12)}
+.st-escalated{color:var(--gold);background:rgba(255,179,0,.12)}
+.st-open{color:var(--e);background:rgba(0,207,255,.12)}
+.tr-acct{font-family:var(--mono);font-size:9px;color:var(--mist);align-self:center}
+.tr-problem{color:var(--ice);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:center}
+.tr-fault{font-family:var(--mono);font-size:9px;color:var(--gold);align-self:center}
+.tr-fix{font-family:var(--mono);font-size:9px;color:var(--mint);align-self:center}
+.tr-date{font-family:var(--mono);font-size:9px;color:var(--fog);align-self:center}
 
-/* ── Ticket detail modal ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:none;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:700px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.6)}
-.modal-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
-.modal-title{font-size:14px;font-weight:600;color:var(--white);flex:1}
-.modal-close{width:28px;height:28px;border-radius:6px;border:none;background:var(--bg3);color:var(--text2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
-.modal-close:hover{color:var(--red)}
-.modal-body{flex:1;overflow-y:auto;padding:20px 22px}
-.modal-body::-webkit-scrollbar{width:3px}
-.modal-body::-webkit-scrollbar-thumb{background:var(--border2)}
+/* ── Modal ──────────────────────────────────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(16px)}
+.modal-overlay.open{display:flex;animation:fadeIn .18s ease}
+.modal{
+  background:rgba(7,16,30,.98);border:1px solid var(--b2);border-radius:14px;
+  width:860px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 48px 120px rgba(0,0,0,.8),0 0 0 1px rgba(0,207,255,.06),0 0 60px rgba(0,207,255,.1);
+}
+.modal-hdr{
+  padding:18px 22px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:12px;
+  flex-shrink:0;background:rgba(7,16,30,.8);
+}
+.modal-title{font-size:14px;font-weight:800;color:#fff;flex:1;letter-spacing:-.2px}
+.modal-close{
+  width:32px;height:32px;border-radius:8px;
+  border:1px solid rgba(255,51,85,.28);background:rgba(255,51,85,.08);
+  color:var(--coral);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.modal-close:hover{background:var(--coral);color:#fff;box-shadow:0 0 16px rgba(255,51,85,.3)}
+.modal-body{flex:1;overflow-y:auto;padding:22px 24px;scrollbar-width:thin;scrollbar-color:rgba(0,207,255,.3) transparent}
+.modal-body::-webkit-scrollbar{width:5px}
+.modal-body::-webkit-scrollbar-thumb{background:rgba(0,207,255,.3);border-radius:2px}
 
-/* Steps in modal */
-.step-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden}
-.step-card-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
-.step-ok{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
-.step-ok.ok{background:rgba(47,216,150,.15);color:var(--green);border:1px solid rgba(47,216,150,.3)}
-.step-ok.warn{background:rgba(255,185,64,.12);color:var(--amber);border:1px solid rgba(255,185,64,.3)}
-.step-ok.err{background:rgba(255,84,101,.12);color:var(--red);border:1px solid rgba(255,84,101,.3)}
-.step-layer{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--white)}
-.step-port{font-family:var(--mono);font-size:9px;color:var(--text2);background:var(--bg4);padding:1px 6px;border-radius:3px}
-.step-tool{font-family:var(--mono);font-size:9px;color:var(--teal);margin-left:auto}
-.step-desc{padding:8px 14px;font-size:11px;color:var(--text2);line-height:1.5}
-.step-result{padding:0 14px 10px}
-.step-kv{display:flex;gap:8px;font-size:10px;padding:2px 0;align-items:flex-start}
-.step-kv-key{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;min-width:120px}
-.step-kv-val{font-family:var(--mono);font-size:9px;color:var(--text);word-break:break-all}
-.step-kv-val.ok{color:var(--teal)}.step-kv-val.err{color:var(--red)}.step-kv-val.warn{color:var(--amber)}
-.step-warn-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:3px;background:rgba(255,185,64,.08);color:var(--amber);border:1px solid rgba(255,185,64,.2);margin-top:4px}
+/* ── Step cards in modal ────────────────────────────────────────────────── */
+.step-card{background:rgba(11,25,42,.7);border:1px solid var(--b1);border-radius:10px;margin-bottom:10px;overflow:hidden;transition:border-color .15s}
+.step-card:hover{border-color:var(--b2)}
+.step-card-hdr{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  border-bottom:1px solid var(--b1);background:rgba(7,16,30,.6);
+}
+.step-ok{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;border:1px solid}
+.step-ok.ok{background:rgba(0,240,192,.12);color:var(--mint);border-color:rgba(0,240,192,.3);box-shadow:0 0 12px rgba(0,240,192,.2)}
+.step-ok.warn{background:rgba(255,179,0,.12);color:var(--gold);border-color:rgba(255,179,0,.3)}
+.step-ok.err{background:rgba(255,51,85,.12);color:var(--coral);border-color:rgba(255,51,85,.3);box-shadow:0 0 12px rgba(255,51,85,.15)}
+.step-layer{font-family:var(--mono);font-size:12px;font-weight:800;color:#fff}
+.step-port{font-family:var(--mono);font-size:9px;color:var(--fog);background:rgba(255,255,255,.05);padding:2px 7px;border-radius:4px;border:1px solid var(--b1)}
+.step-tool{font-family:var(--mono);font-size:9px;color:var(--e);font-weight:700}
+.step-num{font-family:var(--mono);font-size:9px;color:var(--fog);margin-left:auto}
+.step-desc{padding:10px 16px;font-size:12px;color:var(--mist);line-height:1.6}
+.step-result{padding:0 16px 14px}
 
-/* ── Animations ── */
+/* ── Ticket log modal elements ──────────────────────────────────────────── */
+.log-summary{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.log-chip{font-family:var(--mono);font-size:9px;padding:4px 9px;border:1px solid var(--b1);background:rgba(255,255,255,.03);color:var(--mist);border-radius:4px}
+.log-chip-teal{color:var(--mint);border-color:rgba(0,240,192,.26);background:rgba(0,240,192,.07)}
+.log-problem{font-size:12px;color:var(--ice);margin-bottom:14px;padding:12px 16px;background:rgba(0,207,255,.05);border-left:3px solid var(--e);border-radius:0 8px 8px 0;line-height:1.65;font-style:italic}
+.log-verdict-row{display:flex;align-items:stretch;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.log-verdict-box{flex:1;min-width:160px;padding:14px 16px;border:1px solid var(--b1);border-radius:10px}
+.log-verdict-fault{border-left:3px solid var(--coral);background:rgba(255,51,85,.06)}
+.log-verdict-fix{border-left:3px solid var(--mint);background:rgba(0,240,192,.05)}
+.lvb-label{font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+.lvb-value{font-size:14px;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-.2px}
+.log-verdict-fix .lvb-value{color:var(--mint)}
+.lvb-desc{font-size:10px;color:var(--mist);line-height:1.55}
+.log-verdict-arrow{font-family:var(--mono);font-size:24px;color:var(--e);display:flex;align-items:center;flex-shrink:0}
+.log-trace-hdr{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:9px;color:var(--fog);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--b1)}
+.log-empty{text-align:center;color:var(--fog);font-size:11px;padding:28px;font-family:var(--mono)}
+
+/* ── Detail blocks in modal ─────────────────────────────────────────────── */
+.detail-block{border:1px solid var(--b1);border-radius:8px;margin-bottom:6px;overflow:hidden}
+.db-title{font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);letter-spacing:.12em;text-transform:uppercase;padding:7px 12px;background:rgba(7,16,30,.6);border-bottom:1px solid var(--b1)}
+.db-rows{padding:2px 8px}
+.db-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 4px;border-bottom:1px solid rgba(64,196,255,.06)}
+.db-row:last-child{border-bottom:none}
+.db-key{font-family:var(--mono);font-size:9px;color:var(--mist);flex-shrink:0;white-space:nowrap}
+.db-val{font-family:var(--mono);font-size:9px;font-weight:700;text-align:right;word-break:break-all;max-width:240px}
+.db-val.ok{color:var(--mint)}.db-val.err{color:var(--coral)}.db-val.warn{color:var(--gold)}.db-val.dim{color:var(--mist)}
+
+/* alert boxes */
+.alert-box{font-family:var(--mono);font-size:10px;font-weight:800;padding:10px 14px;border:1px solid;border-radius:8px;line-height:1.6;margin-bottom:6px}
+.alert-ok{background:rgba(0,240,192,.08);color:var(--mint);border-color:rgba(0,240,192,.28)}
+.alert-warn{background:rgba(255,179,0,.08);color:var(--gold);border-color:rgba(255,179,0,.28)}
+.alert-err{background:rgba(255,51,85,.08);color:var(--coral);border-color:rgba(255,51,85,.28)}
+.alert-box small{font-weight:400;display:block;margin-top:4px;opacity:.72}
+
+/* diagnostic checks */
+.diag-checks{border:1px solid var(--b1);border-radius:8px;overflow:hidden}
+.diag-check{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-bottom:1px solid rgba(64,196,255,.07);transition:background .12s}
+.diag-check:hover{background:rgba(0,207,255,.03)}
+.diag-check:last-child{border-bottom:none}
+.dc-icon{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;margin-top:1px;border:1px solid}
+.diag-check.pass .dc-icon{background:rgba(0,240,192,.12);color:var(--mint);border-color:rgba(0,240,192,.3);box-shadow:0 0 8px rgba(0,240,192,.15)}
+.diag-check.trigger .dc-icon{background:rgba(255,51,85,.12);color:var(--coral);border-color:rgba(255,51,85,.3);box-shadow:0 0 8px rgba(255,51,85,.15)}
+.diag-check.warn .dc-icon{background:rgba(255,179,0,.12);color:var(--gold);border-color:rgba(255,179,0,.3)}
+.diag-check.skip .dc-icon{background:rgba(255,255,255,.04);color:var(--fog);border-color:var(--b1)}
+.dc-body{flex:1;min-width:0}
+.dc-param{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--ice);margin-bottom:2px}
+.dc-path{font-family:var(--mono);font-size:8px;color:var(--fog);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dc-eval{font-size:10px;color:var(--mist);line-height:1.5}
+.diag-check.trigger .dc-eval{color:rgba(255,100,130,.9)}
+.diag-check.warn .dc-eval{color:rgba(255,179,0,.85)}
+.dc-value{font-family:var(--mono);font-size:11px;font-weight:800;flex-shrink:0;text-align:right;min-width:60px}
+.dc-value.pass{color:var(--mint)}.dc-value.trigger{color:var(--coral)}.dc-value.warn{color:var(--gold)}.dc-value.skip{color:var(--fog)}
+
+/* diagnostic verdict */
+.diag-verdict{margin-top:12px;padding:15px;border:1px solid;border-radius:10px}
+.diag-verdict.ok{background:rgba(0,240,192,.07);border-color:rgba(0,240,192,.26)}
+.diag-verdict.err{background:rgba(255,51,85,.07);border-color:rgba(255,51,85,.24)}
+.dv-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.dv-section{flex:1;min-width:120px}
+.dv-label{font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
+.dv-value{font-size:14px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.dv-value.fix{color:var(--mint)}
+.dv-desc{font-size:10px;color:var(--mist);margin-top:4px;line-height:1.5}
+.dv-arrow{font-family:var(--mono);font-size:24px;color:var(--e);flex-shrink:0}
+.dv-params{margin-top:10px;padding-top:10px;border-top:1px solid rgba(64,196,255,.12);display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:9px;color:var(--fog);font-family:var(--mono)}
+.dv-param-chip{font-family:var(--mono);font-size:9px;padding:3px 8px;background:rgba(0,207,255,.09);color:var(--e);border:1px solid rgba(0,207,255,.22);border-radius:4px}
+
+/* TR-069 write paths */
+.write-path{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid rgba(64,196,255,.07);flex-wrap:wrap}
+.write-path:last-child{border-bottom:none}
+.wp-label{font-family:var(--mono);font-size:9px;color:var(--mint);font-weight:800;flex-shrink:0}
+.wp-path{font-family:var(--mono);font-size:8px;color:var(--fog);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wp-cat{font-family:var(--mono);font-size:8px;padding:2px 6px;background:rgba(0,207,255,.08);color:var(--e);border:1px solid rgba(0,207,255,.18);border-radius:4px;flex-shrink:0}
+.schema-pill,.tr069-path{display:inline-block;font-family:var(--mono);font-size:8px;padding:3px 7px;margin:2px;background:rgba(0,207,255,.07);color:var(--e);border:1px solid rgba(0,207,255,.2);border-radius:4px}
+
+/* ── Create ticket form ──────────────────────────────────────────────────── */
+.form-group{margin-bottom:16px}
+.form-label{font-size:10px;font-weight:700;color:var(--mist);display:block;margin-bottom:7px;letter-spacing:.06em;text-transform:uppercase}
+.form-input,.form-select{width:100%;background:rgba(2,8,18,.8);border:1px solid rgba(64,196,255,.18);border-radius:8px;padding:12px 14px;color:var(--ice);font-family:var(--mono);font-size:11px;outline:none;transition:all .18s}
+.form-input:focus,.form-select:focus{border-color:var(--e);box-shadow:0 0 0 3px rgba(0,207,255,.12)}
+.form-input::placeholder{color:var(--fog)}
+.form-select option{background:#070E18;color:var(--ice)}
+.form-btns{display:flex;gap:10px;margin-top:18px}
+.form-btn-submit{flex:1;background:linear-gradient(135deg,var(--e2),var(--mint2));border:none;border-radius:8px;padding:12px;color:#001A28;font-weight:800;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .15s;box-shadow:0 4px 16px rgba(0,207,255,.25)}
+.form-btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,207,255,.35)}
+.form-btn-cancel{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:8px;padding:12px;color:var(--mist);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.form-btn-cancel:hover{border-color:rgba(255,51,85,.3);color:var(--coral)}
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.animate-in{animation:slideUp .25s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:slideUp .22s ease}
 
-/* ── Create Ticket Form ── */
-.form-group{margin-bottom:14px}
-.form-label{font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;letter-spacing:.05em}
-.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:8px 11px;color:var(--text);font-family:var(--sans);font-size:11px;outline:none;transition:border-color .2s}
-.form-input:focus{border-color:var(--teal)}
-.form-input::placeholder{color:var(--text3)}
-.form-select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:8px 11px;color:var(--text);font-family:var(--sans);font-size:11px;outline:none;transition:border-color .2s}
-.form-select:focus{border-color:var(--teal)}
-.form-select option{background:var(--bg2);color:var(--text)}
-.form-btns{display:flex;gap:8px;margin-top:16px}
-.form-btn-submit{flex:1;background:var(--teal);border:none;border-radius:6px;padding:9px;color:var(--bg);font-weight:600;font-size:11px;cursor:pointer;transition:opacity .15s}
-.form-btn-submit:hover{opacity:.85}
-.form-btn-cancel{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:9px;color:var(--text2);font-weight:600;font-size:11px;cursor:pointer;transition:all .15s}
-.form-btn-cancel:hover{border-color:var(--text2)}
+/* ── Floating background orbs ────────────────────────────────────────────── */
+.bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0}
+.bg-orb-1{width:700px;height:700px;top:-200px;right:-100px;background:radial-gradient(circle,rgba(139,92,246,.16) 0%,transparent 65%);animation:floatOrb1 28s ease-in-out infinite}
+.bg-orb-2{width:600px;height:600px;bottom:-150px;left:-100px;background:radial-gradient(circle,rgba(0,207,255,.13) 0%,transparent 65%);animation:floatOrb2 22s ease-in-out infinite}
+.bg-orb-3{width:400px;height:400px;top:40%;left:30%;background:radial-gradient(circle,rgba(0,240,192,.06) 0%,transparent 65%);animation:floatOrb3 35s ease-in-out infinite}
+@keyframes floatOrb1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-50px,70px) scale(1.05)}66%{transform:translate(80px,-40px) scale(.95)}}
+@keyframes floatOrb2{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(70px,-60px) scale(1.08)}75%{transform:translate(-40px,40px) scale(.96)}}
+@keyframes floatOrb3{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
 
-/* Neo4j detail badge row */
-.neo4j-ok{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;padding:6px 10px;border-radius:5px;background:rgba(77,158,255,.07);border:1px solid rgba(77,158,255,.2);color:var(--blue);margin-top:4px}
-.neo4j-warn{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;padding:6px 10px;border-radius:5px;background:rgba(255,185,64,.07);border:1px solid rgba(255,185,64,.2);color:var(--amber);margin-top:4px}
-.neo4j-err{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;padding:6px 10px;border-radius:5px;background:rgba(255,84,101,.07);border:1px solid rgba(255,84,101,.2);color:var(--red);margin-top:4px}
-.tr069-path{font-family:var(--mono);font-size:8px;color:var(--text3);padding:1px 5px;background:var(--bg4);border-radius:2px;margin:1px 2px 1px 0;display:inline-block}
+/* ── Panel entrance ──────────────────────────────────────────────────────── */
+@keyframes panelIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.kpis{animation:panelIn .45s ease both}
+.fleet-panel{animation:panelIn .45s .07s ease both}
+.detail-outer{animation:panelIn .45s .12s ease both}
+.inject-panel{animation:panelIn .45s .16s ease both}
+.tickets-row{animation:panelIn .45s .09s ease both}
+
+/* ── KPI card interactions ───────────────────────────────────────────────── */
+.kpi{cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s}
+.kpi:hover{transform:translateY(-5px) scale(1.03)}
+.kpi:active{transform:scale(.95)!important;transition-duration:.08s}
+.kpi.k-teal:hover{border-color:rgba(0,240,192,.38);box-shadow:0 16px 48px rgba(0,240,192,.22),0 0 0 1px rgba(0,240,192,.12)}
+.kpi.k-green:hover{border-color:rgba(74,222,128,.38);box-shadow:0 16px 48px rgba(74,222,128,.22),0 0 0 1px rgba(74,222,128,.12)}
+.kpi.k-red:hover{border-color:rgba(255,51,85,.38);box-shadow:0 16px 48px rgba(255,51,85,.22),0 0 0 1px rgba(255,51,85,.12)}
+.kpi.k-amber:hover{border-color:rgba(255,179,0,.38);box-shadow:0 16px 48px rgba(255,179,0,.22),0 0 0 1px rgba(255,179,0,.12)}
+.kpi.k-blue:hover{border-color:rgba(0,207,255,.38);box-shadow:0 16px 48px rgba(0,207,255,.22),0 0 0 1px rgba(0,207,255,.12)}
+
+/* ── KPI popup card ──────────────────────────────────────────────────────── */
+.kpi-popup{
+  position:fixed;z-index:80;
+  background:rgba(6,14,26,.97);
+  border:1px solid var(--b2);border-radius:14px;
+  min-width:290px;max-width:360px;
+  overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,.85),0 0 0 1px rgba(0,207,255,.06),0 0 60px rgba(0,207,255,.12);
+  backdrop-filter:blur(28px);
+  animation:popIn .24s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{opacity:0;transform:scale(.75) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.kpi-popup::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,var(--e),transparent)}
+.kpi-popup-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;background:rgba(7,16,30,.5)}
+.kpi-popup-title{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--e);letter-spacing:.14em;text-transform:uppercase}
+.kpi-popup-count{font-family:var(--mono);font-size:18px;font-weight:900;margin-left:auto;margin-right:12px}
+.kpi-popup-close{width:24px;height:24px;border-radius:6px;border:1px solid rgba(255,51,85,.3);background:rgba(255,51,85,.08);color:var(--coral);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
+.kpi-popup-close:hover{background:var(--coral);color:#fff;box-shadow:0 0 12px rgba(255,51,85,.3)}
+.kpi-popup-body{max-height:280px;overflow-y:auto;padding:4px 6px 8px;scrollbar-width:thin;scrollbar-color:rgba(0,207,255,.25) transparent}
+.kpi-popup-body::-webkit-scrollbar{width:3px}
+.kpi-popup-body::-webkit-scrollbar-thumb{background:rgba(0,207,255,.25);border-radius:2px}
+.kpi-popup-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:all .12s;border:1px solid transparent;margin-bottom:3px}
+.kpi-popup-row:hover{background:rgba(0,207,255,.07);border-color:rgba(0,207,255,.18);transform:translateX(3px)}
+.kpi-popup-row-info{flex:1;min-width:0}
+.kpi-popup-row-name{font-size:11px;font-weight:700;color:var(--ice);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-popup-row-sub{font-family:var(--mono);font-size:9px;color:var(--mist);margin-top:1px}
+.kpi-popup-empty{text-align:center;color:var(--fog);font-family:var(--mono);font-size:10px;padding:24px 16px;letter-spacing:.05em}
+
+/* ── Chip animations ─────────────────────────────────────────────────────── */
+.chip-down{animation:downAlarm 2.6s ease-in-out infinite}
+@keyframes downAlarm{0%,100%{box-shadow:0 0 0 0 rgba(255,51,85,0)}50%{box-shadow:0 0 0 5px rgba(255,51,85,.22),0 0 14px rgba(255,51,85,.3)}}
+.chip-up::before{animation:upGlow 2.2s ease-in-out infinite}
+@keyframes upGlow{0%,100%{box-shadow:0 0 4px var(--mint)}50%{box-shadow:0 0 12px var(--mint),0 0 24px rgba(0,240,192,.35)}}
+
+/* ── Fleet row entrance — class-gated so auto-refresh doesn't re-animate ─── */
+.fleet-table tbody tr.row-anim{animation:rowIn .32s ease both}
+@keyframes rowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+
+/* ── Ticket row popup bounce ─────────────────────────────────────────────── */
+.ticket-row.animate-in{animation:ticketIn .3s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes ticketIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+
+/* ── Inject btn press ────────────────────────────────────────────────────── */
+.inj-btn:active{transform:scale(.9) translateY(2px)!important;box-shadow:none!important;transition-duration:.06s}
+
+/* ── Modal scale in ──────────────────────────────────────────────────────── */
+.modal-overlay.open .modal{animation:modalIn .26s cubic-bezier(.34,1.56,.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:none}}
+
+/* ── Topbar service pill pulse when error ────────────────────────────────── */
+.svc-err{animation:svcErrPulse 2s ease-in-out infinite}
+@keyframes svcErrPulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 10px rgba(255,51,85,.25)}}
+
+/* ── Scanline atmosphere ─────────────────────────────────────────────────── */
+.scanlines{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.025) 3px,rgba(0,0,0,.025) 4px)}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── LIGHT MODE ─────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* Smooth theme switch — only on elements that need it, not body * (too laggy) */
+body{transition:background .3s ease,color .25s ease}
+.topbar,.panel,.kpi,.detail-outer,.inject-panel,.modal,.kpi-popup,
+.fleet-table td,.fleet-table th,.ticket-row,.dp-hdr,.dp-section,.dp-row,
+.dp-bar-track,.step-card,.step-card-hdr,.detail-block,.db-title,
+.tab-btn,.lc,.lc-input,.inj-btn,.form-input,.form-select,.theme-toggle,
+.ticket-tabs,.panel-hdr,.alert-ok,.alert-warn,.alert-err{
+  transition:background .25s ease,border-color .22s ease,color .2s ease,box-shadow .2s ease;
+}
+
+body.light{
+  --bg:#F2F6FB;
+  --s1:#E6EDF6;
+  --s2:#D9E4F0;
+  --s3:#CDDAE8;
+  --glass:rgba(255,255,255,.88);
+  --glass2:rgba(245,250,255,.84);
+  --b1:rgba(0,130,195,.15);
+  --b2:rgba(0,130,195,.30);
+  --b3:rgba(0,130,195,.48);
+  --e:#006FB3;
+  --e2:#005490;
+  --mint:#00896A;
+  --mint2:#006852;
+  --coral:#CC0030;
+  --coral2:#99002A;
+  --gold:#A86800;
+  --violet:#5828AA;
+  --ice:#071525;
+  --mist:#2A4A66;
+  --fog:#587894;
+  color:#071525;
+}
+
+/* Background */
+body.light::before{
+  background:
+    radial-gradient(ellipse 80% 60% at 70% -10%,rgba(100,60,200,.09) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 90%,rgba(0,130,195,.10) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(0,150,120,.05) 0%,transparent 60%),
+    linear-gradient(180deg,#F2F6FB 0%,#EAF0F8 50%,#F2F6FB 100%);
+}
+body.light::after{
+  background-image:
+    linear-gradient(rgba(0,130,195,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,130,195,.07) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+
+/* Background orbs */
+body.light .bg-orb-1{background:radial-gradient(circle,rgba(100,60,200,.10) 0%,transparent 65%)}
+body.light .bg-orb-2{background:radial-gradient(circle,rgba(0,130,195,.09) 0%,transparent 65%)}
+body.light .bg-orb-3{background:radial-gradient(circle,rgba(0,150,120,.05) 0%,transparent 65%)}
+body.light .scanlines{background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.012) 3px,rgba(0,0,0,.012) 4px)}
+
+/* Login */
+body.light .lc{background:rgba(255,255,255,.96);border-color:var(--b2);box-shadow:0 0 0 1px rgba(0,130,195,.06),0 48px 120px rgba(0,0,0,.14),0 0 60px rgba(0,130,195,.09),inset 0 1px 0 rgba(255,255,255,.9)}
+body.light .lc::before{background:linear-gradient(135deg,rgba(0,130,195,.06) 0%,transparent 50%)}
+body.light .lc-title{color:#071525}
+body.light .lc-input{background:rgba(235,243,252,.8);border-color:rgba(0,130,195,.22);color:#071525}
+body.light .lc-input::placeholder{color:var(--fog)}
+body.light .lc-creds{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.07)}
+body.light .lc-cred-row{border-bottom-color:rgba(0,0,0,.06)}
+body.light .lc-err{background:rgba(204,0,48,.07);border-color:rgba(204,0,48,.25)}
+
+/* Topbar */
+body.light .topbar{background:rgba(255,255,255,.92);border-color:var(--b1);box-shadow:0 4px 24px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.9)}
+body.light .tb-divider{background:linear-gradient(transparent,var(--b2),transparent)}
+body.light .tb-logo{color:#071525}
+body.light .tb-sys{color:var(--mist)}
+body.light .tb-user{color:var(--mist)}
+body.light .tb-clock{text-shadow:none;color:var(--e)}
+body.light .tb-logout{background:rgba(204,0,48,.07);border-color:rgba(204,0,48,.25);color:var(--coral)}
+body.light .tb-tickets-link{background:rgba(0,137,106,.09);border-color:rgba(0,137,106,.26);color:var(--mint)}
+
+/* Panels */
+body.light .panel{background:rgba(255,255,255,.88);border-color:var(--b1)}
+body.light .panel-hdr{background:rgba(230,237,246,.7);border-bottom-color:var(--b1)}
+body.light .fleet-scroll{scrollbar-color:rgba(0,130,195,.3) transparent}
+
+/* KPI cards */
+body.light .kpi{background:rgba(255,255,255,.9);border-color:var(--b1)}
+body.light .kpi.k-teal .kpi-val{text-shadow:none;color:var(--mint)}
+body.light .kpi.k-green .kpi-val{text-shadow:none;color:#16A34A}
+body.light .kpi.k-red .kpi-val{text-shadow:none;color:var(--coral)}
+body.light .kpi.k-amber .kpi-val{text-shadow:none;color:var(--gold)}
+body.light .kpi.k-blue .kpi-val{text-shadow:none;color:var(--e)}
+body.light .kpi.k-teal:hover{border-color:rgba(0,137,106,.38);box-shadow:0 16px 48px rgba(0,137,106,.14)}
+body.light .kpi.k-green:hover{border-color:rgba(22,163,74,.38);box-shadow:0 16px 48px rgba(22,163,74,.14)}
+body.light .kpi.k-red:hover{border-color:rgba(204,0,48,.38);box-shadow:0 16px 48px rgba(204,0,48,.14)}
+body.light .kpi.k-amber:hover{border-color:rgba(168,104,0,.38);box-shadow:0 16px 48px rgba(168,104,0,.14)}
+body.light .kpi.k-blue:hover{border-color:rgba(0,111,179,.38);box-shadow:0 16px 48px rgba(0,111,179,.14)}
+
+/* Fleet */
+body.light .fleet-table th{background:rgba(220,232,246,.9);color:var(--fog)}
+body.light .fleet-table td{background:rgba(255,255,255,.75);border-color:var(--b1)}
+body.light .fleet-table tr:hover td{background:rgba(0,130,195,.06);border-color:rgba(0,130,195,.22)}
+body.light .fleet-table tr.sel td{background:rgba(0,137,106,.08)!important;border-color:rgba(0,137,106,.28)}
+body.light .fleet-table tr.sel td:first-child{border-left-color:var(--mint)}
+body.light .fleet-table tr.flashing td{animation:rowflash-light .55s ease 3}
+@keyframes rowflash-light{0%,100%{background:rgba(255,255,255,.75)}50%{background:rgba(204,0,48,.09)}}
+
+/* Detail panel */
+body.light .detail-outer{background:rgba(255,255,255,.88);border-color:var(--b1)}
+body.light .dp-hdr{background:rgba(230,237,246,.8);border-bottom-color:var(--b1)}
+body.light .dp-section{background:rgba(220,232,246,.6);border-bottom-color:var(--b1)}
+body.light .dp-row{border-bottom-color:rgba(0,130,195,.07)}
+body.light .dp-row:hover{background:rgba(0,130,195,.04)}
+body.light .dp-bar-track{background:rgba(0,0,0,.07)}
+
+/* Inject panel */
+body.light .inject-panel{background:rgba(240,245,252,.96);border-color:var(--b1)}
+body.light .inj-btn{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.10);color:var(--mist)}
+body.light .inj-btn:hover{background:rgba(168,104,0,.12);color:var(--gold);border-color:rgba(168,104,0,.35)}
+body.light .inj-btn.random{background:rgba(88,40,170,.08);color:var(--violet);border-color:rgba(88,40,170,.24)}
+body.light .inj-btn.random:hover{background:rgba(88,40,170,.18)}
+body.light .inj-btn.clear{background:rgba(0,137,106,.07);color:var(--mint);border-color:rgba(0,137,106,.26)}
+body.light .inj-btn.clear:hover{background:rgba(0,137,106,.18)}
+body.light .inj-feedback.ok{background:rgba(0,137,106,.08);border-color:rgba(0,137,106,.28);color:var(--mint)}
+body.light .inj-feedback.err{background:rgba(204,0,48,.07);border-color:rgba(204,0,48,.26);color:var(--coral)}
+
+/* Ticket tabs & rows */
+body.light .ticket-tabs{background:rgba(230,237,246,.8);border-bottom-color:var(--b1)}
+body.light .tab-btn{border-color:rgba(0,0,0,.10);color:var(--fog)}
+body.light .tab-btn.active{background:var(--e);color:#fff;border-color:var(--e);box-shadow:0 0 16px rgba(0,111,179,.25)}
+body.light .tab-btn:hover:not(.active){color:var(--e);border-color:rgba(0,111,179,.28);background:rgba(0,111,179,.06)}
+body.light .ticket-row{background:rgba(255,255,255,.78);border-color:var(--b1)}
+body.light .ticket-row:hover{background:rgba(0,130,195,.05);border-color:rgba(0,130,195,.22);box-shadow:0 2px 12px rgba(0,0,0,.07)}
+body.light .st-resolved{color:var(--mint);background:rgba(0,137,106,.10)}
+body.light .st-escalated{color:var(--gold);background:rgba(168,104,0,.10)}
+body.light .st-open{color:var(--e);background:rgba(0,111,179,.10)}
+
+/* Modals */
+body.light .modal-overlay{background:rgba(200,215,230,.55)}
+body.light .modal{background:rgba(255,255,255,.98);border-color:var(--b2);box-shadow:0 48px 120px rgba(0,0,0,.18),0 0 0 1px rgba(0,130,195,.07)}
+body.light .modal-hdr{background:rgba(230,237,246,.9);border-bottom-color:var(--b1)}
+body.light .modal-title{color:#071525}
+body.light .step-card{background:rgba(245,250,255,.85);border-color:var(--b1)}
+body.light .step-card:hover{border-color:var(--b2)}
+body.light .step-card-hdr{background:rgba(225,235,248,.8);border-bottom-color:var(--b1)}
+body.light .step-layer{color:#0A1929}
+body.light .step-desc{color:var(--mist)}
+body.light .detail-block{border-color:var(--b1)}
+body.light .db-title{background:rgba(220,232,246,.7);border-bottom-color:var(--b1)}
+body.light .db-row{border-bottom-color:rgba(0,130,195,.07)}
+body.light .diag-checks{border-color:var(--b1)}
+body.light .diag-check{border-bottom-color:rgba(0,130,195,.08)}
+body.light .diag-check:hover{background:rgba(0,130,195,.04)}
+body.light .diag-verdict.ok{background:rgba(0,137,106,.07);border-color:rgba(0,137,106,.28)}
+body.light .diag-verdict.err{background:rgba(204,0,48,.06);border-color:rgba(204,0,48,.24)}
+body.light .log-problem{background:rgba(0,111,179,.05);border-left-color:var(--e)}
+body.light .log-verdict-fault{background:rgba(204,0,48,.05)}
+body.light .log-verdict-fix{background:rgba(0,137,106,.05)}
+body.light .lvb-value{color:#0A1929}
+body.light .alert-ok{background:rgba(0,137,106,.08);border-color:rgba(0,137,106,.28)}
+body.light .alert-warn{background:rgba(168,104,0,.08);border-color:rgba(168,104,0,.28)}
+body.light .alert-err{background:rgba(204,0,48,.07);border-color:rgba(204,0,48,.26)}
+
+/* KPI popup */
+body.light .kpi-popup{background:rgba(255,255,255,.98);border-color:var(--b2);box-shadow:0 32px 80px rgba(0,0,0,.18),0 0 0 1px rgba(0,130,195,.06)}
+body.light .kpi-popup::before{background:linear-gradient(90deg,transparent,var(--e),transparent)}
+body.light .kpi-popup-hdr{background:rgba(230,237,246,.8)}
+body.light .kpi-popup-row:hover{background:rgba(0,130,195,.06);border-color:rgba(0,130,195,.18)}
+
+/* Form */
+body.light .form-input,body.light .form-select{background:rgba(235,243,252,.9);border-color:rgba(0,130,195,.22);color:#071525}
+body.light .form-select option{background:#F2F6FB;color:#071525}
+body.light .form-btn-cancel{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12);color:var(--mist)}
+
+/* Chip tweaks for light bg */
+body.light .fault-chip{background:rgba(168,104,0,.10);border-color:rgba(168,104,0,.28)}
+body.light .chip-up{background:rgba(0,137,106,.10);border-color:rgba(0,137,106,.28)}
+body.light .chip-down{background:rgba(204,0,48,.10);border-color:rgba(204,0,48,.30)}
+body.light .f-model{background:rgba(0,0,0,.06)}
+body.light .schema-pill,.light .tr069-path{background:rgba(0,111,179,.08);border-color:rgba(0,111,179,.22)}
+body.light .dv-param-chip{background:rgba(0,111,179,.09);border-color:rgba(0,111,179,.24)}
+body.light .write-path{border-bottom-color:rgba(0,130,195,.09)}
+body.light .dp-bar-ok .dp-bar-fill{background:linear-gradient(90deg,var(--mint2),var(--mint))}
+body.light .dp-bar-warn .dp-bar-fill{background:linear-gradient(90deg,#8A5A00,var(--gold))}
+body.light .dp-bar-err .dp-bar-fill{background:linear-gradient(90deg,var(--coral2),var(--coral))}
+
+/* Theme toggle button */
+.theme-toggle{
+  width:34px;height:34px;border-radius:8px;flex-shrink:0;
+  border:1px solid var(--b2);background:rgba(255,255,255,.06);
+  font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.theme-toggle:hover{background:rgba(255,255,255,.14);transform:rotate(20deg);box-shadow:0 0 14px var(--b3)}
+body.light .theme-toggle{background:rgba(0,0,0,.05);border-color:var(--b2)}
+body.light .theme-toggle:hover{background:rgba(0,0,0,.10)}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width:1200px){
+  html,body{overflow:auto}
+  #shell{height:auto!important;min-height:100vh}
+  .body{grid-template-columns:1fr;grid-template-rows:auto 520px auto 240px;grid-template-areas:"kpis" "fleet" "detail" "tickets";overflow:visible}
+  .kpis{flex-direction:row;flex-wrap:wrap;height:auto}
+  .kpi{min-width:140px;min-height:100px}
+  .right-col{min-height:500px}
+}
+@media (max-width:760px){
+  #shell{padding:8px;gap:8px}
+  .topbar{height:auto;flex-wrap:wrap;gap:8px}
+  .tb-services{flex-basis:100%;order:3}
+  .tb-right{order:4;width:100%;justify-content:space-between}
+  .ticket-hdr,.ticket-row{grid-template-columns:80px 100px minmax(120px,1fr)}
+  .ticket-hdr div:nth-child(n+4),.ticket-row div:nth-child(n+4){display:none}
+}
 </style>
 </head>
 <body>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+<div class="scanlines"></div>
 
-<!-- LOGIN -->
+<!-- ══ LOGIN ══════════════════════════════════════════════════════════════ -->
 <div id="login-overlay">
   <div class="lc">
-    <div class="lc-badge">⬡ NOC ACCESS</div>
-    <h2 class="lc-title">Network Operations</h2>
-    <p class="lc-sub">Sign in with your admin credentials to access the dashboard.</p>
+    <div class="lc-icon">🛰</div>
+    <h1 class="lc-title">Operations Center</h1>
+    <p class="lc-sub">Authenticate with your NOC credentials to access the live dashboard.</p>
     <div class="lc-field">
-      <input class="lc-input" id="adm-user" type="text" placeholder="Username" autocomplete="username">
+      <label class="lc-label">Username</label>
+      <input class="lc-input" id="adm-user" type="text" placeholder="username" autocomplete="username">
     </div>
     <div class="lc-field">
-      <input class="lc-input" id="adm-pass" type="password" placeholder="Password" autocomplete="current-password">
+      <label class="lc-label">Password</label>
+      <input class="lc-input" id="adm-pass" type="password" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <button class="lc-btn" onclick="nocLogin()">Access Dashboard</button>
+    <button class="lc-btn" onclick="nocLogin()">Access Dashboard →</button>
     <p class="lc-err" id="lc-err"></p>
     <div class="lc-creds">
-      <div class="lc-creds-title">Admin accounts</div>
-      <div class="lc-cred-row"><span>Mehdi (superadmin)</span><span>mehdi / admin123</span></div>
+      <div class="lc-creds-title">Demo Accounts</div>
+      <div class="lc-cred-row"><span>Mehdi — Superadmin</span><span>mehdi / admin123</span></div>
       <div class="lc-cred-row"><span>Operator 1</span><span>noc_op1 / noc2025!</span></div>
     </div>
   </div>
 </div>
 
-<!-- SHELL -->
+<!-- ══ SHELL ═══════════════════════════════════════════════════════════════ -->
 <div id="shell" style="display:none;flex-direction:column;height:100vh">
 
+  <!-- Topbar -->
   <header class="topbar">
-    <div class="tb-logo"><div class="tb-logo-pulse"></div>NOC</div>
-    <div class="tb-sep"></div>
-    <span class="tb-title">Network Operations Center — MyPFE</span>
-    <div class="tb-pills">
-      <span class="pill pill-dim" id="p-neo4j">neo4j</span>
-      <span class="pill pill-dim" id="p-genie">genie</span>
-      <span class="pill pill-dim" id="p-raduce">raduce</span>
-      <span class="pill pill-dim" id="p-ollama">ollama</span>
+    <div class="tb-brand">
+      <div class="tb-pulse"></div>
+      <span class="tb-logo">NOC</span>
+      <span class="tb-slash">/</span>
+      <span class="tb-sys">MyPFE</span>
     </div>
-    <a href="/noc/tickets" style="font-family:var(--mono);font-size:9px;color:var(--teal);background:var(--teal-bg);border:1px solid rgba(0,229,190,.3);border-radius:4px;padding:4px 11px;text-decoration:none;transition:all .15s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">🎫 TICKETS</a>
+    <div class="tb-divider"></div>
+    <div class="tb-services" id="tb-services">
+      <span class="svc-pill svc-dim" id="p-neo4j"><span class="dot"></span>neo4j</span>
+      <span class="svc-pill svc-dim" id="p-genie"><span class="dot"></span>genie</span>
+      <span class="svc-pill svc-dim" id="p-raduce"><span class="dot"></span>raduce</span>
+      <span class="svc-pill svc-dim" id="p-ollama"><span class="dot"></span>ollama</span>
+    </div>
     <div class="tb-right">
+      <a class="tb-tickets-link" href="/noc/tickets">🎫 All Tickets</a>
+      <div class="tb-divider"></div>
       <span class="tb-clock" id="tb-clock">00:00:00</span>
-      <div class="tb-sep"></div>
-      <span class="tb-admin" id="tb-admin">—</span>
-      <button class="tb-logout" onclick="nocLogout()">LOGOUT</button>
+      <div class="tb-divider"></div>
+      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark mode">🌙</button>
+      <div class="tb-divider"></div>
+      <span class="tb-user" id="tb-admin">—</span>
+      <button class="tb-logout" onclick="nocLogout()">Logout</button>
     </div>
   </header>
 
+  <!-- Body -->
   <div class="body">
 
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="sc-icon teal">📡</div>
-        <div><div class="sc-val teal" id="s-total">—</div><div class="sc-label">Total Routers</div><div class="sc-sub" id="s-total-sub">fleet</div></div>
+    <!-- KPI Column -->
+    <div class="kpis">
+      <div class="kpi k-teal" style="animation-delay:.00s" onclick="openKpiPopup('total',this)">
+        <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="15" width="20" height="6" rx="2"/><path d="M6 15v-3a6 6 0 0 1 12 0v3"/><circle cx="12" cy="9" r="1" fill="currentColor" stroke="none"/><line x1="6" y1="18" x2="6" y2="18" stroke-linecap="round"/><line x1="10" y1="18" x2="10" y2="18" stroke-linecap="round"/></svg></div>
+        <div class="kpi-label">Total Routers</div>
+        <div class="kpi-val" id="s-total">—</div>
+        <div class="kpi-sub" id="s-total-sub">fleet</div>
       </div>
-      <div class="stat-card">
-        <div class="sc-icon green">✓</div>
-        <div><div class="sc-val green" id="s-up">—</div><div class="sc-label">Online</div><div class="sc-sub" id="s-up-pct">—%</div></div>
+      <div class="kpi k-green" style="animation-delay:.05s" onclick="openKpiPopup('up',this)">
+        <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/></svg></div>
+        <div class="kpi-label">Online</div>
+        <div class="kpi-val" id="s-up">—</div>
+        <div class="kpi-sub" id="s-up-pct">—%</div>
       </div>
-      <div class="stat-card">
-        <div class="sc-icon red">✗</div>
-        <div><div class="sc-val red" id="s-down">—</div><div class="sc-label">Faulted</div><div class="sc-sub" id="s-down-pct">—%</div></div>
+      <div class="kpi k-red" style="animation-delay:.10s" onclick="openKpiPopup('down',this)">
+        <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-linecap="round" stroke-width="2"/></svg></div>
+        <div class="kpi-label">Faulted</div>
+        <div class="kpi-val" id="s-down">—</div>
+        <div class="kpi-sub" id="s-down-pct">—%</div>
       </div>
-      <div class="stat-card">
-        <div class="sc-icon amber">⏳</div>
-        <div><div class="sc-val amber" id="s-esc">—</div><div class="sc-label">Escalated</div><div class="sc-sub">open tickets</div></div>
+      <div class="kpi k-amber" style="animation-delay:.15s" onclick="openKpiPopup('escalated',this)">
+        <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+        <div class="kpi-label">Escalated</div>
+        <div class="kpi-val" id="s-esc">—</div>
+        <div class="kpi-sub">open tickets</div>
       </div>
-      <div class="stat-card">
-        <div class="sc-icon blue">🎫</div>
-        <div><div class="sc-val blue" id="s-resolved">—</div><div class="sc-label">Resolved</div><div class="sc-sub">all time</div></div>
+      <div class="kpi k-blue" style="animation-delay:.20s" onclick="openKpiPopup('resolved',this)">
+        <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <div class="kpi-label">Resolved</div>
+        <div class="kpi-val" id="s-resolved">—</div>
+        <div class="kpi-sub">all time</div>
       </div>
     </div>
 
-    <div class="fleet-panel">
+    <!-- Fleet Panel -->
+    <div class="panel fleet-panel">
       <div class="panel-hdr">
         <span class="ph-title">Router Fleet</span>
         <span class="ph-count" id="fleet-count">loading…</span>
-        <button class="ph-btn" onclick="loadFleet()">⟳ Refresh</button>
+        <button class="ph-btn" onclick="loadFleet()">↺ Refresh</button>
       </div>
       <div class="fleet-scroll">
         <table class="fleet-table">
           <thead>
-            <tr><th>Customer</th><th>Phone</th><th>Model</th><th>Status</th><th>Fault</th><th>Updated</th></tr>
+            <tr>
+              <th>Customer</th><th>Phone</th><th>Model</th>
+              <th>Status</th><th>Fault</th><th>Updated</th>
+            </tr>
           </thead>
           <tbody id="fleet-body">
-            <tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text2)">Loading fleet…</td></tr>
+            <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--fog)">Loading fleet…</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
+    <!-- Right column: detail + inject -->
     <div class="right-col">
-      <div class="detail-panel" id="detail-panel">
-        <div class="detail-empty"><div class="icon">📡</div><div>Select a router<br>to view live state</div></div>
+      <div class="detail-outer">
+        <div class="panel-hdr">
+          <span class="ph-title">Router Detail</span>
+          <span class="ph-count" id="detail-serial-label">—</span>
+        </div>
+        <div class="detail-panel" id="detail-panel">
+          <div class="detail-empty">
+            <div class="de-icon">📡</div>
+            <div class="de-text">Select a router<br>to view live state</div>
+          </div>
+        </div>
       </div>
       <div class="inject-panel">
-        <div class="ip-title">Fault Injection</div>
-        <div class="ip-target">Target: <span class="t" id="inj-target">none</span></div>
-        <div class="inject-btns">
-          <button class="inj-btn random" onclick="inject('random')">⚡ Random</button>
+        <div class="ip-header">
+          <span class="ip-title">⚡ Fault Injection</span>
+          <span class="ip-target">Target: <span class="t" id="inj-target">none</span></span>
+        </div>
+        <div class="inject-grid">
+          <button class="inj-btn random" onclick="inject('random')">Random</button>
           <button class="inj-btn" onclick="inject('ppp_auth_failure')">PPP Auth</button>
-          <button class="inj-btn" onclick="inject('wrong_vlan')">VLAN</button>
-          <button class="inj-btn" onclick="inject('dns_failure')">DNS</button>
-          <button class="inj-btn" onclick="inject('weak_signal')">Signal</button>
+          <button class="inj-btn" onclick="inject('wrong_vlan')">Wrong VLAN</button>
+          <button class="inj-btn" onclick="inject('dns_failure')">DNS Fail</button>
+          <button class="inj-btn" onclick="inject('weak_signal')">Weak Signal</button>
           <button class="inj-btn" onclick="inject('random_disconnect')">Disconnect</button>
-          <button class="inj-btn clear" onclick="clearFault()">✓ Clear</button>
+          <button class="inj-btn clear" onclick="clearFault()" style="grid-column:1/-1">✓ Clear Fault</button>
         </div>
         <div class="inj-feedback" id="inj-fb"></div>
       </div>
     </div>
 
-    <div class="tickets-row">
+    <!-- Tickets Row -->
+    <div class="panel tickets-row">
       <div class="ticket-tabs">
-        <button class="tab-btn active" onclick="loadTickets(null,this)">ALL</button>
-        <button class="tab-btn" onclick="loadTickets('escalated',this)">ESCALATED</button>
-        <button class="tab-btn" onclick="loadTickets('resolved',this)">RESOLVED</button>
-        <button class="tab-btn" onclick="loadTickets('open',this)">OPEN</button>
-        <button class="ph-btn" onclick="openCreateTicketModal()" style="margin-left:auto">+ NEW TICKET</button>
+        <button class="tab-btn active" onclick="loadTickets(null,this)">All</button>
+        <button class="tab-btn" onclick="loadTickets('escalated',this)">Escalated</button>
+        <button class="tab-btn" onclick="loadTickets('resolved',this)">Resolved</button>
+        <button class="tab-btn" onclick="loadTickets('open',this)">Open</button>
+        <button class="ph-btn" onclick="openCreateTicketModal()" style="margin-left:auto">+ New Ticket</button>
       </div>
       <div class="ticket-hdr">
-        <div>Status</div><div>Account</div><div>Problem</div><div>Fault</div><div>Fix</div><div>Date</div>
+        <div>Status</div><div>Account</div><div>Problem</div>
+        <div>Fault</div><div>Fix</div><div>Date</div>
       </div>
       <div class="tickets-body" id="tickets-body">
-        <div style="text-align:center;color:var(--text2);padding:14px;font-size:11px">Loading…</div>
+        <div style="text-align:center;color:var(--fog);padding:16px;font-size:11px">Loading…</div>
       </div>
     </div>
 
@@ -433,7 +988,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       </div>
       <div class="form-group">
         <label class="form-label">Problem Description</label>
-        <textarea id="ct-problem" class="form-input" placeholder="Describe the customer's issue..." style="resize:none;height:80px"></textarea>
+        <textarea id="ct-problem" class="form-input" placeholder="Describe the customer's issue…" style="resize:none;height:88px"></textarea>
       </div>
       <div class="form-group">
         <label class="form-label">Fault Type</label>
@@ -464,11 +1019,36 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
   </div>
 </div>
 
+<!-- ══ KPI POPUP ════════════════════════════════════════════════════════════ -->
+<div class="kpi-popup" id="kpi-popup" style="display:none">
+  <div class="kpi-popup-hdr">
+    <span class="kpi-popup-title" id="kpi-popup-title">—</span>
+    <span class="kpi-popup-count" id="kpi-popup-count">—</span>
+    <button class="kpi-popup-close" onclick="closeKpiPopup()">✕</button>
+  </div>
+  <div class="kpi-popup-body" id="kpi-popup-body"></div>
+</div>
+
 <script>
+// Apply theme immediately on page load (before shell renders)
+(function(){
+  const saved=localStorage.getItem('noc-theme');
+  if(saved==='light'||(saved===null&&window.matchMedia('(prefers-color-scheme: light)').matches))
+    document.body.classList.add('light');
+})();
+
 let selSerial=null, fleet=[];
 
 function updateClock(){document.getElementById('tb-clock').textContent=new Date().toLocaleTimeString('en-GB',{hour12:false});}
 updateClock(); setInterval(updateClock,1000);
+
+function _showDashboard(admin){
+  document.getElementById('login-overlay').style.display='none';
+  const sh=document.getElementById('shell'); sh.style.display='flex';
+  document.getElementById('tb-admin').textContent=(admin?.name||'—')+' · '+(admin?.role||'—');
+  applyTheme();
+  initDashboard();
+}
 
 async function nocLogin(){
   const u=document.getElementById('adm-user').value.trim();
@@ -478,15 +1058,32 @@ async function nocLogin(){
     const r=await fetch('/api/noc/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
     const d=await r.json();
     if(d.success){
-      document.getElementById('login-overlay').style.display='none';
-      const sh=document.getElementById('shell'); sh.style.display='flex';
-      document.getElementById('tb-admin').textContent=d.admin.name+' · '+d.admin.role;
-      initDashboard();
+      localStorage.setItem('noc-admin',JSON.stringify(d.admin));
+      _showDashboard(d.admin);
     } else {err.textContent=d.error||'Login failed';err.style.display='block';}
   }catch(e){err.textContent='Connection error';err.style.display='block';}
 }
-async function nocLogout(){await fetch('/api/noc/logout',{method:'POST'});location.reload();}
+
+async function nocLogout(){
+  localStorage.removeItem('noc-admin');
+  await fetch('/api/noc/logout',{method:'POST'});
+  location.reload();
+}
+
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('login-overlay').style.display!=='none')nocLogin();});
+
+// Auto-restore session on page refresh
+document.addEventListener('DOMContentLoaded',async()=>{
+  const saved=localStorage.getItem('noc-admin');
+  if(!saved) return;
+  try{
+    const r=await fetch('/api/noc/fleet');
+    if(r.status===401){localStorage.removeItem('noc-admin');return;}
+    const d=await r.json();
+    if(d.error&&d.error.includes('authenticated')){localStorage.removeItem('noc-admin');return;}
+    _showDashboard(JSON.parse(saved));
+  }catch(e){/* network error — stay on login */}
+});
 
 function initDashboard(){
   checkStatus(); loadFleet(); loadTickets(null,document.querySelector('.tab-btn')); loadTicketStats();
@@ -504,62 +1101,16 @@ async function checkStatus(){
 }
 function setPill(id,ok,label){
   const el=document.getElementById(id);
-  el.textContent=label+(ok?' ✓':' ✗');
-  el.className='pill '+(ok?'pill-ok':'pill-err');
+  el.innerHTML=`<span class="dot"></span>${label}`;
+  el.className='svc-pill '+(ok?'svc-ok':'svc-err');
 }
 
-async function loadTicketStats(){
-  try{
-    const [re,es]=await Promise.all([
-      fetch('/api/noc/tickets?status=resolved').then(r=>r.json()),
-      fetch('/api/noc/tickets?status=escalated').then(r=>r.json()),
-    ]);
-    document.getElementById('s-resolved').textContent=re.total||0;
-    document.getElementById('s-esc').textContent=es.total||0;
-  }catch(e){}
-}
-
-async function loadFleet(){
-  try{
-    const r=await fetch('/api/noc/fleet'); const d=await r.json();
-    fleet=d.routers||[];
-    const total=d.total||0, up=d.up||0, down=d.down||0;
-    document.getElementById('s-total').textContent=total;
-    document.getElementById('s-up').textContent=up;
-    document.getElementById('s-down').textContent=down;
-    document.getElementById('s-total-sub').textContent=total+' devices';
-    document.getElementById('s-up-pct').textContent=total?Math.round(up/total*100)+'%':'—';
-    document.getElementById('s-down-pct').textContent=total?Math.round(down/total*100)+'%':'—';
-    document.getElementById('fleet-count').textContent=total+' devices';
-    renderFleet(fleet);
-    if(selSerial) refreshDetail(selSerial);
-  }catch(e){
-    document.getElementById('fleet-body').innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--red);padding:20px">Error loading fleet</td></tr>';
-  }
-}
-
-function renderFleet(routers){
-  const body=document.getElementById('fleet-body');
-  if(!routers.length){body.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:20px">No routers</td></tr>';return;}
-  body.innerHTML=routers.map(r=>{
-    const down=r.status==='DOWN';
-    const chip=down?'<span class="chip chip-down">● DOWN</span>':'<span class="chip chip-up">● UP</span>';
-    const fault=r.fault&&r.fault!=='healthy'?`<span class="fault-chip">${r.fault.replace(/_/g,' ')}</span>`:'<span style="color:var(--text3)">—</span>';
-    const upd=r.last_updated?new Date(r.last_updated).toLocaleTimeString('en-GB',{hour12:false}):'—';
-    const sel=r.serial===selSerial?'sel':'';
-    return `<tr class="${sel}" onclick="selectRouter('${r.serial}',this)">
-      <td><span style="font-weight:500">${r.customer_name}</span></td>
-      <td style="font-family:var(--mono);color:var(--text2);font-size:10px">${r.customer_phone}</td>
-      <td style="font-family:var(--mono);font-size:10px">${r.model}</td>
-      <td>${chip}</td><td>${fault}</td>
-      <td style="font-family:var(--mono);font-size:9px;color:var(--text3)">${upd}</td>
-    </tr>`;
-  }).join('');
-}
+// loadTicketStats, loadFleet, renderFleet are defined below with counter animations
 
 function selectRouter(serial,rowEl){
   selSerial=serial;
   document.getElementById('inj-target').textContent=serial.split('-').slice(-1)[0]+'…';
+  document.getElementById('detail-serial-label').textContent=serial;
   document.querySelectorAll('.fleet-table tr').forEach(r=>r.classList.remove('sel'));
   if(rowEl) rowEl.classList.add('sel');
   refreshDetail(serial);
@@ -575,18 +1126,62 @@ async function refreshDetail(serial){
 }
 
 function renderDetailError(msg){
-  document.getElementById('detail-panel').innerHTML=`<div class="detail-empty"><div class="icon">⚠️</div><div style="color:var(--red)">${msg}</div></div>`;
+  document.getElementById('detail-panel').innerHTML=`<div class="detail-empty"><div class="de-icon">⚠️</div><div class="de-text" style="color:var(--coral)">${msg}</div></div>`;
+}
+
+function formatUptime(sec){
+  const s=parseInt(sec||0); if(!s) return '—';
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),r=s%60;
+  return h>0?`${h}h ${m}m ${r}s`:m>0?`${m}m ${r}s`:`${r}s`;
+}
+
+function bar(pct,cls){
+  const w=Math.min(100,Math.max(0,pct));
+  return `<div class="dp-bar-track"><div class="dp-bar-fill" style="width:${w}%"></div></div>`;
 }
 
 function renderDetail(serial,state){
-  const p=state.parameters||{};
+  const p=state.parameters_named||{};
   const down=state.status==='DOWN';
-  const faultTag=state.fault&&state.fault!=='healthy'?`<span class="fault-chip">${state.fault.replace(/_/g,' ')}</span>`:'';
-  const drow=(k,v,cls='dim')=>`<div class="dp-row"><span class="dp-key">${k}</span><span class="dp-val ${cls}">${v??'—'}</span></div>`;
-  const pppOk=p.PPPStatus==='Connected';
-  const dnsOk=p.DNSServer&&p.DNSServer!=='0.0.0.0';
-  let rxCls='ok'; try{if(parseFloat(p.RXPower)<-27)rxCls='err';}catch(e){}
-  const errCls=parseInt(p.ErrorCount||0)>100?'warn':'ok';
+  const fault=state.fault||'healthy';
+  const faultInfo=FAULT_LABELS[fault]||{label:fault.replace(/_/g,' '),desc:''};
+  const faultTag=fault!=='healthy'?`<span class="fault-chip">${faultInfo.label}</span>`:'';
+
+  const drow=(k,v,cls='dim',hint='')=>`<div class="dp-row">
+    <span class="dp-key">${k}</span>
+    <span class="dp-val ${cls}">${v??'—'}${hint?`<span style="font-size:8px;opacity:.55;margin-left:5px;font-weight:400">${hint}</span>`:''}</span>
+  </div>`;
+
+  // PPP Connection
+  const pppConn=p.ppp_connection_status;
+  const pppOk=pppConn==='Connected';
+
+  // Last error
+  const lastErr=p.last_connection_error;
+  const errOk=!lastErr||lastErr==='None';
+
+  // VLAN
+  const vlanVal=p.vlan_id;
+  const correctVlan=state.correct_vlan??100;
+  const vlanOk=vlanVal==null||Number(vlanVal)===Number(correctVlan)||Number(vlanVal)===0;
+  const vlanCls=vlanVal==null?'dim':vlanOk?'ok':'err';
+
+  // RX Power (GPON only)
+  const rxNum=parseFloat(p.rx_optical_power);
+  const hasRx=!isNaN(rxNum);
+  const rxOk=hasRx&&rxNum>=-27;
+  const rxPct=hasRx?Math.round((rxNum+40)/30*100):0;
+  const rxBarCls=rxOk?'dp-bar-ok':'dp-bar-err';
+
+  // CRC Errors (DSL only)
+  const crcVal=parseInt(p.dsl_crc_errors);
+  const hasCrc=!isNaN(crcVal);
+  const crcBarCls=!hasCrc?'':crcVal>100?'dp-bar-err':crcVal>50?'dp-bar-warn':'dp-bar-ok';
+  const crcPct=hasCrc?Math.min(100,Math.round(crcVal/150*100)):0;
+
+  // DNS
+  const dnsVal=p.dns_servers;
+  const dnsOk=dnsVal&&dnsVal!=='0.0.0.0';
 
   document.getElementById('detail-panel').innerHTML=`
     <div class="dp-hdr">
@@ -595,25 +1190,33 @@ function renderDetail(serial,state){
       ${faultTag}
     </div>
     <div class="dp-body">
+      <div class="dp-section">Device</div>
+      ${drow('Model',state.model||'—','dim')}
+      ${drow('Account',state.account_id||'—','dim')}
       <div class="dp-section">Connection</div>
-      ${drow('PPP Status',p.PPPStatus,pppOk?'ok':'err')}
-      ${drow('Last Error',p.LastConnectionError,p.LastConnectionError==='None'?'ok':'warn')}
-      ${drow('Conn. Status',p.ConnectionStatus,p.ConnectionStatus==='Connected'?'ok':'err')}
-      ${drow('VLAN ID',p.VLANId,p.VLANId===100?'ok':'warn')}
-      ${drow('External IP',p.ExternalIPAddress,'dim')}
-      ${drow('Uptime',p.Uptime?p.Uptime+'s':'—','dim')}
-      <div class="dp-section">Optical / Diagnostic</div>
-      ${drow('RX Power',p.RXPower!=null?p.RXPower+' dBm':'—',rxCls)}
-      ${drow('TX Power',p.TXPower!=null?p.TXPower+' dBm':'—','dim')}
-      ${drow('Temperature',p.Temperature!=null?p.Temperature+' °C':'—',parseFloat(p.Temperature||0)<80?'ok':'warn')}
-      ${drow('Signal Loss',p.SignalLoss?'YES':'NO',!p.SignalLoss?'ok':'err')}
-      ${drow('Error Count',p.ErrorCount??'—',errCls)}
-      <div class="dp-section">DNS / Network</div>
-      ${drow('DNS Server',p.DNSServer,dnsOk?'ok':'err')}
-      ${drow('DNS Status',p.DNSStatus,p.DNSStatus==='Active'?'ok':'err')}
-      <div class="dp-section">WiFi</div>
-      ${drow('SSID 2.4G',p.SSID_2G,'dim')}
-      ${drow('SSID 5G',p.SSID_5G,'dim')}
+      ${drow('PPP Status',pppConn||'—',pppOk?'ok':'err',pppOk?'authenticated':'not connected')}
+      ${drow('Last Error',lastErr||'None',errOk?'ok':'warn',!errOk?'⚠ auth failed':'')}
+      ${drow('VLAN ID',vlanVal!=null?String(vlanVal):'—',vlanCls,
+             vlanVal!=null&&!vlanOk?`⚠ expected ${correctVlan}`:`expected ${correctVlan}`)}
+      ${p.uptime!=null?drow('Uptime',formatUptime(p.uptime),'dim'):''}
+      ${hasRx?`<div class="dp-section">Optical (GPON)</div>
+      <div class="dp-bar-row ${rxBarCls}">
+        <div class="dp-bar-label"><span>RX Power</span><span class="dp-val ${rxOk?'ok':'err'}">${rxNum} dBm <span style="font-size:8px;opacity:.5">min -27</span></span></div>
+        ${bar(rxPct,rxBarCls)}
+      </div>`:''}
+      ${hasCrc?`<div class="dp-section">DSL Diagnostics</div>
+      <div class="dp-bar-row ${crcBarCls}">
+        <div class="dp-bar-label"><span>CRC Errors</span><span class="dp-val ${crcVal>100?'err':crcVal>50?'warn':'ok'}">${crcVal} <span style="font-size:8px;opacity:.5">max 100</span></span></div>
+        ${bar(crcPct,crcBarCls)}
+      </div>`:''}
+      <div class="dp-section">DNS</div>
+      ${drow('DNS Servers',dnsVal||'—',dnsOk?'ok':'err',!dnsOk?'⚠ broken':'resolving')}
+      ${fault!=='healthy'?`
+      <div class="dp-section">Active Fault</div>
+      <div style="padding:11px 16px 13px">
+        <div style="font-size:12px;font-weight:800;color:var(--coral);margin-bottom:5px">${faultInfo.label}</div>
+        <div style="font-size:11px;color:var(--mist);line-height:1.6">${faultInfo.desc}</div>
+      </div>`:''}
     </div>`;
 }
 
@@ -659,16 +1262,17 @@ async function loadTickets(status,tabEl){
   if(tabEl) tabEl.classList.add('active');
   const url=status?`/api/noc/tickets?status=${status}`:'/api/noc/tickets';
   const body=document.getElementById('tickets-body');
-  body.innerHTML='<div style="text-align:center;color:var(--text2);padding:10px;font-size:11px">Loading…</div>';
+  body.innerHTML='<div style="text-align:center;color:var(--fog);padding:12px;font-size:11px">Loading…</div>';
   try{
     const r=await fetch(url); const d=await r.json();
-    if(!d.tickets?.length){body.innerHTML='<div style="text-align:center;color:var(--text2);padding:14px;font-size:11px">No tickets</div>';return;}
+    if(!d.tickets?.length){body.innerHTML='<div style="text-align:center;color:var(--fog);padding:16px;font-size:11px">No tickets</div>';return;}
     body.innerHTML='';
     d.tickets.forEach(t=>{
       const cls={resolved:'st-resolved',escalated:'st-escalated',open:'st-open'}[t.status]||'';
+      const rowCls={resolved:'tr-resolved',escalated:'tr-escalated',open:'tr-open'}[t.status]||'';
       const date=t.created_at?new Date(t.created_at).toLocaleDateString('en-GB'):'—';
       const div=document.createElement('div');
-      div.className='ticket-row animate-in';
+      div.className=`ticket-row animate-in ${rowCls}`;
       div.onclick=()=>openTicketModal(t);
       div.innerHTML=`
         <div class="tr-status"><span class="st ${cls}">${t.status}</span></div>
@@ -679,101 +1283,375 @@ async function loadTickets(status,tabEl){
         <div class="tr-date">${date}</div>`;
       body.appendChild(div);
     });
-  }catch(e){body.innerHTML=`<div style="color:var(--red);padding:10px;font-size:11px">Error: ${e}</div>`;}
+  }catch(e){body.innerHTML=`<div style="color:var(--coral);padding:12px;font-size:11px">Error: ${e}</div>`;}
 }
 
-// ── Ticket detail modal with step-by-step trace ───────────────────────────
-function openTicketModal(ticket){
-  const steps=(ticket.full_log||[]);
-  document.getElementById('modal-title').textContent=
-    `${ticket.fault_detected||'?'} → ${ticket.fix_applied||'escalated'} · #${ticket.short_id||ticket._id?.slice(-6)||'?'}`;
+// ── Fault / Fix label dictionaries ────────────────────────────────────────
+const FAULT_LABELS={
+  ppp_auth_failure:  {label:'PPP Authentication Failure', desc:'Router cannot authenticate with the ISP — wrong credentials or auth server error'},
+  wrong_vlan:        {label:'Wrong VLAN Configuration',   desc:'Router is tagged with an incorrect VLAN ID, blocking WAN traffic on the ISP backbone'},
+  dns_failure:       {label:'DNS Resolution Failure',      desc:'DNS server is unset (0.0.0.0) or actively failing — name resolution is broken'},
+  weak_signal:       {label:'Weak Optical Signal',         desc:'RX power is below the -27 dBm minimum — physical fiber degradation or dirty connector'},
+  hardware_fault:    {label:'Hardware Fault',              desc:'Error count exceeds 100 — possible NIC corruption, CRC errors, or hardware degradation'},
+  random_disconnect: {label:'Random Disconnection',        desc:'PPP session dropped without an authentication error — could be ISP-side or line instability'},
+  healthy:           {label:'No Fault Detected',           desc:'All monitored parameters are within their acceptable thresholds'},
+  manual:            {label:'Manual Entry',                desc:'Ticket created manually by NOC staff without an automated diagnostic run'},
+  unknown:           {label:'Unknown',                     desc:'Fault could not be determined from available data'},
+};
+const FIX_LABELS={
+  restart_ppp:              {label:'Restart PPP Session',    desc:'Send SetParameterValues via TR-069 to re-authenticate and re-establish the PPP link'},
+  set_vlan:                 {label:'Correct VLAN ID → 100',  desc:'Send SetParameterValues via TR-069 to set the WAN VLAN tag to 100 (ISP standard)'},
+  set_dns:                  {label:'Update DNS Servers',      desc:'Send SetParameterValues via TR-069 to set primary DNS to 8.8.8.8 and secondary to 1.1.1.1'},
+  reboot_router:            {label:'Remote Reboot',           desc:'Send a Reboot RPC via TR-069 to cold-restart the router'},
+  escalate_to_technician:   {label:'Escalate to Technician', desc:'Issue requires physical on-site intervention — ticket created for field team'},
+  no_action_needed:         {label:'No Action Needed',        desc:'Router was already in a healthy state at the time of the call'},
+};
 
+// ── Helpers ────────────────────────────────────────────────────────────────
+function dbRow(k,v,cls='dim'){
+  return `<div class="db-row"><span class="db-key">${k}</span><span class="db-val ${cls}">${v??'—'}</span></div>`;
+}
+
+// ── Per-layer renderers ────────────────────────────────────────────────────
+function renderGraphRAGStep(s){
+  const res=s.result||{};
+  const meta=res.router_meta||{};
+  const rows=[
+    res.router_model?dbRow('Input Model',res.router_model,'dim'):'',
+    meta.id?dbRow('Graph Node ID',meta.id,'ok'):'',
+    meta.product_class?dbRow('Product Class',meta.product_class,'ok'):'',
+    meta.sheet_name?dbRow('Schema Sheet',meta.sheet_name,'dim'):'',
+    res.router_serial?dbRow('Serial',res.router_serial,'dim'):'',
+    res.subscription_plan?dbRow('Subscription Plan',res.subscription_plan,'dim'):'',
+    res.source?dbRow('Source',res.source,'dim'):'',
+  ].filter(Boolean).join('');
+  if(!rows) return '<div class="log-empty">No metadata returned</div>';
+  return `<div class="detail-block"><div class="db-title">Router Resolved from Graph</div><div class="db-rows">${rows}</div></div>
+  <div style="font-size:9px;color:var(--fog);margin-top:6px;font-family:var(--mono)">Neo4j GraphRAG cross-references the router model to load the correct TR-069 parameter schema sheet for diagnostics.</div>`;
+}
+
+function renderGenieReadStep(s){
+  const res=s.result||{};
+  if(res.error) return `<div class="alert-box alert-err">✗ ACS unreachable — ${res.error}<br><small>Cannot read live router parameters. Ticket opened as "open" for manual review.</small></div>`;
+  const params=res.parameters||{};
+  const statusCls=res.status==='UP'?'ok':'err';
+  let html=`<div class="detail-block"><div class="db-title">Live Router State</div><div class="db-rows">
+    ${dbRow('Status',res.status||'—',statusCls)}
+    ${(res.fault&&res.fault!=='healthy')?dbRow('Active Fault',res.fault.replace(/_/g,' '),'err'):dbRow('Active Fault','none','ok')}
+  </div></div>`;
+  if(Object.keys(params).length){
+    const PARAM_MAP=[
+      ['PPPStatus','PPP Status',v=>v==='Connected'?'ok':'err'],
+      ['ConnectionStatus','WAN Connection',v=>v==='Connected'?'ok':v==='Unconfigured'?'err':'warn'],
+      ['VLANId','VLAN ID',v=>(v==0||v==100)?'ok':'warn',v=>v!=null?String(v):'—'],
+      ['ExternalIPAddress','External IP',()=>'dim'],
+      ['Uptime','Uptime',()=>'dim',v=>formatUptime(v)],
+      ['RXPower','RX Optical Power',v=>parseFloat(v)>=-27?'ok':'err',v=>v!=null?`${v} dBm`:'—'],
+      ['TXPower','TX Power',()=>'dim',v=>v!=null?`${v} dBm`:'—'],
+      ['Temperature','Temperature',v=>parseFloat(v)<80?'ok':parseFloat(v)<90?'warn':'err',v=>v!=null?`${v} °C`:'—'],
+      ['SignalLoss','Signal Loss',v=>!v?'ok':'err',v=>v?'YES':'NO'],
+      ['ErrorCount','Error Count',v=>parseInt(v)<=100?'ok':parseInt(v)<=200?'warn':'err'],
+      ['LastConnectionError','Last Connection Error',v=>(!v||v==='None')?'ok':'warn'],
+      ['DNSServer','DNS Server',v=>(v&&v!=='0.0.0.0')?'ok':'err'],
+      ['DNSStatus','DNS Status',v=>v==='Active'?'ok':'err'],
+    ];
+    let rows='';
+    PARAM_MAP.forEach(([key,label,clsFn,fmtFn])=>{
+      if(params[key]===undefined) return;
+      const raw=params[key];
+      const display=fmtFn?fmtFn(raw):(raw!=null?String(raw):'—');
+      rows+=dbRow(label,display,clsFn?clsFn(raw):'dim');
+    });
+    html+=`<div class="detail-block" style="margin-top:7px"><div class="db-title">Key Parameters Read (${Object.keys(params).length} total)</div><div class="db-rows">${rows}</div></div>`;
+    html+=`<div style="font-size:9px;color:var(--fog);margin-top:6px;font-family:var(--mono)">Thresholds: RX ≥ -27 dBm · VLAN ∈ {0,100} · ErrorCount ≤ 100 · Temperature < 80 °C</div>`;
+  }
+  return html;
+}
+
+function renderNeo4jStep(s){
+  const res=s.result||{};
   let html='';
-
-  // Summary row
-  const stCls={resolved:'st-resolved',escalated:'st-escalated',open:'st-open'}[ticket.status]||'';
-  html+=`<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
-    <span class="st ${stCls}" style="font-size:11px">${ticket.status}</span>
-    <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">${ticket.customer_name||''}</span>
-    <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">${ticket.router_serial||''}</span>
-    ${ticket.resolution_time_s!=null?`<span style="font-family:var(--mono);font-size:10px;color:var(--teal)">⏱ ${ticket.resolution_time_s}s</span>`:''}
-  </div>
-  <div style="font-size:12px;color:var(--text);margin-bottom:16px;padding:10px 14px;background:var(--bg3);border-radius:7px;border:1px solid var(--border)">
-    "${ticket.problem_description||''}"
-  </div>`;
-
-  if(!steps.length){
-    html+='<div style="color:var(--text2);font-size:11px;text-align:center;padding:20px">No step trace recorded for this ticket.</div>';
+  if(res.error){
+    html+=`<div class="alert-box alert-err">✗ Neo4j MCP service unreachable — ${res.error}<br><small>Diagnostic engine will fall back to role-based path resolution without schema context.</small></div>`;
+  } else if(res.warning){
+    html+=`<div class="alert-box alert-warn">⚠ Router model not in graph — "${res.warning}"<br><small>No TR-069 schema loaded for this model. Diagnostic continues using built-in role→path mappings.</small></div>`;
   } else {
-    html+='<div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Fix Trace — '+steps.length+' steps</div>';
-    steps.forEach((s,i)=>{
-      const isNeo4j = (s.layer||'').includes('Neo4j');
-      // Determine status class
-      let statusClass='ok', statusIcon='✓';
-      if(s.ok===false){
-        statusClass='err'; statusIcon='✗';
-      } else if(isNeo4j && s.result?.warning){
-        statusClass='warn'; statusIcon='⚠';
-      }
+    html+=`<div class="alert-box alert-ok">✓ TR-069 parameter schema loaded — ${res.total_params||0} parameters indexed across ${(res.categories||[]).length} categories</div>`;
+  }
+  if(res.total_params>0||res.parsed_params>0){
+    html+=`<div class="detail-block" style="margin-top:7px"><div class="db-title">Schema Statistics</div><div class="db-rows">
+      ${dbRow('Raw Parameters in DB',res.total_params,'ok')}
+      ${dbRow('Parsed into Role Index',res.parsed_params,'ok')}
+    </div></div>`;
+  }
+  if(res.categories?.length){
+    html+=`<div class="detail-block" style="margin-top:7px">
+      <div class="db-title">Parameter Categories (${res.categories.length} groups)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px">${res.categories.map(c=>`<span class="schema-pill">${c}</span>`).join('')}</div>
+      <div style="font-size:9px;color:var(--fog);padding:0 10px 8px;font-family:var(--mono)">Each category maps to a sub-tree of the TR-069 object model (e.g., WANDevice, LANDevice, DeviceInfo).</div>
+    </div>`;
+  }
+  const paths=res.tr069_paths_read||[];
+  if(paths.length){
+    html+=`<div class="detail-block" style="margin-top:7px">
+      <div class="db-title">TR-069 Paths Consulted for Diagnosis (${paths.length})</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;padding:8px 10px">${paths.slice(0,14).map(p=>`<span class="tr069-path" title="${p.path||''}">${p.label}</span>`).join('')}${paths.length>14?`<span style="font-size:9px;color:var(--fog);padding:3px 0">+${paths.length-14} more</span>`:''}</div>
+    </div>`;
+  }
+  return html;
+}
 
+function buildDiagChecks(paths){
+  return paths.map(p=>{
+    const role=(p.role||p.label||'').toLowerCase();
+    const val=p.value;
+    const path=p.path||'';
+    let param=role, displayValue=String(val??'—'), status='skip', evaluation='No threshold applied';
+    if(role.includes('rx')||role.includes('optical receive')||role.includes('receive power')){
+      param='RX Optical Power'; displayValue=val!=null?`${val} dBm`:'—';
+      const n=parseFloat(val);
+      if(!isNaN(n)){
+        if(n<-27){status='trigger';evaluation=`${val} dBm is below the -27 dBm minimum threshold → signal too weak for reliable communication`;}
+        else{status='pass';evaluation=`${val} dBm is above the -27 dBm threshold → optical level is acceptable`;}
+      } else {status='skip';evaluation='Value unavailable — check skipped';}
+    } else if(role.includes('signal')&&role.includes('loss')){
+      param='Signal Loss Flag'; displayValue=val?'TRUE':'false';
+      if(val){status='trigger';evaluation='Signal loss flag is asserted → fiber break, dirty connector, or SFP failure';}
+      else{status='pass';evaluation='No signal loss reported by the ONU';}
+    } else if(role.includes('error')||role.includes('count')||role.includes('crc')){
+      param='Error / CRC Count'; displayValue=String(val??'—');
+      const n=parseInt(val);
+      if(!isNaN(n)){
+        if(n>100){status='trigger';evaluation=`${val} errors exceeds the 100-error threshold → hardware degradation or bad line`;}
+        else{status='pass';evaluation=`${val} errors — within the 100-error threshold`;}
+      }
+    } else if(role.includes('ppp')&&(role.includes('status')||role.includes('state'))){
+      param='PPP Session Status'; displayValue=String(val??'—');
+      const lower=String(val||'').toLowerCase();
+      if(lower.includes('disconnect')||lower.includes('error')){status='trigger';evaluation=`PPP status is "${val}" — session is not established`;}
+      else if(lower.includes('connect')){status='pass';evaluation=`PPP status "${val}" — session is active and authenticated`;}
+      else{status='warn';evaluation=`PPP status "${val}" — unexpected or transitional state`;}
+    } else if(role.includes('connection')&&role.includes('status')){
+      param='WAN Connection Status'; displayValue=String(val??'—');
+      const lower=String(val||'').toLowerCase();
+      if(lower.includes('unconfigured')){status='trigger';evaluation=`"${val}" — WAN interface cannot connect: missing or wrong VLAN configuration`;}
+      else if(lower.includes('connected')){status='pass';evaluation=`"${val}" — WAN is connected and passing traffic`;}
+      else{status='warn';evaluation=`"${val}" — intermediate state (connecting or error)`;}
+    } else if(role.includes('vlan')||role.includes('vid')){
+      param='VLAN ID'; displayValue=String(val??'—');
+      const n=parseInt(val);
+      if(!isNaN(n)){
+        if(n!==0&&n!==100){status='trigger';evaluation=`VLAN ${val} is not in the allowed set {0, 100} — traffic will be dropped by the ISP uplink`;}
+        else{status='pass';evaluation=`VLAN ${val} is correct (allowed: 0 or 100)`;}
+      }
+    } else if(role.includes('dns')&&(role.includes('server')||role.includes('domain'))){
+      param='DNS Server Address'; displayValue=String(val??'—');
+      if(val==='0.0.0.0'||!val){status='trigger';evaluation=`DNS server is "${val}" — unset or unreachable, all name resolution will fail`;}
+      else{status='pass';evaluation=`DNS server "${val}" is set and reachable`;}
+    } else if(role.includes('dns')&&role.includes('status')){
+      param='DNS Service Status'; displayValue=String(val??'—');
+      const lower=String(val||'').toLowerCase();
+      if(lower.includes('error')||lower.includes('fail')||lower.includes('inactive')){status='trigger';evaluation=`DNS status "${val}" — resolution is failing`;}
+      else{status='pass';evaluation=`DNS status "${val}"`;}
+    } else if(role.includes('last')&&role.includes('error')){
+      param='Last Connection Error'; displayValue=String(val||'None');
+      const lower=String(val||'').toLowerCase();
+      if(lower.includes('authentication')||lower.includes('auth')){status='trigger';evaluation=`"${val}" — authentication error confirms PPP credential mismatch`;}
+      else if(!val||val==='None'){status='pass';evaluation='No recent connection errors recorded';}
+      else{status='warn';evaluation=`"${val}" — a connection error is present`;}
+    } else if(role.includes('ppp_auth_failure')||role.includes('auth failure')){
+      param='PPP Auth Failure (diagnostic rule)'; displayValue=String(val||'—');
+      status='trigger'; evaluation=`Correlation rule fired: ${val}`;
+    } else {
+      param=p.role||p.label||role; displayValue=String(val??'—'); status='skip'; evaluation='Supporting parameter — no independent threshold check';
+    }
+    return {param,path,status,displayValue,evaluation};
+  });
+}
+
+function renderDiagStep(s){
+  const res=s.result||{};
+  const paths=res.tr069_paths_read||[];
+  const fault=res.fault_detected;
+  const fixTool=res.fix_tool;
+  const fixParams=res.fix_params||{};
+  let html='';
+  if(paths.length){
+    const checks=buildDiagChecks(paths);
+    html+=`<div class="detail-block"><div class="db-title">Diagnostic Decision Log — ${paths.length} TR-069 paths evaluated</div><div class="diag-checks">`;
+    checks.forEach(c=>{
+      const icon=c.status==='pass'?'✓':c.status==='trigger'?'✗':c.status==='warn'?'⚠':'·';
+      html+=`<div class="diag-check ${c.status}">
+        <div class="dc-icon">${icon}</div>
+        <div class="dc-body">
+          <div class="dc-param">${c.param}</div>
+          ${c.path?`<div class="dc-path" title="${c.path}">${c.path}</div>`:''}
+          <div class="dc-eval">${c.evaluation}</div>
+        </div>
+        <div class="dc-value ${c.status}">${c.displayValue}</div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  }
+  const faultInfo=FAULT_LABELS[fault]||{label:fault||'Unknown',desc:''};
+  const fixInfo=FIX_LABELS[fixTool]||{label:fixTool||'N/A',desc:''};
+  const verdictCls=fault==='healthy'?'ok':'err';
+  html+=`<div class="diag-verdict ${verdictCls}" style="margin-top:10px">
+    <div class="dv-row">
+      <div class="dv-section">
+        <div class="dv-label">Fault Identified</div>
+        <div class="dv-value">${faultInfo.label}</div>
+        <div class="dv-desc">${faultInfo.desc}</div>
+      </div>
+      ${fixTool?`<div class="dv-arrow">→</div>
+      <div class="dv-section">
+        <div class="dv-label">Remediation Selected</div>
+        <div class="dv-value fix">${fixInfo.label}</div>
+        <div class="dv-desc">${fixInfo.desc}</div>
+      </div>`:''}
+    </div>
+    ${Object.keys(fixParams).length?`<div class="dv-params">Parameters: ${Object.entries(fixParams).map(([k,v])=>`<span class="dv-param-chip">${k} = ${v}</span>`).join('')}</div>`:''}
+  </div>`;
+  return html;
+}
+
+function renderRaDuceStep(s){
+  const res=s.result||{};
+  const args={...s.args||{}}; delete args.serial;
+  const writePaths=s.tr069_paths_written||[];
+  let html='';
+  if(Object.keys(args).length){
+    html+=`<div class="detail-block"><div class="db-title">Parameters Sent to Router</div><div class="db-rows">
+      ${Object.entries(args).map(([k,v])=>dbRow(k,String(v),'dim')).join('')}
+    </div></div>`;
+  }
+  if(writePaths.length){
+    html+=`<div class="detail-block" style="margin-top:7px">
+      <div class="db-title">TR-069 Paths Written via SetParameterValues (${writePaths.length})</div>
+      <div style="font-size:9px;color:var(--fog);padding:5px 10px;font-family:var(--mono)">These OID paths were written on the CPE through the ACS session:</div>
+      ${writePaths.map(p=>`<div class="write-path"><span class="wp-label">${p.label}</span><span class="wp-path">${p.path}</span>${p.category?`<span class="wp-cat">${p.category}</span>`:''}</div>`).join('')}
+    </div>`;
+  }
+  if(res.success===true){
+    html+=`<div class="alert-box alert-ok" style="margin-top:7px">✓ ${res.message||'Fix applied successfully — ACS confirmed write'}</div>`;
+  } else if(res.error){
+    html+=`<div class="alert-box alert-err" style="margin-top:7px">✗ ${res.error}<br><small>Router may be offline or ACS could not reach the CPE. Manual escalation may be required.</small></div>`;
+  } else if(res.ticket_id||res.short_id){
+    html+=`<div class="alert-box alert-warn" style="margin-top:7px">⚠ Escalation ticket created — #${res.short_id||res.ticket_id}</div>`;
+  }
+  return html||renderGenericKV(s.result);
+}
+
+function renderGenieVerifyStep(s){
+  const res=s.result||{};
+  const params=res.parameters||{};
+  if(!Object.keys(res).length) return `<div class="alert-box alert-warn">⚠ No post-fix state returned from ACS</div>`;
+  const status=res.status||'—';
+  const fault=res.fault||'healthy';
+  let html='';
+  if(s.ok){
+    html+=`<div class="alert-box alert-ok">✓ Router confirmed ONLINE after fix — recovery successful</div>`;
+  } else {
+    html+=`<div class="alert-box alert-err">✗ Router still unreachable or DOWN after fix — automatic escalation triggered<br><small>A field technician ticket will be created for on-site intervention.</small></div>`;
+  }
+  html+=`<div class="detail-block" style="margin-top:7px"><div class="db-title">Post-Fix Parameter Verification</div><div class="db-rows">
+    ${dbRow('Status After Fix',status,status==='UP'?'ok':'err')}
+    ${dbRow('Fault After Fix',(fault&&fault!=='healthy')?fault.replace(/_/g,' '):'none',(!fault||fault==='healthy')?'ok':'err')}
+    ${params.PPPStatus?dbRow('PPP Status',params.PPPStatus,params.PPPStatus==='Connected'?'ok':'err'):''}
+    ${params.DNSServer?dbRow('DNS Server',params.DNSServer,params.DNSServer&&params.DNSServer!=='0.0.0.0'?'ok':'err'):''}
+    ${params.VLANId!=null?dbRow('VLAN ID',String(params.VLANId),(params.VLANId==0||params.VLANId==100)?'ok':'warn'):''}
+    ${params.ExternalIPAddress?dbRow('External IP',params.ExternalIPAddress,'dim'):''}
+  </div></div>`;
+  return html;
+}
+
+function renderGenericKV(obj){
+  if(!obj||!Object.keys(obj).length) return '';
+  const skip=new Set(['full_log','router_state_before','router_state_after']);
+  const rows=Object.entries(obj).filter(([k])=>!skip.has(k)).slice(0,14).map(([k,v])=>{
+    if(v===null||v===undefined||v==='') return '';
+    const vs=typeof v==='object'?JSON.stringify(v).slice(0,140):String(v).slice(0,140);
+    let cls='';
+    if(k==='error'||(k==='ok'&&v===false)) cls='err';
+    else if(k==='ok'&&v===true) cls='ok';
+    else if(k.toLowerCase().includes('warning')) cls='warn';
+    return dbRow(k,vs,cls);
+  }).filter(Boolean).join('');
+  return rows?`<div class="detail-block"><div class="db-rows">${rows}</div></div>`:'';
+}
+
+// ── Main modal entry ───────────────────────────────────────────────────────
+function openTicketModal(ticket){
+  const steps=ticket.full_log||[];
+  const stCls={resolved:'st-resolved',escalated:'st-escalated',open:'st-open'}[ticket.status]||'';
+  document.getElementById('modal-title').textContent=
+    `${(ticket.fault_detected||'?').replace(/_/g,' ')} → ${(ticket.fix_applied||'escalated').replace(/_/g,' ')} · #${ticket.short_id||ticket._id?.slice(-6)||'?'}`;
+  let html='';
+  html+=`<div class="log-summary">
+    <span class="st ${stCls}" style="font-size:11px">${(ticket.status||'').toUpperCase()}</span>
+    ${ticket.customer_name?`<span class="log-chip">👤 ${ticket.customer_name}</span>`:''}
+    ${ticket.router_serial?`<span class="log-chip">📡 ${ticket.router_serial}</span>`:''}
+    ${ticket.router_model?`<span class="log-chip">📋 ${ticket.router_model}</span>`:''}
+    ${ticket.resolution_time_s!=null?`<span class="log-chip log-chip-teal">⏱ ${ticket.resolution_time_s}s resolution</span>`:''}
+    ${ticket.created_at?`<span class="log-chip">🗓 ${new Date(ticket.created_at).toLocaleString('en-GB')}</span>`:''}
+  </div>`;
+  if(ticket.problem_description){
+    html+=`<div class="log-problem">"${ticket.problem_description}"</div>`;
+  }
+  const fd=ticket.fault_detected,fa=ticket.fix_applied;
+  if(fd&&fd!=='unknown'){
+    const fi=FAULT_LABELS[fd]||{label:fd.replace(/_/g,' '),desc:''};
+    const xi=FIX_LABELS[fa]||{label:(fa||'N/A').replace(/_/g,' '),desc:''};
+    html+=`<div class="log-verdict-row">
+      <div class="log-verdict-box log-verdict-fault">
+        <div class="lvb-label">Fault Detected</div>
+        <div class="lvb-value">${fi.label}</div>
+        <div class="lvb-desc">${fi.desc}</div>
+      </div>
+      <div class="log-verdict-arrow">→</div>
+      <div class="log-verdict-box log-verdict-fix">
+        <div class="lvb-label">Fix Applied</div>
+        <div class="lvb-value">${xi.label}</div>
+        <div class="lvb-desc">${xi.desc}</div>
+      </div>
+    </div>`;
+  }
+  if(!steps.length){
+    html+='<div class="log-empty">No diagnostic trace recorded for this ticket.</div>';
+  } else {
+    html+=`<div class="log-trace-hdr"><span>Diagnostic Trace</span><span>${steps.length} steps</span></div>`;
+    steps.forEach((s,i)=>{
+      const layer=s.layer||'';
+      const isGraphRAG=layer.includes('GraphRAG');
+      const isNeo4j=layer.includes('Neo4j');
+      const isDiag=layer.includes('Diagnostic');
+      const isRaDuce=layer.includes('RaDuce');
+      const isGenie=layer.includes('GenieACS');
+      const isVerify=isGenie&&(s.description||'').toLowerCase().includes('verify');
+      let statusClass=s.ok!==false?'ok':'err';
+      let statusIcon=s.ok!==false?'✓':'✗';
+      if(isNeo4j&&s.result?.warning){statusClass='warn';statusIcon='⚠';}
+      let innerHtml='';
+      if(isGraphRAG)     innerHtml=renderGraphRAGStep(s);
+      else if(isNeo4j)   innerHtml=renderNeo4jStep(s);
+      else if(isDiag)    innerHtml=renderDiagStep(s);
+      else if(isRaDuce)  innerHtml=renderRaDuceStep(s);
+      else if(isVerify)  innerHtml=renderGenieVerifyStep(s);
+      else if(isGenie)   innerHtml=renderGenieReadStep(s);
+      else               innerHtml=renderGenericKV(s.result);
       html+=`<div class="step-card">
         <div class="step-card-hdr">
           <div class="step-ok ${statusClass}">${statusIcon}</div>
-          <span class="step-layer">${s.layer||'Step '+(i+1)}</span>
+          <span class="step-layer">${layer||'Step '+(i+1)}</span>
           <span class="step-port">:${s.port||'?'}</span>
           <span class="step-tool">${s.tool||''}</span>
+          <span class="step-num">#${i+1}/${steps.length}</span>
         </div>
         <div class="step-desc">${s.description||''}</div>
-        <div class="step-result">`;
-
-      // Special rendering for Neo4j step
-      if(isNeo4j){
-        const res=s.result||{};
-        if(res.error){
-          html+=`<div class="neo4j-err">✗ Service unreachable — ${res.error}</div>`;
-        } else if(res.warning){
-          html+=`<div class="neo4j-warn">⚠ Model not found in graph — "${res.warning}" — diagnostic continues without schema</div>`;
-          if(res.categories?.length){
-            html+=`<div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px">${res.categories.map(c=>`<span class="schema-pill">${c}</span>`).join('')}</div>`;
-          }
-        } else {
-          html+=`<div class="neo4j-ok">✓ ${res.total_params||0} parameters loaded · ${(res.categories||[]).length} categories</div>`;
-          if(res.categories?.length){
-            html+=`<div style="margin-top:5px">${res.categories.map(c=>`<span class="schema-pill">${c}</span>`).join('')}</div>`;
-          }
-        }
-
-        // TR-069 paths used
-        const paths=(s.result?.tr069_paths_read||[]);
-        if(paths.length){
-          html+=`<div style="margin-top:8px;font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">TR-069 paths consulted</div>`;
-          html+=paths.slice(0,10).map(p=>`<span class="tr069-path" title="${p.path}">${p.label}</span>`).join('');
-        }
-      } else {
-        // Generic KV rendering
-        const res=s.result||{};
-        const skip=new Set(['full_log','router_state_before','router_state_after']);
-        Object.entries(res).filter(([k])=>!skip.has(k)).slice(0,12).forEach(([k,v])=>{
-          if(v===null||v===undefined||v==='') return;
-          const vs=typeof v==='object'?JSON.stringify(v):String(v);
-          let cls='';
-          if(k==='error'||k==='ok'&&v===false) cls='err';
-          else if(k==='ok'&&v===true) cls='ok';
-          else if(k.includes('warning')) cls='warn';
-          html+=`<div class="step-kv"><span class="step-kv-key">${k}</span><span class="step-kv-val ${cls}">${vs.slice(0,120)}</span></div>`;
-        });
-      }
-
-      // TR-069 write paths (RaDuce step)
-      if((s.tr069_paths_written||[]).length){
-        html+=`<div style="margin-top:6px;font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">TR-069 paths written</div>`;
-        html+=s.tr069_paths_written.map(p=>`<span class="tr069-path">${p.label}</span>`).join('');
-      }
-
-      html+='</div></div>';
+        <div class="step-result">${innerHtml}</div>
+      </div>`;
     });
   }
-
   document.getElementById('modal-body').innerHTML=html;
   document.getElementById('modal-overlay').classList.add('open');
 }
@@ -783,7 +1661,6 @@ function openCreateTicketModal(){
   document.getElementById('create-ticket-modal').classList.add('open');
   document.getElementById('ct-account-id').focus();
 }
-
 function closeCreateTicketModal(){
   document.getElementById('create-ticket-modal').classList.remove('open');
   document.getElementById('ct-account-id').value='';
@@ -791,35 +1668,218 @@ function closeCreateTicketModal(){
   document.getElementById('ct-fault').value='manual';
   document.getElementById('ct-status').value='open';
 }
-
 async function submitCreateTicket(){
-  const accountId = document.getElementById('ct-account-id').value.trim();
-  const problem = document.getElementById('ct-problem').value.trim();
-  const fault = document.getElementById('ct-fault').value;
-  const status = document.getElementById('ct-status').value;
-  
-  if(!accountId || !problem){
-    alert('Please fill in all required fields');
-    return;
-  }
-  
+  const accountId=document.getElementById('ct-account-id').value.trim();
+  const problem=document.getElementById('ct-problem').value.trim();
+  const fault=document.getElementById('ct-fault').value;
+  const status=document.getElementById('ct-status').value;
+  if(!accountId||!problem){alert('Please fill in all required fields');return;}
   try{
-    const r = await fetch('/api/noc/tickets/create', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({account_id: accountId, problem: problem, fault: fault, status: status})
-    });
-    const d = await r.json();
-    if(d.success){
-      closeCreateTicketModal();
-      loadTickets(null, document.querySelector('.tab-btn'));
-      alert('✓ Ticket #' + d.short_id + ' created');
-    } else {
-      alert('Error: ' + (d.error || 'Unknown error'));
-    }
-  }catch(e){
-    alert('Connection error: ' + e);
+    const r=await fetch('/api/noc/tickets/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({account_id:accountId,problem:problem,fault:fault,status:status})});
+    const d=await r.json();
+    if(d.success){closeCreateTicketModal();loadTickets(null,document.querySelector('.tab-btn'));alert('✓ Ticket #'+d.short_id+' created');}
+    else alert('Error: '+(d.error||'Unknown error'));
+  }catch(e){alert('Connection error: '+e);}
+}
+
+// ── Theme toggle ──────────────────────────────────────────────────────────
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light');
+  const btn=document.getElementById('theme-toggle');
+  if(btn) btn.textContent=isLight?'☀️':'🌙';
+  localStorage.setItem('noc-theme',isLight?'light':'dark');
+}
+function applyTheme(){
+  const saved=localStorage.getItem('noc-theme');
+  const preferLight=saved==='light'||(saved===null&&window.matchMedia('(prefers-color-scheme: light)').matches);
+  if(preferLight){
+    document.body.classList.add('light');
+    const btn=document.getElementById('theme-toggle');
+    if(btn) btn.textContent='☀️';
   }
+}
+applyTheme();
+
+// ── Counter animation ──────────────────────────────────────────────────────
+function animateCounter(el,target){
+  if(target===null||target===undefined||isNaN(Number(target))){el.textContent=target??'—';return;}
+  const n=Number(target);
+  const prev=parseInt(el.textContent)||0;
+  if(prev===n)return;
+  const dur=600,start=performance.now();
+  const tick=(now)=>{
+    const p=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(prev+(n-prev)*ease);
+    if(p<1)requestAnimationFrame(tick);
+    else el.textContent=n;
+  };
+  requestAnimationFrame(tick);
+}
+
+// Patch stat updates to use counter animation
+async function loadFleet(){
+  try{
+    const r=await fetch('/api/noc/fleet');const d=await r.json();
+    fleet=d.routers||[];
+    const total=d.total||0,up=d.up||0,down=d.down||0;
+    animateCounter(document.getElementById('s-total'),total);
+    animateCounter(document.getElementById('s-up'),up);
+    animateCounter(document.getElementById('s-down'),down);
+    document.getElementById('s-total-sub').textContent=total+' devices';
+    document.getElementById('s-up-pct').textContent=total?Math.round(up/total*100)+'%':'—';
+    document.getElementById('s-down-pct').textContent=total?Math.round(down/total*100)+'%':'—';
+    document.getElementById('fleet-count').textContent=total+' devices';
+    renderFleet(fleet);
+    if(selSerial)refreshDetail(selSerial);
+  }catch(e){
+    document.getElementById('fleet-body').innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--coral);padding:24px">Error loading fleet</td></tr>';
+  }
+}
+async function loadTicketStats(){
+  try{
+    const [re,es]=await Promise.all([
+      fetch('/api/noc/tickets?status=resolved').then(r=>r.json()),
+      fetch('/api/noc/tickets?status=escalated').then(r=>r.json()),
+    ]);
+    animateCounter(document.getElementById('s-resolved'),re.total||0);
+    animateCounter(document.getElementById('s-esc'),es.total||0);
+  }catch(e){}
+}
+
+// ── KPI Popup ──────────────────────────────────────────────────────────────
+let _kpiPopupOpen=false;
+function openKpiPopup(type,anchorEl){
+  if(_kpiPopupOpen){closeKpiPopup();return;}
+  const pop=document.getElementById('kpi-popup');
+  const title=document.getElementById('kpi-popup-title');
+  const count=document.getElementById('kpi-popup-count');
+  const body=document.getElementById('kpi-popup-body');
+
+  let rows='',titleText='',countVal='',countColor='var(--e)';
+
+  if(type==='total'){
+    titleText='All Routers';countColor='var(--mint)';
+    const sorted=[...fleet].sort((a,b)=>(a.status==='UP'?1:-1));
+    countVal=fleet.length;
+    rows=sorted.map(r=>`<div class="kpi-popup-row" onclick="selectRouter('${r.serial}',null);closeKpiPopup()">
+      <div class="kpi-popup-row-info">
+        <div class="kpi-popup-row-name">${r.customer_name}</div>
+        <div class="kpi-popup-row-sub">${r.serial} · ${r.model}</div>
+      </div>
+      <span class="chip ${r.status==='UP'?'chip-up':'chip-down'}">${r.status}</span>
+    </div>`).join('');
+  } else if(type==='up'){
+    titleText='Online Routers';countColor='#4ADE80';
+    const up=fleet.filter(r=>r.status==='UP');
+    countVal=up.length;
+    rows=up.length?up.map(r=>`<div class="kpi-popup-row" onclick="selectRouter('${r.serial}',null);closeKpiPopup()">
+      <div class="kpi-popup-row-info">
+        <div class="kpi-popup-row-name">${r.customer_name}</div>
+        <div class="kpi-popup-row-sub">${r.serial} · ${r.model}</div>
+      </div>
+      <span class="chip chip-up">UP</span>
+    </div>`).join(''):`<div class="kpi-popup-empty">No routers currently online</div>`;
+  } else if(type==='down'){
+    titleText='Faulted Routers';countColor='var(--coral)';
+    const down=fleet.filter(r=>r.status==='DOWN');
+    countVal=down.length;
+    rows=down.length?down.map(r=>`<div class="kpi-popup-row" onclick="selectRouter('${r.serial}',null);closeKpiPopup()">
+      <div class="kpi-popup-row-info">
+        <div class="kpi-popup-row-name">${r.customer_name}</div>
+        <div class="kpi-popup-row-sub">${r.serial}</div>
+      </div>
+      <span class="fault-chip">${(r.fault||'fault').replace(/_/g,' ')}</span>
+    </div>`).join(''):`<div class="kpi-popup-empty">No faulted routers — all clear ✓</div>`;
+  } else if(type==='escalated'){
+    titleText='Escalated Tickets';countColor='var(--gold)';
+    fetch('/api/noc/tickets?status=escalated').then(r=>r.json()).then(d=>{
+      const tickets=d.tickets||[];
+      countVal=tickets.length;
+      count.textContent=countVal;
+      body.innerHTML=tickets.length?tickets.map(t=>`<div class="kpi-popup-row">
+        <div class="kpi-popup-row-info">
+          <div class="kpi-popup-row-name">${(t.problem_description||'—').slice(0,42)}</div>
+          <div class="kpi-popup-row-sub">${t.account_id||'—'} · ${t.created_at?new Date(t.created_at).toLocaleDateString('en-GB'):''}</div>
+        </div>
+        <span class="st st-escalated">ESC</span>
+      </div>`).join(''):`<div class="kpi-popup-empty">No escalated tickets</div>`;
+    });
+    countVal='…';
+  } else if(type==='resolved'){
+    titleText='Resolved Tickets';countColor='var(--e)';
+    fetch('/api/noc/tickets?status=resolved').then(r=>r.json()).then(d=>{
+      const tickets=(d.tickets||[]).slice(0,8);
+      countVal=d.total||0;count.textContent=countVal;
+      body.innerHTML=tickets.length?tickets.map(t=>`<div class="kpi-popup-row">
+        <div class="kpi-popup-row-info">
+          <div class="kpi-popup-row-name">${(t.fault_detected||'fault').replace(/_/g,' ')} → ${(t.fix_applied||'fixed').replace(/_/g,' ')}</div>
+          <div class="kpi-popup-row-sub">${t.account_id||'—'} · ${t.resolution_time_s!=null?t.resolution_time_s+'s':'—'}</div>
+        </div>
+        <span class="st st-resolved">OK</span>
+      </div>`).join(''):`<div class="kpi-popup-empty">No resolved tickets yet</div>`;
+    });
+    countVal='…';
+  }
+
+  title.textContent=titleText;
+  count.textContent=countVal;
+  count.style.color=countColor;
+  if(rows) body.innerHTML=rows;
+
+  // Position popup to the right of the KPI card
+  const rect=anchorEl.getBoundingClientRect();
+  pop.style.display='block';
+  pop.style.removeProperty('animation');
+  void pop.offsetWidth;
+  pop.style.animation='popIn .24s cubic-bezier(.34,1.56,.64,1)';
+
+  const pw=300;
+  let left=rect.right+10;
+  let top=rect.top;
+  if(left+pw>window.innerWidth-10) left=rect.left-pw-10;
+  if(top+320>window.innerHeight-10) top=window.innerHeight-330;
+  if(top<10) top=10;
+  pop.style.left=left+'px';
+  pop.style.top=top+'px';
+  _kpiPopupOpen=true;
+
+  // Close on outside click
+  setTimeout(()=>document.addEventListener('click',_kpiOutsideClick,{once:true}),50);
+}
+
+function _kpiOutsideClick(e){
+  const pop=document.getElementById('kpi-popup');
+  if(!pop.contains(e.target))closeKpiPopup();
+}
+
+function closeKpiPopup(){
+  document.getElementById('kpi-popup').style.display='none';
+  _kpiPopupOpen=false;
+}
+
+// Stagger fleet row entrance — only animate on first load, silent on auto-refresh
+let _fleetFirstLoad=true;
+function renderFleet(routers){
+  const tbody=document.getElementById('fleet-body');
+  if(!routers.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--fog);padding:24px">No routers</td></tr>';return;}
+  const anim=_fleetFirstLoad; _fleetFirstLoad=false;
+  tbody.innerHTML=routers.map((r,i)=>{
+    const down=r.status==='DOWN';
+    const chip=down?'<span class="chip chip-down">DOWN</span>':'<span class="chip chip-up">UP</span>';
+    const fault=r.fault&&r.fault!=='healthy'?`<span class="fault-chip">${r.fault.replace(/_/g,' ')}</span>`:'<span style="color:var(--fog);font-family:var(--mono);font-size:9px">—</span>';
+    const upd=r.last_updated?new Date(r.last_updated).toLocaleTimeString('en-GB',{hour12:false}):'—';
+    const sel=r.serial===selSerial?'sel':'';
+    const animCls=anim?'row-anim':'';
+    const animDelay=anim?`style="animation-delay:${i*0.04}s"`:'';
+    return `<tr class="${sel} ${animCls}" ${animDelay} onclick="selectRouter('${r.serial}',this)">
+      <td><span class="f-name">${r.customer_name}</span></td>
+      <td><span class="f-phone">${r.customer_phone}</span></td>
+      <td><span class="f-model">${r.model}</span></td>
+      <td>${chip}</td><td>${fault}</td>
+      <td style="font-family:var(--mono);font-size:9px;color:var(--fog)">${upd}</td>
+    </tr>`;
+  }).join('');
 }
 </script>
 </body>
