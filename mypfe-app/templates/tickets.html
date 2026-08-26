@@ -415,6 +415,28 @@ body.light .param-row,body.light .tr069-path{background:rgba(255,255,255,.7)}
 body.light .form-input,body.light .form-select{background:rgba(235,243,252,.9);color:#071525}
 body.light .form-select option{background:#F2F6FB;color:#071525}
 body.light .form-btn-cancel{background:rgba(0,0,0,.04)}
+
+/* ── IDLE-TIMEOUT WARNING ── */
+.idle-warn{
+  position:fixed;top:74px;left:50%;z-index:250;max-width:360px;
+  padding:14px 16px;border-radius:12px;
+  background:var(--glass);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,179,0,.35);
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;
+  transform:translate(-50%,-10px);transition:opacity .22s ease,transform .22s ease;
+}
+.idle-warn.show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.idle-warn-ic{font-size:20px;flex-shrink:0}
+.idle-warn-txt{font-size:12px;color:var(--mist);line-height:1.45;font-family:var(--sans)}
+.idle-warn-txt b{color:var(--ice)}
+.idle-warn-btn{
+  padding:8px 14px;border-radius:8px;border:none;flex-shrink:0;
+  background:linear-gradient(135deg,var(--e2),var(--mint2));color:#001A28;
+  font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;
+  font-family:var(--mono);letter-spacing:.04em;
+}
 </style>
 </head>
 <body>
@@ -422,6 +444,11 @@ body.light .form-btn-cancel{background:rgba(0,0,0,.04)}
 <div class="bg-orb bg-orb-2"></div>
 <div class="bg-orb bg-orb-3"></div>
 <div class="scanlines"></div>
+<div class="idle-warn" id="idle-warn" role="alert">
+  <span class="idle-warn-ic">⏱</span>
+  <span class="idle-warn-txt" id="idle-warn-txt"></span>
+  <button class="idle-warn-btn" onclick="stayLoggedIn()">Stay signed in</button>
+</div>
 
 <div id="shell">
 
@@ -436,6 +463,10 @@ body.light .form-btn-cancel{background:rgba(0,0,0,.04)}
       <span class="tb-sys">Ticket Management</span>
     </div>
     <div class="tb-right">
+      <a class="tb-back" href="/noc/engine">⚙️ Engine</a>
+      <a class="tb-back" href="/noc/analytics">📊 Analytics</a>
+      <a class="tb-back" href="/noc/customers">👥 Customers</a>
+      <div class="tb-divider"></div>
       <span class="tb-clock" id="tb-clock">00:00:00</span>
       <div class="tb-divider"></div>
       <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark mode">🌙</button>
@@ -599,6 +630,31 @@ applyThemeIcon();
 function updateClock(){document.getElementById('tb-clock').textContent=new Date().toLocaleTimeString('en-GB',{hour12:false});}
 updateClock(); setInterval(updateClock,1000);
 
+// Idle timeout — 1h since the last real interaction (independent of the
+// background polling, which would otherwise keep the tab looking "active"
+// even after the admin has walked away).
+(function(){
+  const IDLE_LIMIT_MS=60*60*1000;
+  const IDLE_WARN_MS=60*1000;
+  let lastActivity=Date.now();
+  ['mousemove','mousedown','keydown','touchstart','scroll'].forEach(ev=>
+    window.addEventListener(ev,()=>{lastActivity=Date.now();},{passive:true}));
+  window.stayLoggedIn=function(){
+    lastActivity=Date.now();
+    document.getElementById('idle-warn').classList.remove('show');
+  };
+  setInterval(()=>{
+    const idle=Date.now()-lastActivity;
+    const warn=document.getElementById('idle-warn');
+    if(idle>IDLE_LIMIT_MS){ warn.classList.remove('show'); logout(); }
+    else if(idle>IDLE_LIMIT_MS-IDLE_WARN_MS){
+      const s=Math.max(0,Math.ceil((IDLE_LIMIT_MS-idle)/1000));
+      document.getElementById('idle-warn-txt').innerHTML=`You'll be signed out in <b>${s}s</b> due to inactivity.`;
+      warn.classList.add('show');
+    } else warn.classList.remove('show');
+  },1000);
+})();
+
 // ── Toasts ───────────────────────────────────────────────────────────────
 function toast(msg,type='ok'){
   const stack=document.getElementById('toast-stack');
@@ -615,7 +671,7 @@ async function checkAuth(){
   if(r.status===401){ window.location.href='/noc'; return false; }
   return true;
 }
-async function logout(){ await fetch('/api/noc/logout',{method:'POST'}); localStorage.removeItem('noc-admin'); window.location.href='/noc'; }
+async function logout(){ await fetch('/api/noc/logout',{method:'POST'}); sessionStorage.removeItem('noc-admin'); window.location.href='/noc'; }
 
 // ── State ────────────────────────────────────────────────────────────────
 let allTickets=[], currentFilter=null, searchTerm='';
@@ -795,8 +851,8 @@ function renderModal(t){
     <div>
       <div class="sect-title">Router State — Before &amp; After</div>
       <div class="state-diff">
-        <div class="state-panel"><div class="sp-title before">● Before fix</div>${renderStateParams(t.router_state_before?.parameters||{})}</div>
-        <div class="state-panel"><div class="sp-title after">✓ After fix</div>${renderStateParams(t.router_state_after?.parameters||{})}</div>
+        <div class="state-panel"><div class="sp-title before">● Before fix</div>${renderStateParams(t.router_state_before||{})}</div>
+        <div class="state-panel"><div class="sp-title after">✓ After fix</div>${renderStateParams(t.router_state_after||{})}</div>
       </div>
     </div>`:''}
   `;
@@ -851,8 +907,10 @@ function renderKV(obj){
 
 function classifyVal(key,val){
   const k=key.toLowerCase(), v=String(val).toLowerCase();
-  if(k.includes('status')&&v==='connected') return 'ok';
-  if(k.includes('status')&&(v==='disconnected'||v==='error')) return 'err';
+  if(k.includes('status')&&(v==='connected'||v==='up')) return 'ok';
+  if(k.includes('status')&&(v==='disconnected'||v==='error'||v==='down'||v==='unconfigured')) return 'err';
+  if(k.includes('fault')&&(v==='healthy'||v==='none')) return 'ok';
+  if(k.includes('fault')&&v!=='healthy'&&v!=='none'&&v!=='—') return 'err';
   if(k.includes('error')&&v==='none') return 'ok';
   if(k.includes('error')&&v!=='none'&&v!=='null') return 'warn';
   if(k.includes('rx')&&!isNaN(parseFloat(val))) return parseFloat(val)<-27?'err':'ok';
@@ -875,10 +933,13 @@ function renderResult(result,tool){
   }
 
   if(result.parameters){
-    const p=result.parameters;
-    const keyParams=['PPPStatus','ConnectionStatus','VLANId','DNSServer','RXPower','ErrorCount','Uptime','LastConnectionError'];
+    // Readable values live under .parameters_named (role names), not as flat
+    // PascalCase keys on the raw TR-069-path-keyed .parameters dict.
+    const p=result.parameters_named||{};
+    const keyLabels={ppp_connection_status:'PPP Status',vlan_id:'VLAN ID',dns_servers:'DNS Server',
+      rx_optical_power:'RX Power',uptime:'Uptime',last_connection_error:'Last Error'};
     return `<div class="param-grid">
-      ${keyParams.filter(k=>p[k]!==undefined).map(k=>`<div class="param-row"><span class="param-key">${k}</span><span class="param-val ${classifyVal(k,p[k])}">${p[k]}</span></div>`).join('')}
+      ${Object.entries(keyLabels).filter(([k])=>p[k]!=null).map(([k,label])=>`<div class="param-row"><span class="param-key">${label}</span><span class="param-val ${classifyVal(k,p[k])}">${p[k]}</span></div>`).join('')}
     </div>
     <div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--fog)">
       Status: <span style="color:${result.status==='UP'?'var(--mint)':'var(--coral)'}">${result.status}</span>
@@ -890,11 +951,26 @@ function renderResult(result,tool){
   return `<div class="param-grid">${entries.map(([k,v])=>`<div class="param-row"><span class="param-key">${k}</span><span class="param-val ${classifyVal(k,v)}">${String(v).slice(0,60)}</span></div>`).join('')}</div>`;
 }
 
-function renderStateParams(params){
-  const keys=['PPPStatus','LastConnectionError','ConnectionStatus','VLANId','ExternalIPAddress','DNSServer','DNSStatus','RXPower','TXPower','Temperature','ErrorCount','Uptime'];
-  return keys.filter(k=>params[k]!==undefined).map(k=>{
-    const v=String(params[k]), cls=classifyVal(k,v);
-    return `<div class="sp-row"><span class="sp-key">${k}</span><span class="sp-val" style="color:${cls==='ok'?'var(--mint)':cls==='err'?'var(--coral)':cls==='warn'?'var(--gold)':'var(--mist)'}">${v}</span></div>`;
+// Router-state snapshots keep readable values under .parameters_named (role
+// names like ppp_connection_status/vlan_id/rx_optical_power), not as flat
+// PascalCase keys on .parameters (which is the raw TR-069-path-keyed dict) —
+// read from there, plus the top-level status/fault as the "simple" details.
+function renderStateParams(state){
+  if(!state||!Object.keys(state).length) return '<div class="sp-row"><span class="sp-key">—</span></div>';
+  const p=state.parameters_named||{};
+  const rows=[]; // [rawKeyForClassification, label, value]
+  if(state.status) rows.push(['status','Status',state.status]);
+  if(state.fault) rows.push(['fault','Fault',state.fault==='healthy'?'None':state.fault.replace(/_/g,' ')]);
+  if(p.ppp_connection_status!=null) rows.push(['ppp_connection_status','PPP Connection',p.ppp_connection_status]);
+  if(p.vlan_id!=null) rows.push(['vlan_id','VLAN ID',p.vlan_id]);
+  if(p.dns_servers!=null) rows.push(['dns_servers','DNS Server',p.dns_servers]);
+  if(p.rx_optical_power!=null) rows.push(['rx_optical_power','Optical Power',`${p.rx_optical_power} dBm`]);
+  if(p.uptime!=null) rows.push(['uptime','Uptime',`${p.uptime}s`]);
+  if(p.last_connection_error!=null) rows.push(['last_connection_error','Last Error',p.last_connection_error==='None'?'None':p.last_connection_error]);
+  if(!rows.length) return '<div class="sp-row"><span class="sp-key">—</span></div>';
+  return rows.map(([rawKey,label,v])=>{
+    const cls=classifyVal(rawKey,String(v));
+    return `<div class="sp-row"><span class="sp-key">${label}</span><span class="sp-val" style="color:${cls==='ok'?'var(--mint)':cls==='err'?'var(--coral)':cls==='warn'?'var(--gold)':'var(--mist)'}">${v}</span></div>`;
   }).join('');
 }
 
@@ -929,7 +1005,7 @@ async function submitCreateTicket(){
   const ok=await checkAuth();
   if(!ok) return;
   try{
-    const saved=localStorage.getItem('noc-admin');
+    const saved=sessionStorage.getItem('noc-admin');
     document.getElementById('tb-admin').textContent=saved?(JSON.parse(saved).name||'Admin'):'Admin';
   }catch(e){ document.getElementById('tb-admin').textContent='Admin'; }
   loadTickets();

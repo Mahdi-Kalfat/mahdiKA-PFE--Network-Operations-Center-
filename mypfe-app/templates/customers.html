@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customers · NOC · MyPFE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020810;
+  --s1:#07101E;
+  --s2:#0B1929;
+  --glass:rgba(8,18,32,.88);
+  --b1:rgba(64,196,255,.13);
+  --b2:rgba(64,196,255,.26);
+  --b3:rgba(64,196,255,.44);
+  --e:#00CFFF;
+  --e2:#0098CC;
+  --mint:#00F0C0;
+  --mint2:#00BF96;
+  --coral:#FF3355;
+  --coral2:#CC1A3D;
+  --gold:#FFB300;
+  --violet:#8B5CF6;
+  --ice:#E6F8FF;
+  --mist:#6B9AB8;
+  --fog:#3A607C;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Inter',sans-serif;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ice);-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+
+/* ── Background ─────────────────────────────────────────────────────────── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% -10%,rgba(139,92,246,.22) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 90%,rgba(0,207,255,.18) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(0,240,192,.06) 0%,transparent 60%),
+    linear-gradient(180deg,#020810 0%,#030C1A 50%,#020810 100%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(64,196,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(64,196,255,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.scanlines{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.025) 3px,rgba(0,0,0,.025) 4px)}
+.bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0}
+.bg-orb-1{width:700px;height:700px;top:-200px;right:-100px;background:radial-gradient(circle,rgba(139,92,246,.16) 0%,transparent 65%);animation:floatOrb1 28s ease-in-out infinite}
+.bg-orb-2{width:600px;height:600px;bottom:-150px;left:-100px;background:radial-gradient(circle,rgba(0,207,255,.13) 0%,transparent 65%);animation:floatOrb2 22s ease-in-out infinite}
+.bg-orb-3{width:400px;height:400px;top:40%;left:30%;background:radial-gradient(circle,rgba(0,240,192,.06) 0%,transparent 65%);animation:floatOrb3 35s ease-in-out infinite}
+@keyframes floatOrb1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-50px,70px) scale(1.05)}66%{transform:translate(80px,-40px) scale(.95)}}
+@keyframes floatOrb2{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(70px,-60px) scale(1.08)}75%{transform:translate(-40px,40px) scale(.96)}}
+@keyframes floatOrb3{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
+
+/* ── Shell ──────────────────────────────────────────────────────────────── */
+#shell{position:relative;z-index:1;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:100vh}
+
+/* ── Topbar ─────────────────────────────────────────────────────────────── */
+.topbar{
+  flex-shrink:0;display:flex;align-items:center;gap:16px;padding:0 20px;height:60px;
+  background:rgba(7,16,30,.9);backdrop-filter:blur(20px);
+  border:1px solid var(--b1);border-radius:12px;
+  box-shadow:0 4px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);
+}
+.tb-back{
+  display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:700;
+  color:var(--mist);text-decoration:none;padding:7px 12px;border-radius:6px;
+  border:1px solid var(--b1);transition:all .15s;flex-shrink:0;
+}
+.tb-back:hover{border-color:var(--e);color:var(--e);background:rgba(0,207,255,.06)}
+.tb-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.tb-pulse{
+  width:10px;height:10px;border-radius:50%;background:var(--mint);flex-shrink:0;
+  box-shadow:0 0 14px var(--mint),0 0 0 5px rgba(0,240,192,.12);
+  animation:heartbeat 2s ease-in-out infinite;
+}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(.6);opacity:.6}}
+.tb-logo{font-family:var(--mono);font-size:14px;font-weight:800;color:#fff;letter-spacing:.2em}
+.tb-slash{color:var(--fog);font-weight:300;font-size:14px}
+.tb-sys{font-size:12px;font-weight:600;color:var(--mist)}
+.tb-divider{width:1px;height:24px;background:linear-gradient(transparent,var(--b2),transparent);flex-shrink:0}
+.tb-right{display:flex;align-items:center;gap:14px;margin-left:auto;flex-shrink:0}
+.tb-clock{font-family:var(--mono);font-size:17px;font-weight:800;color:var(--e);text-shadow:0 0 20px rgba(0,207,255,.5);letter-spacing:.05em}
+.tb-user{font-size:11px;font-weight:600;color:var(--mist);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-logout{
+  font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.08em;
+  color:var(--coral);background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.24);
+  border-radius:6px;padding:7px 11px;cursor:pointer;transition:all .15s;
+}
+.tb-logout:hover{background:var(--coral);color:#fff;box-shadow:0 0 16px rgba(255,51,85,.3)}
+.theme-toggle{
+  width:34px;height:34px;border-radius:8px;flex-shrink:0;
+  border:1px solid var(--b2);background:rgba(255,255,255,.06);
+  font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.theme-toggle:hover{background:rgba(255,255,255,.14);transform:rotate(20deg);box-shadow:0 0 14px var(--b3)}
+
+/* ── Panel base ─────────────────────────────────────────────────────────── */
+.panel{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--b1);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+.d-panel{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--b1);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);overflow:hidden}
+.panel-hdr{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--b1);background:rgba(7,16,30,.6)}
+.ph-title{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--e);letter-spacing:.14em;text-transform:uppercase}
+.ph-count{font-family:var(--mono);font-size:10px;color:var(--fog);margin-left:auto}
+
+/* ── Controls ───────────────────────────────────────────────────────────── */
+.controls{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--b1);background:rgba(7,16,30,.6);flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:220px;max-width:380px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--fog);pointer-events:none}
+.search-input{
+  width:100%;background:rgba(2,8,18,.8);border:1px solid rgba(64,196,255,.18);border-radius:8px;
+  padding:9px 12px 9px 30px;color:var(--ice);font-family:var(--mono);font-size:11px;outline:none;transition:all .18s;
+}
+.search-input:focus{border-color:var(--e);box-shadow:0 0 0 3px rgba(0,207,255,.14)}
+.search-input::placeholder{color:var(--fog)}
+.ctrl-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.total-badge{font-family:var(--mono);font-size:10px;color:var(--fog)}
+.ph-btn{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  color:var(--e);background:rgba(0,207,255,.07);
+  border:1px solid rgba(0,207,255,.22);border-radius:6px;
+  padding:8px 12px;cursor:pointer;letter-spacing:.06em;transition:all .15s;white-space:nowrap;
+}
+.ph-btn:hover{background:rgba(0,207,255,.16);box-shadow:0 0 12px rgba(0,207,255,.2)}
+
+/* ── Customer list ──────────────────────────────────────────────────────── */
+.list-scroll{flex:1;min-height:0;overflow-y:auto;padding:10px 12px;scrollbar-width:thin;scrollbar-color:rgba(0,207,255,.3) transparent}
+.list-scroll::-webkit-scrollbar{width:5px}
+.list-scroll::-webkit-scrollbar-thumb{background:rgba(0,207,255,.3);border-radius:3px}
+.c-hdr{
+  display:grid;grid-template-columns:48px minmax(160px,1.6fr) 130px 190px 150px 100px;
+  gap:10px;padding:6px 14px;margin-bottom:6px;
+  font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);
+  letter-spacing:.12em;text-transform:uppercase;
+}
+.c-row{
+  display:grid;grid-template-columns:48px minmax(160px,1.6fr) 130px 190px 150px 100px;
+  gap:10px;align-items:center;padding:11px 14px;margin-bottom:6px;font-size:11px;
+  background:rgba(11,25,42,.6);border:1px solid var(--b1);border-radius:9px;
+  transition:all .15s;cursor:pointer;
+}
+.c-row:hover{background:rgba(0,207,255,.07);border-color:rgba(0,207,255,.26);transform:translateX(3px);box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.c-row.row-in{animation:ticketIn .28s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes ticketIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.c-name{font-weight:700;font-size:12px;color:var(--ice);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-acct{font-family:var(--mono);font-size:9px;color:var(--mist);margin-top:1px}
+.c-phone{font-family:var(--mono);font-size:10px;color:var(--mist)}
+.c-email{font-family:var(--mono);font-size:10px;color:var(--mist);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-email.none{color:var(--fog);font-style:italic}
+.c-model{font-family:var(--mono);font-size:9px;background:rgba(255,255,255,.05);padding:3px 7px;border-radius:4px;color:var(--mist);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-empty{text-align:center;padding:60px 20px;color:var(--fog)}
+.c-empty .ce-icon{font-size:40px;margin-bottom:12px;filter:drop-shadow(0 0 20px rgba(0,207,255,.3))}
+.c-empty .ce-text{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.t-loading{display:flex;flex-direction:column;gap:6px}
+.skel{height:52px;border-radius:9px;background:linear-gradient(90deg,rgba(255,255,255,.03) 0%,rgba(0,207,255,.07) 50%,rgba(255,255,255,.03) 100%);background-size:200% 100%;animation:skelShine 1.4s ease-in-out infinite;border:1px solid var(--b1)}
+@keyframes skelShine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:20px;font-family:var(--mono);font-size:8px;font-weight:800;text-transform:uppercase;border:1px solid}
+.chip::before{content:'';width:5px;height:5px;border-radius:50%}
+.chip-up{color:var(--mint);background:rgba(0,240,192,.1);border-color:rgba(0,240,192,.26)}
+.chip-up::before{background:var(--mint);box-shadow:0 0 6px var(--mint)}
+.chip-down{color:var(--coral);background:rgba(255,51,85,.1);border-color:rgba(255,51,85,.28)}
+.chip-down::before{background:var(--coral)}
+.chip-down{animation:downAlarm 2.6s ease-in-out infinite}
+@keyframes downAlarm{0%,100%{box-shadow:0 0 0 0 rgba(255,51,85,0)}50%{box-shadow:0 0 0 5px rgba(255,51,85,.22),0 0 14px rgba(255,51,85,.3)}}
+.chip-up::before{animation:upGlow 2.2s ease-in-out infinite}
+@keyframes upGlow{0%,100%{box-shadow:0 0 4px var(--mint)}50%{box-shadow:0 0 12px var(--mint),0 0 24px rgba(0,240,192,.35)}}
+
+.cust-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:800;font-size:12px;color:var(--e);background:rgba(0,207,255,.1);border:2px solid rgba(0,207,255,.24);flex-shrink:0}
+.cust-avatar.up{border-color:var(--mint);box-shadow:0 0 10px rgba(0,240,192,.3)}
+.cust-avatar.down{border-color:var(--coral);box-shadow:0 0 10px rgba(255,51,85,.3)}
+
+/* ── Detail view ────────────────────────────────────────────────────────── */
+.d-toolbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.d-who{display:flex;align-items:center;gap:12px}
+.d-avatar{width:52px;height:52px;font-size:16px}
+.d-name{font-size:16px;font-weight:800;color:#fff}
+.d-meta{font-family:var(--mono);font-size:10px;color:var(--mist);margin-top:3px}
+.d-actions{margin-left:auto;display:flex;gap:8px}
+.d-grid{display:grid;grid-template-columns:1fr 320px;gap:14px;align-items:start}
+.d-col-main{display:flex;flex-direction:column;gap:14px;min-width:0}
+.d-col-side{display:flex;flex-direction:column;gap:14px}
+@media (max-width:980px){.d-grid{grid-template-columns:1fr}}
+
+/* Connection path diagram */
+.path-diagram{display:flex;align-items:flex-start;justify-content:center;gap:0;padding:26px 14px;flex-wrap:wrap}
+.path-node{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:76px}
+.path-node .pn-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;border:2px solid;transition:all .3s}
+.path-node.ok .pn-icon{border-color:var(--mint);color:var(--mint);background:rgba(0,240,192,.08);box-shadow:0 0 14px rgba(0,240,192,.25)}
+.path-node.bad .pn-icon{border-color:var(--coral);color:var(--coral);background:rgba(255,51,85,.1);box-shadow:0 0 14px rgba(255,51,85,.3);animation:rcIconAlarm 2.2s ease-in-out infinite}
+@keyframes rcIconAlarm{0%,100%{opacity:1}50%{opacity:.55}}
+.path-node .pn-label{font-family:var(--mono);font-size:8px;color:var(--mist);text-transform:uppercase;letter-spacing:.05em;text-align:center}
+.path-line{width:36px;height:2px;background:var(--mint);margin-top:21px;transition:background .3s;flex-shrink:0}
+.path-line.bad{background:var(--coral)}
+
+/* Live parameters (ported from noc.html) */
+.dp-section{font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);letter-spacing:.16em;text-transform:uppercase;padding:10px 16px 6px;border-bottom:1px solid var(--b1);background:rgba(7,16,30,.4)}
+.dp-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid rgba(64,196,255,.06);transition:background .1s}
+.dp-row:hover{background:rgba(0,207,255,.03)}
+.dp-key{font-size:10px;color:var(--mist);font-weight:500;white-space:nowrap}
+.dp-val{font-family:var(--mono);font-size:10px;font-weight:700;text-align:right;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.dp-val.ok{color:var(--mint)}.dp-val.err{color:var(--coral)}.dp-val.warn{color:var(--gold)}.dp-val.dim{color:var(--mist)}
+.dp-bar-row{padding:7px 16px 9px;border-bottom:1px solid rgba(64,196,255,.06)}
+.dp-bar-label{display:flex;justify-content:space-between;margin-bottom:5px}
+.dp-bar-label span:first-child{font-size:10px;color:var(--mist);font-weight:500}
+.dp-bar-label span:last-child{font-family:var(--mono);font-size:10px;font-weight:700}
+.dp-bar-track{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.dp-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.dp-bar-ok .dp-bar-fill{background:linear-gradient(90deg,var(--mint2),var(--mint))}
+.dp-bar-warn .dp-bar-fill{background:linear-gradient(90deg,#D97706,var(--gold))}
+.dp-bar-err .dp-bar-fill{background:linear-gradient(90deg,var(--coral2),var(--coral))}
+
+/* Health ring */
+.health-panel{padding:18px 16px 20px;display:flex;flex-direction:column;align-items:center}
+.health-ring-wrap{position:relative;width:130px;height:130px;margin:6px auto 4px}
+.health-ring{width:100%;height:100%;transform:rotate(-90deg)}
+.hr-track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:10}
+.hr-fill{fill:none;stroke:var(--mint);stroke-width:10;stroke-linecap:round;stroke-dasharray:327;stroke-dashoffset:327;transition:stroke-dashoffset .6s ease,stroke .3s ease}
+.health-score{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:900}
+.health-label{text-align:center;font-family:var(--mono);font-size:9px;color:var(--fog);text-transform:uppercase;letter-spacing:.12em;margin-top:2px}
+
+/* Status card */
+.status-card{padding:18px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.sc-icon{width:52px;height:52px}
+.sc-icon svg{width:100%;height:100%;stroke-width:1.5}
+.sc-icon.up{color:var(--mint);filter:drop-shadow(0 0 8px rgba(0,240,192,.5))}
+.sc-icon.down{color:var(--coral);filter:drop-shadow(0 0 8px rgba(255,51,85,.5));animation:rcIconAlarm 2.2s ease-in-out infinite}
+.sc-ticker{font-family:var(--mono);font-size:17px;font-weight:800}
+.sc-ticker.up{color:var(--mint)}.sc-ticker.down{color:var(--coral)}
+.sc-sub{font-family:var(--mono);font-size:9px;color:var(--fog)}
+.sc-model{font-family:var(--mono);font-size:9px;background:rgba(255,255,255,.05);padding:3px 7px;border-radius:4px;color:var(--mist);margin-top:2px}
+
+/* Timeline */
+.timeline{padding:12px 16px 14px;display:flex;flex-direction:column;max-height:340px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,207,255,.3) transparent}
+.tl-item{display:flex;gap:12px;padding:9px 0 9px 16px;border-left:2px solid var(--b1);margin-left:9px;position:relative}
+.tl-item:last-child{border-left-color:transparent;padding-bottom:0}
+.tl-dot{position:absolute;left:-7px;top:11px;width:12px;height:12px;border-radius:50%;border:2px solid var(--s1)}
+.tl-dot.resolved{background:var(--mint)}.tl-dot.escalated{background:var(--gold)}.tl-dot.open{background:var(--e)}
+.tl-body{flex:1;min-width:0;display:flex;justify-content:space-between;gap:10px}
+.tl-title{font-size:11px;font-weight:700;color:var(--ice)}
+.tl-sub{font-family:var(--mono);font-size:9px;color:var(--fog);margin-top:2px;text-transform:capitalize}
+.tl-time{font-family:var(--mono);font-size:9px;color:var(--mist);white-space:nowrap;flex-shrink:0}
+.tl-empty{text-align:center;padding:26px;color:var(--fog);font-family:var(--mono);font-size:10px}
+
+/* Fault injection (ported from noc.html) */
+.inject-panel{padding:14px 16px;border:1px solid var(--b1);border-radius:10px;background:rgba(7,16,30,.9);backdrop-filter:blur(20px)}
+.ip-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ip-title{font-family:var(--mono);font-size:9px;font-weight:800;color:var(--coral);letter-spacing:.16em;text-transform:uppercase}
+.ip-target{font-family:var(--mono);font-size:9px;color:var(--fog)}
+.ip-target .t{color:var(--e);font-weight:800}
+.inject-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.inj-btn{
+  font-family:var(--mono);font-size:8px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  padding:8px 6px;border-radius:6px;cursor:pointer;transition:all .15s;border:1px solid;
+  background:rgba(255,255,255,.04);color:var(--mist);border-color:rgba(255,255,255,.08);
+}
+.inj-btn:hover{background:rgba(255,179,0,.15);color:var(--gold);border-color:rgba(255,179,0,.4);transform:translateY(-1px)}
+.inj-btn.random{color:var(--violet);border-color:rgba(139,92,246,.28);background:rgba(139,92,246,.08)}
+.inj-btn.random:hover{background:rgba(139,92,246,.2)}
+.inj-btn.clear{color:var(--mint);border-color:rgba(0,240,192,.28);background:rgba(0,240,192,.07)}
+.inj-btn.clear:hover{background:rgba(0,240,192,.18)}
+.inj-feedback{margin-top:8px;font-family:var(--mono);font-size:10px;font-weight:700;padding:8px 12px;border-radius:6px;border:1px solid;display:none}
+.inj-feedback.ok{background:rgba(0,240,192,.08);color:var(--mint);border-color:rgba(0,240,192,.28)}
+.inj-feedback.err{background:rgba(255,51,85,.08);color:var(--coral);border-color:rgba(255,51,85,.28)}
+
+/* ── Toasts ─────────────────────────────────────────────────────────────── */
+#toast-stack{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{
+  pointer-events:auto;font-family:var(--mono);font-size:11px;font-weight:700;padding:12px 16px;border-radius:9px;
+  border:1px solid;box-shadow:0 12px 32px rgba(0,0,0,.4);animation:toastIn .25s cubic-bezier(.34,1.56,.64,1);max-width:320px;
+}
+.toast.ok{background:rgba(0,240,192,.12);color:var(--mint);border-color:rgba(0,240,192,.3)}
+.toast.err{background:rgba(255,51,85,.12);color:var(--coral);border-color:rgba(255,51,85,.3)}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+.toast.leaving{animation:toastOut .2s ease forwards}
+@keyframes toastOut{to{opacity:0;transform:translateX(30px)}}
+
+/* ── Panel entrance ─────────────────────────────────────────────────────── */
+@keyframes panelIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.topbar{animation:panelIn .4s ease both}
+.panel{animation:panelIn .4s .1s ease both}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width:1100px){
+  .c-hdr,.c-row{grid-template-columns:48px minmax(120px,1.4fr) 110px 100px;}
+  .c-hdr div:nth-child(n+5),.c-row > :nth-child(n+5){display:none}
+}
+@media (max-width:640px){
+  #shell{padding:8px;gap:8px}
+  .controls{flex-direction:column;align-items:stretch}
+  .search-wrap{max-width:none}
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── LIGHT MODE ─────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+body{transition:background .3s ease,color .25s ease}
+.topbar,.panel,.d-panel,.controls,.c-row,.inject-panel,
+.search-input,.theme-toggle{
+  transition:background .25s ease,border-color .22s ease,color .2s ease,box-shadow .2s ease;
+}
+body.light{
+  --bg:#F2F6FB;--glass:rgba(255,255,255,.88);
+  --b1:rgba(0,130,195,.15);--b2:rgba(0,130,195,.30);--b3:rgba(0,130,195,.48);
+  --e:#006FB3;--e2:#005490;--mint:#00896A;--mint2:#006852;
+  --coral:#CC0030;--coral2:#99002A;--gold:#A86800;--violet:#5828AA;
+  --ice:#071525;--mist:#2A4A66;--fog:#587894;
+  color:#071525;
+}
+body.light::before{
+  background:
+    radial-gradient(ellipse 80% 60% at 70% -10%,rgba(100,60,200,.09) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 90%,rgba(0,130,195,.10) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(0,150,120,.05) 0%,transparent 60%),
+    linear-gradient(180deg,#F2F6FB 0%,#EAF0F8 50%,#F2F6FB 100%);
+}
+body.light::after{background-image:linear-gradient(rgba(0,130,195,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,130,195,.07) 1px,transparent 1px);background-size:40px 40px}
+body.light .bg-orb-1{background:radial-gradient(circle,rgba(100,60,200,.10) 0%,transparent 65%)}
+body.light .bg-orb-2{background:radial-gradient(circle,rgba(0,130,195,.09) 0%,transparent 65%)}
+body.light .bg-orb-3{background:radial-gradient(circle,rgba(0,150,120,.05) 0%,transparent 65%)}
+body.light .scanlines{background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.012) 3px,rgba(0,0,0,.012) 4px)}
+body.light .topbar{background:rgba(255,255,255,.92);box-shadow:0 4px 24px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.9)}
+body.light .tb-logo{color:#071525}
+body.light .tb-clock{text-shadow:none}
+body.light .theme-toggle{background:rgba(0,0,0,.05)}
+body.light .theme-toggle:hover{background:rgba(0,0,0,.10)}
+body.light .tb-logout{background:rgba(204,0,48,.07);border-color:rgba(204,0,48,.25)}
+body.light .panel,body.light .d-panel{background:rgba(255,255,255,.9)}
+body.light .controls{background:rgba(230,237,246,.7)}
+body.light .panel-hdr{background:rgba(230,237,246,.7)}
+body.light .search-input{background:rgba(235,243,252,.8)}
+body.light .c-row{background:rgba(255,255,255,.78)}
+body.light .c-row:hover{background:rgba(0,130,195,.05);box-shadow:0 2px 12px rgba(0,0,0,.07)}
+body.light .skel{background:linear-gradient(90deg,rgba(0,0,0,.03) 0%,rgba(0,130,195,.08) 50%,rgba(0,0,0,.03) 100%);background-size:200% 100%}
+body.light .c-model,body.light .sc-model{background:rgba(0,0,0,.06)}
+body.light .inject-panel{background:rgba(240,245,252,.96)}
+body.light .inj-btn{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.10);color:var(--mist)}
+body.light .chip-up{background:rgba(0,137,106,.10);border-color:rgba(0,137,106,.28)}
+body.light .chip-down{background:rgba(204,0,48,.10);border-color:rgba(204,0,48,.30)}
+
+/* ── IDLE-TIMEOUT WARNING ── */
+.idle-warn{
+  position:fixed;top:74px;left:50%;z-index:250;max-width:360px;
+  padding:14px 16px;border-radius:12px;
+  background:var(--glass);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,179,0,.35);
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;
+  transform:translate(-50%,-10px);transition:opacity .22s ease,transform .22s ease;
+}
+.idle-warn.show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.idle-warn-ic{font-size:20px;flex-shrink:0}
+.idle-warn-txt{font-size:12px;color:var(--mist);line-height:1.45;font-family:var(--sans)}
+.idle-warn-txt b{color:var(--ice)}
+.idle-warn-btn{
+  padding:8px 14px;border-radius:8px;border:none;flex-shrink:0;
+  background:linear-gradient(135deg,var(--e2),var(--mint2));color:#001A28;
+  font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;
+  font-family:var(--mono);letter-spacing:.04em;
+}
+</style>
+</head>
+<body>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+<div class="scanlines"></div>
+<div class="idle-warn" id="idle-warn" role="alert">
+  <span class="idle-warn-ic">⏱</span>
+  <span class="idle-warn-txt" id="idle-warn-txt"></span>
+  <button class="idle-warn-btn" onclick="stayLoggedIn()">Stay signed in</button>
+</div>
+
+<div id="shell">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <a class="tb-back" href="/noc">← Dashboard</a>
+    <div class="tb-divider"></div>
+    <div class="tb-brand">
+      <div class="tb-pulse"></div>
+      <span class="tb-logo">NOC</span>
+      <span class="tb-slash">/</span>
+      <span class="tb-sys">Customer Directory</span>
+    </div>
+    <div class="tb-right">
+      <a class="tb-back" href="/noc/engine">⚙️ Engine</a>
+      <a class="tb-back" href="/noc/analytics">📊 Analytics</a>
+      <a class="tb-back" href="/noc/tickets">🎫 Tickets</a>
+      <div class="tb-divider"></div>
+      <span class="tb-clock" id="tb-clock">00:00:00</span>
+      <div class="tb-divider"></div>
+      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark mode">🌙</button>
+      <div class="tb-divider"></div>
+      <span class="tb-user" id="tb-admin">—</span>
+      <button class="tb-logout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- ══ LIST VIEW ══════════════════════════════════════════════════════════ -->
+  <div class="panel" id="list-view">
+    <div class="controls">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="search" placeholder="Search by name, phone, or email…" oninput="applySearch()">
+      </div>
+      <div class="ctrl-right">
+        <span class="total-badge" id="showing-count">—</span>
+        <button class="ph-btn" onclick="loadCustomers()">↺ Refresh</button>
+      </div>
+    </div>
+    <div class="c-hdr">
+      <div></div><div>Customer</div><div>Phone</div><div>Email</div><div>Router</div><div>Status</div>
+    </div>
+    <div class="list-scroll" id="customer-list">
+      <div class="t-loading"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+    </div>
+  </div>
+
+  <!-- ══ DETAIL VIEW ════════════════════════════════════════════════════════ -->
+  <div id="detail-view" style="display:none">
+    <div class="d-toolbar" style="margin-bottom:14px">
+      <button class="tb-back" style="cursor:pointer" onclick="closeDetail()">← All Customers</button>
+      <div class="d-who">
+        <div class="cust-avatar d-avatar" id="d-avatar">—</div>
+        <div>
+          <div class="d-name" id="d-name">—</div>
+          <div class="d-meta" id="d-meta">—</div>
+        </div>
+      </div>
+      <div class="d-actions">
+        <button class="ph-btn" onclick="loadDetail(currentAccount)">↺ Refresh</button>
+      </div>
+    </div>
+
+    <div class="d-grid">
+      <div class="d-col-main">
+        <div class="d-panel">
+          <div class="panel-hdr"><span class="ph-title">Connection Path</span></div>
+          <div class="path-diagram" id="path-diagram"></div>
+        </div>
+        <div class="d-panel">
+          <div class="panel-hdr"><span class="ph-title">Live Parameters</span><span class="ph-count" id="d-updated">—</span></div>
+          <div id="d-params"></div>
+        </div>
+        <div class="d-panel">
+          <div class="panel-hdr"><span class="ph-title">Fault &amp; Fix Timeline</span></div>
+          <div class="timeline" id="d-timeline"></div>
+        </div>
+      </div>
+      <div class="d-col-side">
+        <div class="d-panel health-panel">
+          <div class="health-ring-wrap">
+            <svg viewBox="0 0 120 120" class="health-ring">
+              <circle cx="60" cy="60" r="52" class="hr-track"/>
+              <circle cx="60" cy="60" r="52" class="hr-fill" id="hr-fill"/>
+            </svg>
+            <div class="health-score" id="health-score">—</div>
+          </div>
+          <div class="health-label" id="health-label">Network Health</div>
+        </div>
+        <div class="d-panel">
+          <div class="panel-hdr"><span class="ph-title">Router Status</span></div>
+          <div class="status-card" id="status-card"></div>
+        </div>
+        <div class="inject-panel">
+          <div class="ip-header">
+            <span class="ip-title">⚡ Fault Injection</span>
+            <span class="ip-target">Target: <span class="t" id="d-inj-target">none</span></span>
+          </div>
+          <div class="inject-grid">
+            <button class="inj-btn random" onclick="injectScoped('')">Random</button>
+            <button class="inj-btn" onclick="injectScoped('ppp_auth_failure')">PPP Auth</button>
+            <button class="inj-btn" onclick="injectScoped('wrong_vlan')">Wrong VLAN</button>
+            <button class="inj-btn" onclick="injectScoped('dns_failure')">DNS Fail</button>
+            <button class="inj-btn" onclick="injectScoped('weak_signal')">Weak Signal</button>
+            <button class="inj-btn" onclick="injectScoped('random_disconnect')">Disconnect</button>
+            <button class="inj-btn clear" onclick="clearScoped()" style="grid-column:1/-1">✓ Clear Fault</button>
+          </div>
+          <div class="inj-feedback" id="d-inj-fb"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- #shell -->
+
+<div id="toast-stack"></div>
+
+<script>
+// ── Theme (shared with NOC dashboard) ───────────────────────────────────────
+(function(){
+  const saved=localStorage.getItem('noc-theme');
+  if(saved==='light'||(saved===null&&window.matchMedia('(prefers-color-scheme: light)').matches))
+    document.body.classList.add('light');
+})();
+function applyThemeIcon(){
+  const btn=document.getElementById('theme-toggle');
+  btn.textContent=document.body.classList.contains('light')?'☀️':'🌙';
+}
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light');
+  localStorage.setItem('noc-theme',isLight?'light':'dark');
+  applyThemeIcon();
+}
+applyThemeIcon();
+
+// ── Clock ────────────────────────────────────────────────────────────────
+function updateClock(){document.getElementById('tb-clock').textContent=new Date().toLocaleTimeString('en-GB',{hour12:false});}
+updateClock(); setInterval(updateClock,1000);
+
+// Idle timeout — 1h since the last real interaction (independent of the
+// background polling, which would otherwise keep the tab looking "active"
+// even after the admin has walked away).
+(function(){
+  const IDLE_LIMIT_MS=60*60*1000;
+  const IDLE_WARN_MS=60*1000;
+  let lastActivity=Date.now();
+  ['mousemove','mousedown','keydown','touchstart','scroll'].forEach(ev=>
+    window.addEventListener(ev,()=>{lastActivity=Date.now();},{passive:true}));
+  window.stayLoggedIn=function(){
+    lastActivity=Date.now();
+    document.getElementById('idle-warn').classList.remove('show');
+  };
+  setInterval(()=>{
+    const idle=Date.now()-lastActivity;
+    const warn=document.getElementById('idle-warn');
+    if(idle>IDLE_LIMIT_MS){ warn.classList.remove('show'); logout(); }
+    else if(idle>IDLE_LIMIT_MS-IDLE_WARN_MS){
+      const s=Math.max(0,Math.ceil((IDLE_LIMIT_MS-idle)/1000));
+      document.getElementById('idle-warn-txt').innerHTML=`You'll be signed out in <b>${s}s</b> due to inactivity.`;
+      warn.classList.add('show');
+    } else warn.classList.remove('show');
+  },1000);
+})();
+
+// ── Toasts ───────────────────────────────────────────────────────────────
+function toast(msg,type='ok'){
+  const stack=document.getElementById('toast-stack');
+  const el=document.createElement('div');
+  el.className='toast '+type;
+  el.textContent=msg;
+  stack.appendChild(el);
+  setTimeout(()=>{el.classList.add('leaving');setTimeout(()=>el.remove(),220);},3200);
+}
+
+// ── Auth ─────────────────────────────────────────────────────────────────
+async function checkAuth(){
+  const r=await fetch('/api/noc/fleet');
+  if(r.status===401){ window.location.href='/noc'; return false; }
+  return true;
+}
+async function logout(){ await fetch('/api/noc/logout',{method:'POST'}); sessionStorage.removeItem('noc-admin'); window.location.href='/noc'; }
+
+function initials(name){
+  if(!name) return '?';
+  return name.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+}
+
+// ── Fault dictionaries (mirrors noc.html) ───────────────────────────────────
+const FAULT_LABELS={
+  ppp_auth_failure:  {label:'PPP Authentication Failure', desc:'Router cannot authenticate with the ISP — wrong credentials or auth server error'},
+  wrong_vlan:        {label:'Wrong VLAN Configuration',   desc:'Router is tagged with an incorrect VLAN ID, blocking WAN traffic on the ISP backbone'},
+  dns_failure:       {label:'DNS Resolution Failure',      desc:'DNS server is unset (0.0.0.0) or actively failing — name resolution is broken'},
+  weak_signal:       {label:'Weak Optical Signal',         desc:'RX power is below the -27 dBm minimum — physical fiber degradation or dirty connector'},
+  hardware_fault:    {label:'Hardware Fault',              desc:'Error count exceeds 100 — possible NIC corruption, CRC errors, or hardware degradation'},
+  random_disconnect: {label:'Random Disconnection',        desc:'PPP session dropped without an authentication error — could be ISP-side or line instability'},
+  healthy:           {label:'No Fault Detected',           desc:'All monitored parameters are within their acceptable thresholds'},
+  manual:            {label:'Manual Entry',                desc:'Ticket created manually by NOC staff without an automated diagnostic run'},
+  unknown:           {label:'Unknown',                     desc:'Fault could not be determined from available data'},
+};
+const FAULT_SEVERITY={healthy:100,dns_failure:70,wrong_vlan:60,ppp_auth_failure:50,random_disconnect:45,weak_signal:30,hardware_fault:10};
+const FAULT_NODE={ppp_auth_failure:'ppp',random_disconnect:'ppp',wrong_vlan:'vlan',dns_failure:'dns',weak_signal:'router',hardware_fault:'router'};
+
+function formatUptime(sec){
+  const s=parseInt(sec||0); if(!s) return '—';
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),r=s%60;
+  return h>0?`${h}h ${m}m ${r}s`:m>0?`${m}m ${r}s`:`${r}s`;
+}
+function timeAgo(iso){
+  if(!iso) return '—';
+  const s=Math.max(0,Math.floor((Date.now()-new Date(iso).getTime())/1000));
+  if(s<60) return 'just now';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+function animateCounter(el,target){
+  if(target===null||target===undefined||isNaN(Number(target))){el.textContent=target??'—';return;}
+  const n=Number(target);
+  const prev=parseInt(el.textContent)||0;
+  if(prev===n){el.textContent=n;return;}
+  const dur=600,start=performance.now();
+  const tick=(now)=>{
+    const p=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(prev+(n-prev)*ease);
+    if(p<1)requestAnimationFrame(tick); else el.textContent=n;
+  };
+  requestAnimationFrame(tick);
+}
+
+// ── State ────────────────────────────────────────────────────────────────
+let allCustomers=[], fleetByAccount={}, searchTerm='', currentAccount=null, ws=null;
+let tickTimer=null;
+
+async function loadCustomers(){
+  document.getElementById('customer-list').innerHTML=`<div class="t-loading"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>`;
+  try{
+    const [cr,fr]=await Promise.all([
+      fetch('/api/noc/customers/search?limit=200'),
+      fetch('/api/noc/fleet'),
+    ]);
+    const cd=await cr.json(), fd=await fr.json();
+    allCustomers=cd.customers||[];
+    fleetByAccount={};
+    (fd.routers||[]).forEach(r=>{ fleetByAccount[r.account_id]=r; });
+    render();
+  }catch(e){
+    document.getElementById('customer-list').innerHTML=`<div class="c-empty"><div class="ce-icon">⚠️</div><div class="ce-text" style="color:var(--coral)">Failed to load customers</div></div>`;
+  }
+}
+
+function applySearch(){ searchTerm=document.getElementById('search').value.toLowerCase(); render(); }
+
+function render(){
+  let list=allCustomers;
+  if(searchTerm) list=list.filter(c=>{
+    const s=(c.name||'')+' '+(c.phone||'')+' '+(c.email||'')+' '+(c.account_id||'');
+    return s.toLowerCase().includes(searchTerm);
+  });
+  document.getElementById('showing-count').textContent=`${list.length} of ${allCustomers.length} customers`;
+  renderList(list);
+}
+
+function renderList(customers){
+  const box=document.getElementById('customer-list');
+  if(!customers.length){
+    box.innerHTML=`<div class="c-empty"><div class="ce-icon">🗂️</div><div class="ce-text">No customers found</div></div>`;
+    return;
+  }
+  box.innerHTML=customers.map((c,i)=>{
+    const r=fleetByAccount[c.account_id];
+    const down=r&&r.status==='DOWN';
+    const statusChip=r?`<span class="chip ${down?'chip-down':'chip-up'}">${down?'DOWN':'UP'}</span>`:'<span style="color:var(--fog);font-family:var(--mono);font-size:9px">—</span>';
+    const avatarCls=r?(down?'down':'up'):'';
+    const delay=Math.min(i,14)*0.025;
+    return `<div class="c-row row-in" data-account="${c.account_id}" style="animation-delay:${delay}s" onclick="openCustomerDetail('${c.account_id}')">
+      <div class="cust-avatar ${avatarCls}">${initials(c.name)}</div>
+      <div style="min-width:0">
+        <div class="c-name">${c.name||'—'}</div>
+        <div class="c-acct">${c.account_id||''}</div>
+      </div>
+      <div class="c-phone">${c.phone||'—'}</div>
+      <div class="c-email ${c.email?'':'none'}">${c.email||'no email on file'}</div>
+      <div class="c-model">${c.router_model||'—'}</div>
+      <div>${statusChip}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Detail view ──────────────────────────────────────────────────────────
+function closeDetail(){
+  currentAccount=null;
+  if(tickTimer){clearInterval(tickTimer);tickTimer=null;}
+  document.getElementById('detail-view').style.display='none';
+  document.getElementById('list-view').style.display='flex';
+}
+
+async function openCustomerDetail(accountId){
+  currentAccount=accountId;
+  document.getElementById('list-view').style.display='none';
+  document.getElementById('detail-view').style.display='block';
+  await loadDetail(accountId);
+}
+
+let lastParams=null, lastRouter=null;
+
+async function loadDetail(accountId){
+  const cust=allCustomers.find(c=>c.account_id===accountId)||{};
+  document.getElementById('d-avatar').textContent=initials(cust.name);
+  document.getElementById('d-name').textContent=cust.name||'—';
+  document.getElementById('d-meta').textContent=`${accountId} · ${cust.phone||'—'} · ${cust.email||'no email on file'} · ${cust.subscription_plan||''}`;
+
+  let state={};
+  try{
+    const r=await fetch(`/api/noc/router_state?account_id=${accountId}`);
+    state=await r.json();
+  }catch(e){}
+  if(state.error){
+    document.getElementById('d-params').innerHTML=`<div class="tl-empty">${state.error}</div>`;
+    return;
+  }
+  lastParams=state; lastRouter=fleetByAccount[accountId];
+  document.getElementById('d-avatar').className='cust-avatar d-avatar '+(state.status==='DOWN'?'down':'up');
+  document.getElementById('d-inj-target').textContent=(state.serial||'').split('-').slice(-1)[0]+'…';
+
+  renderPathDiagram(state);
+  renderParams(state);
+  renderHealth(state);
+  renderStatusCard(state);
+  startTicker(state);
+  loadTimeline(accountId);
+}
+
+function renderPathDiagram(state){
+  const fault=state.fault||'healthy';
+  const badNode=FAULT_NODE[fault];
+  const nodes=[
+    {id:'router',icon:'📡',label:'Router'},
+    {id:'vlan',icon:'🏷️',label:'VLAN'},
+    {id:'ppp',icon:'🌐',label:'ISP Link'},
+    {id:'dns',icon:'☁️',label:'DNS / Internet'},
+  ];
+  let brokenFrom=nodes.findIndex(n=>n.id===badNode);
+  let html='';
+  nodes.forEach((n,i)=>{
+    const bad=n.id===badNode;
+    if(i>0){
+      const lineBad=brokenFrom!==-1 && i-1>=brokenFrom;
+      html+=`<div class="path-line ${lineBad?'bad':''}"></div>`;
+    }
+    html+=`<div class="path-node ${bad?'bad':'ok'}"><div class="pn-icon">${n.icon}</div><div class="pn-label">${n.label}</div></div>`;
+  });
+  document.getElementById('path-diagram').innerHTML=html;
+}
+
+function renderParams(state){
+  const p=state.parameters_named||{};
+  const down=state.status==='DOWN';
+  const fault=state.fault||'healthy';
+  const faultInfo=FAULT_LABELS[fault]||{label:fault.replace(/_/g,' '),desc:''};
+
+  const drow=(k,v,cls='dim',hint='')=>`<div class="dp-row">
+    <span class="dp-key">${k}</span>
+    <span class="dp-val ${cls}">${v??'—'}${hint?`<span style="font-size:8px;opacity:.55;margin-left:5px;font-weight:400">${hint}</span>`:''}</span>
+  </div>`;
+  const bar=(pct,cls)=>`<div class="dp-bar-track"><div class="dp-bar-fill" style="width:${Math.min(100,Math.max(0,pct))}%"></div></div>`;
+
+  const pppConn=p.ppp_connection_status, pppOk=pppConn==='Connected';
+  const lastErr=p.last_connection_error, errOk=!lastErr||lastErr==='None';
+  const vlanVal=p.vlan_id, correctVlan=state.correct_vlan??100;
+  const vlanOk=vlanVal==null||Number(vlanVal)===Number(correctVlan)||Number(vlanVal)===0;
+  const vlanCls=vlanVal==null?'dim':vlanOk?'ok':'err';
+  const rxNum=parseFloat(p.rx_optical_power), hasRx=!isNaN(rxNum), rxOk=hasRx&&rxNum>=-27;
+  const rxPct=hasRx?Math.round((rxNum+40)/30*100):0, rxBarCls=rxOk?'dp-bar-ok':'dp-bar-err';
+  const crcVal=parseInt(p.dsl_crc_errors), hasCrc=!isNaN(crcVal);
+  const crcBarCls=!hasCrc?'':crcVal>100?'dp-bar-err':crcVal>50?'dp-bar-warn':'dp-bar-ok';
+  const crcPct=hasCrc?Math.min(100,Math.round(crcVal/150*100)):0;
+  const dnsVal=p.dns_servers, dnsOk=dnsVal&&dnsVal!=='0.0.0.0';
+
+  document.getElementById('d-updated').textContent=state.last_updated?new Date(state.last_updated).toLocaleTimeString('en-GB',{hour12:false}):'—';
+  document.getElementById('d-params').innerHTML=`
+    <div class="dp-section">Device</div>
+    ${drow('Model',state.model||'—','dim')}
+    ${drow('Serial',state.serial||'—','dim')}
+    <div class="dp-section">Connection</div>
+    ${drow('PPP Status',pppConn||'—',pppOk?'ok':'err',pppOk?'authenticated':'not connected')}
+    ${drow('Last Error',lastErr||'None',errOk?'ok':'warn')}
+    ${drow('VLAN ID',vlanVal!=null?String(vlanVal):'—',vlanCls,`expected ${correctVlan}`)}
+    ${p.uptime!=null?drow('Uptime',formatUptime(p.uptime),'dim'):''}
+    ${hasRx?`<div class="dp-section">Optical (GPON)</div>
+    <div class="dp-bar-row ${rxBarCls}">
+      <div class="dp-bar-label"><span>RX Power</span><span class="dp-val ${rxOk?'ok':'err'}">${rxNum} dBm</span></div>
+      ${bar(rxPct,rxBarCls)}
+    </div>`:''}
+    ${hasCrc?`<div class="dp-section">DSL Diagnostics</div>
+    <div class="dp-bar-row ${crcBarCls}">
+      <div class="dp-bar-label"><span>CRC Errors</span><span class="dp-val ${crcVal>100?'err':crcVal>50?'warn':'ok'}">${crcVal}</span></div>
+      ${bar(crcPct,crcBarCls)}
+    </div>`:''}
+    <div class="dp-section">DNS</div>
+    ${drow('DNS Servers',dnsVal||'—',dnsOk?'ok':'err')}
+    ${fault!=='healthy'?`<div class="dp-section">Active Fault</div>
+    <div style="padding:11px 16px 13px">
+      <div style="font-size:12px;font-weight:800;color:var(--coral);margin-bottom:5px">${faultInfo.label}</div>
+      <div style="font-size:11px;color:var(--mist);line-height:1.6">${faultInfo.desc}</div>
+    </div>`:''}`;
+}
+
+function renderHealth(state){
+  const score=FAULT_SEVERITY[state.fault]??(state.status==='UP'?100:20);
+  const circumference=327;
+  const offset=circumference*(1-score/100);
+  const fill=document.getElementById('hr-fill');
+  fill.style.strokeDashoffset=offset;
+  fill.style.stroke=score>=80?'var(--mint)':score>=40?'var(--gold)':'var(--coral)';
+  animateCounter(document.getElementById('health-score'),score);
+  document.getElementById('health-label').textContent=score>=80?'Healthy':score>=40?'Degraded':'Critical';
+}
+
+function renderStatusCard(state){
+  const down=state.status==='DOWN';
+  document.getElementById('status-card').innerHTML=`
+    <div class="sc-icon ${down?'down':'up'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="13" width="18" height="7" rx="2"/>
+      <line x1="8" y1="13" x2="8" y2="8"/><line x1="16" y1="13" x2="16" y2="8"/>
+      <circle cx="8" cy="7" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="16" cy="7" r="1" fill="currentColor" stroke="none"/>
+    </svg></div>
+    <span class="chip ${down?'chip-down':'chip-up'}">${down?'DOWN':'UP'}</span>
+    <div class="sc-ticker ${down?'down':'up'}" id="sc-ticker">—</div>
+    <div class="sc-sub" id="sc-sub">—</div>
+    <div class="sc-model">${state.model||'—'}</div>
+  `;
+}
+
+function startTicker(state){
+  if(tickTimer){clearInterval(tickTimer);tickTimer=null;}
+  const down=state.status==='DOWN';
+  const p=state.parameters_named||{};
+  if(!down){
+    const base=parseInt(p.uptime||0), baseTime=Date.now();
+    const tick=()=>{
+      const el=document.getElementById('sc-ticker'); if(!el)return;
+      el.textContent=formatUptime(base+Math.floor((Date.now()-baseTime)/1000));
+      document.getElementById('sc-sub').textContent='uptime';
+    };
+    tick(); tickTimer=setInterval(tick,1000);
+  }else{
+    const since=state.last_updated?new Date(state.last_updated).getTime():Date.now();
+    const tick=()=>{
+      const el=document.getElementById('sc-ticker'); if(!el)return;
+      el.textContent=formatUptime(Math.floor((Date.now()-since)/1000));
+      document.getElementById('sc-sub').textContent='down for';
+    };
+    tick(); tickTimer=setInterval(tick,1000);
+  }
+}
+
+async function loadTimeline(accountId){
+  const box=document.getElementById('d-timeline');
+  try{
+    const r=await fetch(`/api/noc/tickets/search?account=${accountId}&limit=20`);
+    const d=await r.json();
+    const tickets=d.tickets||[];
+    if(!tickets.length){ box.innerHTML=`<div class="tl-empty">No fault history for this customer yet</div>`; return; }
+    box.innerHTML=tickets.map(t=>{
+      const st=t.status||'open';
+      const icon=st==='resolved'?'🟢':st==='escalated'?'🟠':'🔴';
+      const fault=(t.fault_detected||'fault').replace(/_/g,' ');
+      const fix=t.fix_applied?` → fixed with ${t.fix_applied.replace(/_/g,' ')}`:'';
+      return `<div class="tl-item">
+        <span class="tl-dot ${st}"></span>
+        <div class="tl-body">
+          <div>
+            <div class="tl-title">${icon} ${fault}${fix}</div>
+            <div class="tl-sub">${st}${t.resolution_time_s?' · resolved in '+t.resolution_time_s+'s':''}</div>
+          </div>
+          <div class="tl-time">${timeAgo(t.created_at)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    box.innerHTML=`<div class="tl-empty">Failed to load history</div>`;
+  }
+}
+
+// ── Scoped fault injection ──────────────────────────────────────────────────
+function showInjFb(msg,ok){
+  const el=document.getElementById('d-inj-fb');
+  el.textContent=msg; el.className='inj-feedback '+(ok?'ok':'err');
+  el.style.display='block';
+  clearTimeout(el._t); el._t=setTimeout(()=>el.style.display='none',4000);
+}
+async function injectScoped(fault){
+  if(!lastParams||!lastParams.serial){showInjFb('No router targeted',false);return;}
+  const body=fault?{serial:lastParams.serial,fault}:{serial:lastParams.serial};
+  try{
+    const r=await fetch('/api/noc/inject_fault',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(d.success){showInjFb('✓ Injected: '+d.fault_injected.replace(/_/g,' '),true);setTimeout(()=>loadDetail(currentAccount),500);}
+    else showInjFb(d.error||'Failed',false);
+  }catch(e){showInjFb('Error: '+e,false);}
+}
+async function clearScoped(){
+  if(!lastParams||!lastParams.serial){showInjFb('No router targeted',false);return;}
+  try{
+    const r=await fetch('/api/noc/clear_fault',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({serial:lastParams.serial})});
+    const d=await r.json();
+    if(d.success){showInjFb('✓ Router cleared — now UP',true);setTimeout(()=>loadDetail(currentAccount),400);}
+    else showInjFb(d.error||'Failed',false);
+  }catch(e){showInjFb('Error: '+e,false);}
+}
+
+// ── Live WebSocket push (genie:8001) — shared with the fleet dashboard ─────
+function connectWs(){
+  try{
+    ws=new WebSocket(`ws://${location.hostname}:8001/noc/ws`);
+    ws.onmessage=(ev)=>{
+      try{
+        const d=JSON.parse(ev.data);
+        if(d.type!=='fleet_update') return;
+        (d.routers||[]).forEach(r=>{ fleetByAccount[r.account_id]=r; });
+        render();
+        if(currentAccount && (d.routers||[]).some(r=>r.account_id===currentAccount)) loadDetail(currentAccount);
+      }catch(e){}
+    };
+    ws.onclose=()=>{setTimeout(connectWs,1500);};
+    ws.onerror=()=>{ws.close();};
+  }catch(e){setTimeout(connectWs,1500);}
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────
+(async function init(){
+  if(!await checkAuth()) return;
+  try{
+    const saved=sessionStorage.getItem('noc-admin');
+    document.getElementById('tb-admin').textContent=saved?(JSON.parse(saved).name||'Admin'):'Admin';
+  }catch(e){ document.getElementById('tb-admin').textContent='Admin'; }
+  loadCustomers();
+  connectWs();
+  setInterval(loadCustomers,30000);
+})();
+</script>
+</body>
+</html>

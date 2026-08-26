@@ -17,13 +17,14 @@ Port 8001.
 """
 
 import os
+import asyncio
 import contextlib
 import random
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 import requests
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 
@@ -33,11 +34,12 @@ import mcp_engine as E
 
 load_dotenv()
 
-MONGO_URI   = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-MONGO_DB    = os.getenv("MONGO_DB",  "mypfe")
-SERVER_PORT = int(os.getenv("GENIE_PORT", "8001"))
-BASE_URL    = os.getenv("GENIE_BASE_URL", f"http://localhost:{SERVER_PORT}")
-NEO4J_API   = os.getenv("NEO4J_API",   "http://neo4j-agent:8000")
+MONGO_URI    = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+MONGO_DB     = os.getenv("MONGO_DB",  "mypfe")
+SERVER_PORT  = int(os.getenv("GENIE_PORT", "8001"))
+BASE_URL     = os.getenv("GENIE_BASE_URL", f"http://localhost:{SERVER_PORT}")
+NEO4J_API    = os.getenv("NEO4J_API",   "http://neo4j-agent:8000")
+CUSTOMER_API = os.getenv("CUSTOMER_API", "http://customer:8003")
 
 client   = MongoClient(MONGO_URI)
 db       = client[MONGO_DB]
@@ -53,7 +55,15 @@ INJECTABLE_FAULTS = ["ppp_auth_failure", "wrong_vlan", "dns_failure",
 # -- SHARED HELPERS ------------------------------------------------------------
 
 def _iso(value):
-    return value.isoformat() if isinstance(value, datetime) else value
+    if not isinstance(value, datetime):
+        return value
+    # Values are stored via datetime.utcnow(), which is naive — isoformat() on
+    # a naive datetime omits the UTC suffix, so the browser's `new Date(...)`
+    # parses it as local time instead of UTC and renders it an hour (or more)
+    # off. Stamp it as UTC before formatting so the client converts correctly.
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.isoformat()
 
 
 def _named_view(model: str, params: dict) -> dict:
@@ -280,11 +290,42 @@ def rest_get_fault_history(account_id: str):
 
 # -- NOC admin (fault injection writes path-keyed state) -----------------------
 
-@app.post("/noc/inject_fault")
-async def inject_fault(request: Request):
-    body   = await request.json()
-    serial = body.get("serial")
-    fault  = body.get("fault") or random.choice(INJECTABLE_FAULTS)
+def _notify_customer(account_id: str, customer_name: str, fault: str):
+    """Best-effort notification to the customer portal (mirrors mypfe-app's
+    add_notification, minus the email step, so simulated faults show up in
+    the customer's notification feed same as manual ones)."""
+    if not account_id or fault == "healthy":
+        return
+    try:
+        requests.post(f"{CUSTOMER_API}/notifications/create", timeout=5, json={
+            "account_id":     account_id,
+            "customer_name":  customer_name,
+            "fault":          fault,
+            "fault_label_en": fault.replace("_", " ").title(),
+            "fault_label_fr": fault.replace("_", " ").title(),
+        })
+    except Exception:
+        pass
+
+
+def _log_fault_event(state: dict, customer: dict, model: str, fault: str, event: str):
+    """Append to the fault/recovery event log that powers /noc/analytics.
+    Every inject/clear — simulated, scoped, or manual — lands here, so trend
+    charts stay populated even though not every fault becomes a ticket."""
+    vendor = (customer or {}).get("vendor") or _lookup_router_meta(model).get("vendor", "")
+    db.fault_events.insert_one({
+        "serial":     state.get("serial", ""),
+        "account_id": (customer or {}).get("account_id", ""),
+        "model":      model,
+        "vendor":     vendor,
+        "fault":      fault,
+        "event":      event,   # "fault" | "resolved"
+        "at":         datetime.utcnow(),
+    })
+
+
+def logic_inject_fault(serial: str, fault: str = "") -> dict:
+    fault = fault or random.choice(INJECTABLE_FAULTS)
     if fault not in E.FAULTS:
         return {"error": f"Unknown fault: {fault}. Options: {list(E.FAULTS.keys())}"}
     state = db.router_states.find_one({"serial": serial})
@@ -297,27 +338,47 @@ async def inject_fault(request: Request):
         "status": status, "fault": fault,
         "last_updated": datetime.utcnow(), "parameters": params,
     }})
+    customer = db.customers.find_one({"_id": state.get("customer_id")})
+    _log_fault_event(state, customer, model, fault, "fault")
+    if customer:
+        _notify_customer(customer.get("account_id", ""), customer.get("name", ""), fault)
     return {"success": True, "serial": serial, "fault_injected": fault, "status": status}
 
 
-@app.post("/noc/clear_fault")
-async def clear_fault(request: Request):
-    body   = await request.json()
-    serial = body.get("serial")
-    state  = db.router_states.find_one({"serial": serial})
+def logic_clear_fault(serial: str) -> dict:
+    state = db.router_states.find_one({"serial": serial})
     if not state:
         return {"error": f"Router {serial} not found"}
-    model  = state.get("model", "")
+    model = state.get("model", "")
+    prior_fault = state.get("fault", "healthy")
     params = E.expand_state(model, "healthy", resolver)
     db.router_states.update_one({"serial": serial}, {"$set": {
         "status": "UP", "fault": "healthy",
         "last_updated": datetime.utcnow(), "parameters": params,
     }})
+    if prior_fault and prior_fault != "healthy":
+        customer = db.customers.find_one({"_id": state.get("customer_id")})
+        _log_fault_event(state, customer, model, prior_fault, "resolved")
     return {"success": True, "serial": serial, "status": "UP"}
 
 
-@app.get("/noc/fleet")
-def get_fleet():
+@app.post("/noc/inject_fault")
+async def inject_fault(request: Request):
+    body   = await request.json()
+    result = logic_inject_fault(body.get("serial"), body.get("fault") or "")
+    await broadcast_fleet()
+    return result
+
+
+@app.post("/noc/clear_fault")
+async def clear_fault(request: Request):
+    body   = await request.json()
+    result = logic_clear_fault(body.get("serial"))
+    await broadcast_fleet()
+    return result
+
+
+def build_fleet_payload() -> dict:
     pipeline = [
         {"$lookup": {"from": "customers", "localField": "customer_id",
                      "foreignField": "_id", "as": "customer"}},
@@ -332,6 +393,207 @@ def get_fleet():
     up   = sum(1 for r in fleet if r["status"] == "UP")
     down = sum(1 for r in fleet if r["status"] == "DOWN")
     return {"total": len(fleet), "up": up, "down": down, "routers": fleet}
+
+
+@app.get("/noc/fleet")
+def get_fleet():
+    return build_fleet_payload()
+
+
+# -- Analytics (MTTR, fault frequency, uptime trend) ----------------------------
+
+def logic_get_analytics(account_id: str = None) -> dict:
+    ev_query = {"account_id": account_id} if account_id else {}
+    events = list(db.fault_events.find(ev_query, {"_id": 0}).sort("at", 1))
+
+    fault_events = [e for e in events if e["event"] == "fault"]
+    freq_model, freq_vendor, freq_type = {}, {}, {}
+    for e in fault_events:
+        m = e.get("model") or "Unknown"
+        v = e.get("vendor") or "Unknown"
+        t = e.get("fault") or "unknown"
+        freq_model[m]  = freq_model.get(m, 0) + 1
+        freq_vendor[v] = freq_vendor.get(v, 0) + 1
+        freq_type[t]   = freq_type.get(t, 0) + 1
+
+    # MTTR: pair each "fault" with the next "resolved" on the same serial.
+    by_serial: dict[str, list] = {}
+    for e in events:
+        by_serial.setdefault(e["serial"], []).append(e)
+    durations = []
+    for serial, evs in by_serial.items():
+        pending_at = None
+        for e in evs:
+            if e["event"] == "fault":
+                pending_at = e["at"]
+            elif e["event"] == "resolved" and pending_at is not None:
+                durations.append((e["at"] - pending_at).total_seconds())
+                pending_at = None
+    mttr_seconds = round(sum(durations) / len(durations), 1) if durations else None
+
+    # Uptime % trend: bucket the span from the first recorded event to now,
+    # so a brand-new install still renders a chart instead of an empty window.
+    fleet = build_fleet_payload()["routers"]
+    if account_id:
+        fleet = [r for r in fleet if r.get("account_id") == account_id]
+    serials = [r["serial"] for r in fleet]
+
+    now = datetime.utcnow()
+    start = events[0]["at"] if events else now - timedelta(hours=1)
+    if start >= now:
+        start = now - timedelta(minutes=1)
+    n_buckets = 20
+    step = (now - start) / n_buckets
+
+    serial_events = {s: [e for e in events if e["serial"] == s] for s in serials}
+    # For any time before a router's first logged event we have no real history —
+    # assume its current status held throughout, so the series' last point always
+    # agrees with current_uptime_pct instead of defaulting everything to "UP".
+    current_status_by_serial = {r["serial"]: r["status"] for r in fleet}
+
+    def status_at(serial, ts):
+        status = current_status_by_serial.get(serial, "UP")
+        for e in serial_events.get(serial, []):
+            if e["at"] > ts:
+                break
+            status = "DOWN" if e["event"] == "fault" else "UP"
+        return status
+
+    uptime_series = []
+    for i in range(n_buckets + 1):
+        ts = start + step * i
+        if serials:
+            up_count = sum(1 for s in serials if status_at(s, ts) == "UP")
+            pct = round(up_count / len(serials) * 100, 1)
+        else:
+            pct = None
+        uptime_series.append({"t": _iso(ts), "pct": pct})
+
+    # Support ticket stats — a separate signal from raw network fault events.
+    tickets = list(db.tickets.find(ev_query, {"_id": 0}))
+    resolved = [t for t in tickets if t.get("status") == "resolved"]
+    res_times = [t["resolution_time_s"] for t in resolved if t.get("resolution_time_s")]
+
+    current = build_fleet_payload()
+    scoped = [r for r in current["routers"] if not account_id or r.get("account_id") == account_id]
+    current_uptime_pct = round(sum(1 for r in scoped if r["status"] == "UP") / len(scoped) * 100, 1) if scoped else None
+    routers_down = sum(1 for r in scoped if r["status"] == "DOWN")
+
+    return {
+        "account_id": account_id,
+        "total_fault_events": len(fault_events),
+        "mttr_seconds": mttr_seconds,
+        "current_uptime_pct": current_uptime_pct,
+        "routers_down": routers_down,
+        "routers_total": len(scoped),
+        "fault_frequency_by_model":  [{"label": k, "count": v} for k, v in sorted(freq_model.items(), key=lambda x: -x[1])],
+        "fault_frequency_by_vendor": [{"label": k, "count": v} for k, v in sorted(freq_vendor.items(), key=lambda x: -x[1])],
+        "fault_frequency_by_type":   [{"type": k, "count": v} for k, v in sorted(freq_type.items(), key=lambda x: -x[1])],
+        "uptime_pct_series": uptime_series,
+        "ticket_stats": {
+            "total":            len(tickets),
+            "open":             sum(1 for t in tickets if t.get("status") == "open"),
+            "escalated":        sum(1 for t in tickets if t.get("status") == "escalated"),
+            "resolved":         len(resolved),
+            "avg_resolution_s": round(sum(res_times) / len(res_times), 1) if res_times else None,
+        },
+    }
+
+
+@app.get("/noc/analytics")
+def get_analytics(account_id: str = None):
+    return logic_get_analytics(account_id)
+
+
+# -- WebSocket live push --------------------------------------------------------
+
+_ws_clients: set[WebSocket] = set()
+
+
+@app.websocket("/noc/ws")
+async def noc_ws(websocket: WebSocket):
+    await websocket.accept()
+    _ws_clients.add(websocket)
+    try:
+        while True:
+            await websocket.receive_text()   # ignore inbound; connection is push-only
+    except WebSocketDisconnect:
+        pass
+    finally:
+        _ws_clients.discard(websocket)
+
+
+async def broadcast_fleet():
+    if not _ws_clients:
+        return
+    payload = {"type": "fleet_update", **build_fleet_payload()}
+    dead = set()
+    for ws in _ws_clients:
+        try:
+            await ws.send_json(payload)
+        except Exception:
+            dead.add(ws)
+    _ws_clients.difference_update(dead)
+
+
+# -- Fault simulator -------------------------------------------------------------
+
+SIM = {"running": False, "speed": 1.0}
+SIM_TICK_S = 0.25   # how often the loop re-checks speed / running state
+
+
+async def _simulate_loop():
+    remaining = random.uniform(5, 10)
+    while SIM["running"]:
+        await asyncio.sleep(SIM_TICK_S)
+        if not SIM["running"]:
+            break
+        remaining -= SIM_TICK_S * SIM["speed"]
+        if remaining > 0:
+            continue
+        remaining = random.uniform(5, 10)
+        fleet = build_fleet_payload()["routers"]
+        if not fleet:
+            continue
+        down = [r for r in fleet if r["status"] == "DOWN"]
+        if len(down) / len(fleet) > 0.7:
+            # Too many faults already — auto-heal one instead of idling, so the
+            # board stays visibly alive instead of silently freezing at the cap.
+            logic_clear_fault(random.choice(down)["serial"])
+        else:
+            candidates = [r for r in fleet if r["status"] == "UP"] or fleet
+            logic_inject_fault(random.choice(candidates)["serial"])
+        await broadcast_fleet()
+
+
+@app.post("/noc/simulation/start")
+async def simulation_start():
+    if not SIM["running"]:
+        SIM["running"] = True
+        asyncio.create_task(_simulate_loop())
+    return {"running": SIM["running"], "speed": SIM["speed"]}
+
+
+@app.post("/noc/simulation/stop")
+async def simulation_stop():
+    SIM["running"] = False
+    return {"running": SIM["running"], "speed": SIM["speed"]}
+
+
+@app.post("/noc/simulation/speed")
+async def simulation_speed(request: Request):
+    body = await request.json()
+    try:
+        speed = float(body.get("speed", 1))
+    except (TypeError, ValueError):
+        speed = 1.0
+    SIM["speed"] = max(1.0, min(50.0, speed))
+    return {"running": SIM["running"], "speed": SIM["speed"]}
+
+
+@app.get("/noc/simulation/status")
+def simulation_status():
+    return {"running": SIM["running"], "speed": SIM["speed"]}
 
 
 if __name__ == "__main__":

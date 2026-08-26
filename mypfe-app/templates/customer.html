@@ -19,10 +19,13 @@
   --byrsa-lime:#C6EE00;--byrsa-lime2:#A6C700;
   --mist:#8899BB;--mist2:#5A6E8C;--mist3:#3A4E6A;
   --white:#FFFFFF;
+  --text:#C8D8F0;
+  --fill1:rgba(255,255,255,.03);--fill2:rgba(255,255,255,.04);
+  --fill3:rgba(255,255,255,.05);--fill4:rgba(255,255,255,.06);
   --mono:'Space Mono',monospace;
   --sans:'Space Grotesk',sans-serif;
 }
-html,body{height:100%;font-family:var(--sans);background:var(--ink);color:#C8D8F0;-webkit-font-smoothing:antialiased;overflow:hidden}
+html,body{height:100%;font-family:var(--sans);background:var(--ink);color:var(--text);-webkit-font-smoothing:antialiased;overflow:hidden}
 
 /* ── NOISE TEXTURE ── */
 body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-events:none;
@@ -56,11 +59,13 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .lang-sw{display:flex;background:var(--ink3);border:1px solid var(--edge);border-radius:6px;padding:2px;gap:1px}
 .lang-sw button{padding:3px 10px;border-radius:4px;border:none;background:transparent;color:var(--mist);font-size:10px;font-weight:600;cursor:pointer;font-family:var(--sans);letter-spacing:.05em;transition:all .15s}
 .lang-sw button.on{background:var(--sky);color:var(--white);box-shadow:0 2px 6px rgba(79,142,247,.4)}
+.theme-toggle{width:32px;height:32px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--mist);cursor:pointer;font-size:14px;display:grid;place-items:center;transition:all .2s;flex-shrink:0}
+.theme-toggle:hover{background:var(--ink3);color:var(--text);border-color:var(--edge2);transform:rotate(20deg)}
 
 /* ── NOTIFICATION BELL ── */
 .bell-wrap{position:relative}
 .bell-btn{position:relative;width:32px;height:32px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--mist);cursor:pointer;display:grid;place-items:center;font-size:15px;transition:all .15s}
-.bell-btn:hover{background:var(--ink3);color:#C8D8F0;border-color:var(--edge2)}
+.bell-btn:hover{background:var(--ink3);color:var(--text);border-color:var(--edge2)}
 .bell-btn.ringing{animation:bellRing 0.6s ease}
 @keyframes bellRing{0%,100%{transform:rotate(0)}20%{transform:rotate(-15deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(5deg)}}
 .bell-badge{position:absolute;top:-4px;right:-4px;background:var(--rose);color:var(--white);font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 0 0 2px var(--ink)}
@@ -74,7 +79,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .bell-item:hover{background:rgba(79,142,247,.07)}
 .bell-item.unread{background:rgba(244,91,105,.05)}
 .bi-body{flex:1;min-width:0;text-align:left;background:transparent;border:none;cursor:pointer;padding:0;font-family:var(--sans)}
-.bi-main{font-size:12.5px;color:#C8D8F0;line-height:1.5;font-weight:500}
+.bi-main{font-size:12.5px;color:var(--text);line-height:1.5;font-weight:500}
 .bi-main b{color:var(--white)}
 .bi-sub{font-size:11px;color:var(--sky2);font-weight:600;margin-top:4px}
 .bi-time{font-size:9px;font-family:var(--mono);color:var(--mist3);margin-top:5px}
@@ -84,7 +89,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 
 /* quick-reply buttons inside chat */
 .qr-row{display:flex;gap:8px;margin-top:12px}
-.qr-btn{padding:8px 16px;border-radius:20px;border:1px solid var(--edge2);background:rgba(255,255,255,.04);color:#C8D8F0;font-size:12px;font-weight:600;font-family:var(--sans);cursor:pointer;transition:all .15s}
+.qr-btn{padding:8px 16px;border-radius:20px;border:1px solid var(--edge2);background:var(--fill2);color:var(--text);font-size:12px;font-weight:600;font-family:var(--sans);cursor:pointer;transition:all .15s}
 .qr-btn:hover{border-color:rgba(79,142,247,.4);background:rgba(79,142,247,.1)}
 .qr-btn.yes{border-color:rgba(34,211,176,.3);color:var(--mint)}
 .qr-btn.yes:hover{background:rgba(34,211,176,.1)}
@@ -122,7 +127,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .lficon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--mist3);pointer-events:none;transition:color .2s}
 .lfinput{
   width:100%;padding:12px 14px 12px 42px;
-  background:rgba(255,255,255,.04);border:1px solid var(--edge2);border-radius:10px;
+  background:var(--fill2);border:1px solid var(--edge2);border-radius:10px;
   font-size:14px;font-family:var(--sans);color:var(--white);
   outline:none;transition:all .2s;-webkit-appearance:none
 }
@@ -160,7 +165,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .demo-panel{background:rgba(20,25,40,.6);backdrop-filter:blur(20px);border:1px solid var(--edge);border-radius:14px;padding:16px 18px}
 .demo-hd{font-size:9px;font-family:var(--mono);letter-spacing:.1em;color:var(--mist3);text-transform:uppercase;margin-bottom:10px}
 .demo-g{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.demo-c{padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--edge);cursor:pointer;transition:all .2s}
+.demo-c{padding:8px 10px;border-radius:8px;background:var(--fill1);border:1px solid var(--edge);cursor:pointer;transition:all .2s}
 .demo-c:hover{background:rgba(79,142,247,.1);border-color:rgba(79,142,247,.25);transform:translateY(-1px)}
 .demo-f{font-size:10px;font-weight:600;color:var(--mist);margin-bottom:2px}
 .demo-k{font-size:10px;font-family:var(--mono);color:var(--sky2)}
@@ -179,7 +184,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .sb-name{font-size:14px;font-weight:600;color:var(--white);letter-spacing:-.02em;margin-bottom:1px}
 .sb-plan{font-size:11px;font-family:var(--mono);color:var(--mist2)}
 
-.router-pill{margin-top:10px;padding:9px 11px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid var(--edge)}
+.router-pill{margin-top:10px;padding:9px 11px;border-radius:9px;background:var(--fill1);border:1px solid var(--edge)}
 .rp-hd{font-size:8px;font-family:var(--mono);letter-spacing:.12em;color:var(--mist3);text-transform:uppercase;margin-bottom:7px}
 .rp-row{display:flex;justify-content:space-between;font-size:11px;padding:2px 0}
 .rp-k{color:var(--mist2)}.rp-v{font-family:var(--mono);font-size:10px;color:var(--sky2)}
@@ -192,7 +197,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .sb-nav{flex:1;padding:10px 8px}
 .sb-nl{font-size:8px;font-family:var(--mono);letter-spacing:.12em;color:var(--mist3);text-transform:uppercase;padding:0 8px;margin-bottom:6px}
 .nb{width:100%;display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;border:none;background:transparent;color:var(--mist);font-size:13px;font-family:var(--sans);cursor:pointer;transition:all .15s;text-align:left;font-weight:500;position:relative}
-.nb:hover{background:rgba(255,255,255,.05);color:#C8D8F0}
+.nb:hover{background:var(--fill3);color:var(--text)}
 .nb.on{background:rgba(79,142,247,.12);color:var(--sky2)}
 .nb.on::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:2px;border-radius:2px;background:var(--sky)}
 .nb-ic{font-size:16px;width:20px;text-align:center}
@@ -214,7 +219,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .ag-st.busy{color:var(--gold2)}
 .hd-actions{margin-left:auto;display:flex;gap:7px}
 .hd-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--mist2);cursor:pointer;display:grid;place-items:center;font-size:14px;transition:all .15s}
-.hd-btn:hover{background:var(--ink3);color:#C8D8F0;border-color:var(--edge2)}
+.hd-btn:hover{background:var(--ink3);color:var(--text);border-color:var(--edge2)}
 
 /* messages */
 .msgs{flex:1;overflow-y:auto;padding:26px 22px;display:flex;flex-direction:column;gap:18px;scroll-behavior:smooth}
@@ -228,7 +233,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .wtitle{font-size:23px;font-weight:700;letter-spacing:-.04em;color:var(--white)}
 .wsub{font-size:13px;color:var(--mist);max-width:300px;line-height:1.7}
 .qgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:6px;width:100%;max-width:360px}
-.qbtn{padding:13px 14px;border-radius:13px;border:1px solid var(--edge2);background:rgba(255,255,255,.03);cursor:pointer;font-family:var(--sans);transition:all .2s;text-align:left;display:flex;flex-direction:column;gap:3px;position:relative;overflow:hidden}
+.qbtn{padding:13px 14px;border-radius:13px;border:1px solid var(--edge2);background:var(--fill1);cursor:pointer;font-family:var(--sans);transition:all .2s;text-align:left;display:flex;flex-direction:column;gap:3px;position:relative;overflow:hidden}
 .qbtn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(79,142,247,.1),transparent);opacity:0;transition:opacity .2s}
 .qbtn:hover::before{opacity:1}
 .qbtn:hover{border-color:rgba(79,142,247,.3);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.3)}
@@ -252,15 +257,15 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 /* diagnostic trace */
 .dtrace{margin-top:12px;display:flex;flex-direction:column;gap:3px}
 .dhead{font-size:9px;font-family:var(--mono);letter-spacing:.1em;color:var(--mist3);text-transform:uppercase;margin-bottom:4px;padding:0 2px}
-.dstep{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);transition:background .15s;cursor:default}
-.dstep:hover{background:rgba(255,255,255,.06)}
+.dstep{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:9px;background:var(--fill1);border:1px solid var(--fill3);transition:background .15s;cursor:default}
+.dstep:hover{background:var(--fill4)}
 .dstatus{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:8px;font-weight:800;flex-shrink:0}
 .dstatus.ok{background:rgba(34,211,176,.15);color:var(--mint)}
 .dstatus.err{background:rgba(244,91,105,.15);color:var(--rose2)}
 .dstatus.warn{background:rgba(244,167,42,.15);color:var(--gold2)}
 .dinfo{flex:1;min-width:0}
-.dlayer{font-size:11px;font-weight:600;color:#C8D8F0;display:flex;align-items:center;gap:5px}
-.dport{font-family:var(--mono);font-size:8px;color:var(--mist3);background:rgba(255,255,255,.05);padding:1px 5px;border-radius:3px}
+.dlayer{font-size:11px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:5px}
+.dport{font-family:var(--mono);font-size:8px;color:var(--mist3);background:var(--fill3);padding:1px 5px;border-radius:3px}
 .ddesc{font-size:10px;color:var(--mist);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dresult{font-family:var(--mono);font-size:9px;margin-left:auto;flex-shrink:0}
 .dresult.ok{color:var(--mint)}.dresult.err{color:var(--rose2)}.dresult.warn{color:var(--gold2)}
@@ -275,9 +280,9 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 
 /* input */
 .input-area{padding:15px 22px;background:rgba(10,14,26,.7);backdrop-filter:blur(20px);border-top:1px solid var(--edge);flex-shrink:0}
-.ibox{display:flex;align-items:flex-end;gap:9px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);border-radius:15px;padding:7px 7px 7px 17px;transition:all .2s}
+.ibox{display:flex;align-items:flex-end;gap:9px;background:var(--fill2);border:1px solid var(--edge2);border-radius:15px;padding:7px 7px 7px 17px;transition:all .2s}
 .ibox:focus-within{border-color:rgba(79,142,247,.4);box-shadow:0 0 0 3px rgba(79,142,247,.08)}
-#userinput{flex:1;background:transparent;border:none;outline:none;font-size:13.5px;font-family:var(--sans);color:#C8D8F0;resize:none;min-height:22px;max-height:120px;line-height:1.6;padding:3px 0}
+#userinput{flex:1;background:transparent;border:none;outline:none;font-size:13.5px;font-family:var(--sans);color:var(--text);resize:none;min-height:22px;max-height:120px;line-height:1.6;padding:3px 0}
 #userinput::placeholder{color:var(--mist3)}
 .sbtn{width:40px;height:40px;border-radius:11px;border:none;flex-shrink:0;background:linear-gradient(135deg,#1E40AF,var(--sky));color:var(--white);cursor:pointer;display:grid;place-items:center;transition:all .2s;box-shadow:0 3px 12px rgba(79,142,247,.3)}
 .sbtn:hover:not(:disabled){transform:scale(1.07);box-shadow:0 5px 18px rgba(79,142,247,.4)}
@@ -293,6 +298,40 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .tk-cnt{font-size:10px;font-family:var(--mono);color:var(--mist2);background:var(--ink3);border:1px solid var(--edge);padding:3px 9px;border-radius:4px}
 .tklist{flex:1;overflow-y:auto;padding:14px 22px;display:flex;flex-direction:column;gap:8px}
 .tklist::-webkit-scrollbar{width:3px}.tklist::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:2px}
+
+/* My Network (analytics) */
+.anlist{flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:16px}
+.anlist::-webkit-scrollbar{width:3px}.anlist::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:2px}
+.an-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.an-tile{padding:14px 14px 12px;border-radius:11px;background:var(--fill1);border:1px solid var(--edge)}
+.an-tile-lbl{font-size:9px;font-weight:700;color:var(--mist2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.an-tile-val{font-family:var(--mono);font-weight:700;font-size:24px;line-height:1}
+.an-tile-val.mint{color:var(--mint)}.an-tile-val.gold{color:var(--gold)}.an-tile-val.sky{color:var(--sky2)}
+.an-tile-sub{font-size:10px;color:var(--mist2);margin-top:6px}
+.an-panel{border-radius:12px;background:var(--fill1);border:1px solid var(--edge);overflow:hidden}
+.an-panel-hd{padding:12px 16px;border-bottom:1px solid var(--edge);font-size:11px;font-weight:700;color:var(--mist);text-transform:uppercase;letter-spacing:.08em}
+.an-bars{padding:16px;display:flex;flex-direction:column;gap:10px}
+.an-bar-row{display:grid;grid-template-columns:110px 1fr 28px;align-items:center;gap:10px}
+.an-bar-label{font-family:var(--mono);font-size:10px;color:var(--mist2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:capitalize}
+.an-bar-track{height:12px;background:var(--fill3);border-radius:4px;overflow:hidden}
+.an-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--rose2),var(--rose));transition:width .6s cubic-bezier(.22,1,.36,1)}
+.an-bar-value{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--rose2);text-align:right}
+.an-empty{text-align:center;padding:26px;color:var(--mist2);font-size:11px}
+.an-trend-wrap{position:relative;padding:16px}
+.an-trend-svg{width:100%;height:160px;display:block;overflow:visible}
+.an-trend-grid{stroke:var(--fill4);stroke-width:1}
+.an-trend-axis-lbl{font-family:var(--mono);font-size:8px;fill:var(--mist2)}
+.an-trend-area{fill:url(#anTrendGradient)}
+.an-trend-line{fill:none;stroke:var(--mint);stroke-width:2}
+.an-trend-hover-line{stroke:var(--sky);stroke-width:1;stroke-dasharray:3 3;opacity:0}
+.an-trend-hover-dot{fill:var(--mint);stroke:var(--ink);stroke-width:2;opacity:0}
+.an-trend-tooltip{
+  position:absolute;pointer-events:none;background:var(--ink3);border:1px solid var(--edge2);
+  border-radius:7px;padding:6px 10px;font-family:var(--mono);font-size:10px;color:var(--text);
+  box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;transition:opacity .1s;white-space:nowrap;transform:translate(-50%,-115%);
+}
+.an-trend-tooltip .tt-pct{color:var(--mint);font-weight:700}
+@media (max-width:640px){.an-grid{grid-template-columns:1fr}}
 
 .tkcard{padding:15px 17px;border-radius:14px;background:rgba(20,25,40,.7);border:1px solid var(--edge);cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
 .tkcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
@@ -312,19 +351,19 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .tkproblem{font-size:13px;font-weight:600;color:var(--white);margin-bottom:5px}
 .tkmeta{display:flex;gap:14px;flex-wrap:wrap}
 .tkfault{font-size:11px;color:var(--mist)}
-.tkfault span{font-family:var(--mono);color:#C8D8F0;font-size:10px}
+.tkfault span{font-family:var(--mono);color:var(--text);font-size:10px}
 
 /* expanded ticket detail */
 .tkdetail{display:none;flex-direction:column;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--edge)}
 .tkcard.expanded .tkdetail{display:flex}
 .state-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.state-panel{padding:10px 12px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid var(--edge)}
+.state-panel{padding:10px 12px;border-radius:9px;background:var(--fill1);border:1px solid var(--edge)}
 .state-ph{font-size:8px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;font-weight:700}
 .state-panel.before .state-ph{color:var(--rose2)}
 .state-panel.after .state-ph{color:var(--mint)}
 .srow{display:flex;justify-content:space-between;font-size:10px;padding:2px 0}
 .sk{color:var(--mist)}.sv{font-family:var(--mono);font-size:9px}
-.sv.g{color:var(--mint)}.sv.r{color:var(--rose2)}.sv.n{color:#C8D8F0}
+.sv.g{color:var(--mint)}.sv.r{color:var(--rose2)}.sv.n{color:var(--text)}
 
 /* empty state */
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--mist2);text-align:center;padding:40px}
@@ -348,6 +387,29 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .toast.show{transform:translateX(0)}
 .toast.ok{border-color:rgba(34,211,176,.3)}.toast.bad{border-color:rgba(244,91,105,.3)}
 
+/* ── IDLE-TIMEOUT WARNING ── */
+.idle-warn{
+  position:fixed;top:66px;left:50%;z-index:250;max-width:360px;
+  padding:14px 16px;border-radius:13px;
+  background:rgba(20,25,40,.97);backdrop-filter:blur(24px);
+  border:1px solid rgba(244,167,42,.35);
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;
+  transform:translate(-50%,-10px);transition:opacity .22s ease,transform .22s ease;
+}
+.idle-warn.show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.idle-warn-ic{font-size:20px;flex-shrink:0}
+.idle-warn-txt{font-size:12.5px;color:var(--text);line-height:1.45}
+.idle-warn-txt b{color:var(--white)}
+.idle-warn-btn{
+  padding:8px 14px;border-radius:9px;border:none;flex-shrink:0;
+  background:linear-gradient(135deg,#1E40AF,var(--sky));color:var(--white);
+  font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;
+  font-family:var(--sans);transition:transform .15s;
+}
+.idle-warn-btn:hover{transform:translateY(-1px)}
+
 /* ── EMAIL VERIFICATION GATE ── */
 #app.gated{filter:blur(10px) saturate(.7);pointer-events:none;user-select:none;transition:filter .25s ease}
 .egate{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:24px;
@@ -360,7 +422,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
 .egate-ic{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#1E40AF,var(--sky),var(--mint));display:grid;place-items:center;font-size:24px;margin-bottom:18px;box-shadow:0 8px 22px rgba(79,142,247,.3)}
 .egate-title{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--white);margin-bottom:8px}
 .egate-sub{font-size:12.5px;color:var(--mist);line-height:1.65;margin-bottom:24px}
-.egate-sub b{color:#C8D8F0;font-weight:600}
+.egate-sub b{color:var(--text);font-weight:600}
 .egate-step{display:none}
 .egate-step.on{display:block}
 .egate-code-row{display:flex;gap:8px}
@@ -383,6 +445,60 @@ body::before{content:'';position:fixed;inset:0;opacity:.03;z-index:0;pointer-eve
   .sb-mob-btn{display:grid}.bubble,.mwrap{max-width:88%}
 }
 
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── LIGHT MODE ─────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+body{transition:background .3s ease,color .25s ease}
+.aurora-band,.nav,nav,.sb,.lcard,.demo-panel,.chat-hd,.input-area,.bubble.a,.tbub,.tkcard,
+.toast,.bell-dd,.egate-card{transition:background .25s ease,border-color .22s ease,color .2s ease,box-shadow .2s ease}
+body.light{
+  --ink:#F2F6FB;--ink2:#FFFFFF;--ink3:#E8EEF7;--ink4:#DCE5F2;
+  --edge:rgba(10,40,80,.10);--edge2:rgba(10,40,80,.18);
+  --sky:#006FB3;--sky2:#00589A;--sky3:#004480;
+  --mint:#00896A;--mint2:#006852;
+  --rose:#CC0030;--rose2:#99002A;
+  --gold:#A86800;--gold2:#8A5500;
+  --byrsa-lime:#6B8500;--byrsa-lime2:#566C00;
+  --mist:#2A4A66;--mist2:#4A6684;--mist3:#7691AC;
+  --text:#33445E;
+  --fill1:rgba(10,40,80,.035);--fill2:rgba(10,40,80,.05);
+  --fill3:rgba(10,40,80,.06);--fill4:rgba(10,40,80,.08);
+}
+body.light .aurora-band{opacity:.07}
+body.light::before{opacity:.02}
+
+/* raised glass surfaces — flip dark-tinted backgrounds to light */
+body.light nav{background:rgba(255,255,255,.8)}
+body.light .sb{background:rgba(255,255,255,.75)}
+body.light .chat-hd{background:rgba(255,255,255,.7)}
+body.light .input-area{background:rgba(255,255,255,.75)}
+body.light .lcard{background:rgba(255,255,255,.92);box-shadow:0 8px 32px rgba(10,40,80,.1)}
+body.light .demo-panel{background:rgba(255,255,255,.7)}
+body.light .bubble.a{background:rgba(255,255,255,.92);box-shadow:0 4px 16px rgba(10,40,80,.08)}
+body.light .tbub{background:rgba(255,255,255,.92)}
+body.light .tkcard{background:rgba(255,255,255,.85)}
+body.light .tkcard:hover{background:rgba(237,242,250,.97)}
+body.light .toast{background:rgba(255,255,255,.97);box-shadow:0 8px 28px rgba(10,40,80,.18)}
+body.light .idle-warn{background:rgba(255,255,255,.97);box-shadow:0 12px 32px rgba(10,40,80,.2)}
+body.light .bell-dd{background:rgba(255,255,255,.98);box-shadow:0 16px 40px rgba(10,40,80,.16)}
+body.light .egate-card{background:rgba(255,255,255,.96);box-shadow:0 24px 60px rgba(10,40,80,.2)}
+
+/* headings/labels that used literal white text on a (now-flipped) dark surface */
+body.light .bell-dd-hd,body.light .bi-main b,body.light .ltitle,body.light .lfinput,
+body.light .sb-name,body.light .ag-nm,body.light .wtitle,body.light .ql,
+body.light .tk-title,body.light .tkproblem,body.light .toast,body.light .egate-title,
+body.light .idle-warn-txt b{
+  color:#071525;
+}
+
+/* scrollbar thumbs + misc literal fills that weren't consolidated into --fillN */
+body.light .bell-dd::-webkit-scrollbar-thumb,body.light .msgs::-webkit-scrollbar-thumb,
+body.light .tklist::-webkit-scrollbar-thumb,body.light .anlist::-webkit-scrollbar-thumb{
+  background:rgba(10,40,80,.15);
+}
+body.light .bubble code{background:rgba(10,40,80,.08)}
+body.light .an-trend-grid{stroke:rgba(10,40,80,.1)}
+
 /* ── ACCESSIBILITY ── */
 :focus-visible{outline:2px solid var(--sky2);outline-offset:2px;border-radius:6px}
 button:focus:not(:focus-visible){outline:none}
@@ -394,6 +510,11 @@ button:focus:not(:focus-visible){outline:none}
 <body>
 <div class="aurora"><div class="aurora-band"></div><div class="aurora-band"></div><div class="aurora-band"></div></div>
 <div class="toast" id="toast"></div>
+<div class="idle-warn" id="idle-warn" role="alert">
+  <span class="idle-warn-ic">⏱</span>
+  <span class="idle-warn-txt" id="idle-warn-txt"></span>
+  <button class="idle-warn-btn" id="idle-warn-btn" onclick="stayLoggedIn()">Stay signed in</button>
+</div>
 <div class="mob-overlay" id="mob-ov" onclick="closeSB()"></div>
 
 <!-- EMAIL VERIFICATION GATE -->
@@ -469,6 +590,7 @@ button:focus:not(:focus-visible){outline:none}
       <button id="lfr" onclick="setLang('fr')">FR</button>
       <button id="len" class="on" onclick="setLang('en')">EN</button>
     </div>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark mode">🌙</button>
   </div>
 </nav>
 
@@ -505,17 +627,17 @@ button:focus:not(:focus-visible){outline:none}
     <div class="demo-panel">
       <div class="demo-hd" id="demo-hd">🧪 Test Accounts — click to autofill</div>
       <div class="demo-g">
-        <div class="demo-c" onclick="fill('0661234567','1234')"><div class="demo-f">PPP Auth Failure</div><div class="demo-k">0661234567 · 1234</div></div>
-        <div class="demo-c" onclick="fill('0662345678','2345')"><div class="demo-f">Weak Signal</div><div class="demo-k">0662345678 · 2345</div></div>
-        <div class="demo-c" onclick="fill('0664567890','4567')"><div class="demo-f">VLAN Mismatch</div><div class="demo-k">0664567890 · 4567</div></div>
-        <div class="demo-c" onclick="fill('0666789012','6789')"><div class="demo-f">DNS Failure</div><div class="demo-k">0666789012 · 6789</div></div>
-        <div class="demo-c" onclick="fill('0663456789','3456')"><div class="demo-f">✓ Healthy Line</div><div class="demo-k">0663456789 · 3456</div></div>
+        <div class="demo-c" onclick="fill('0661234567','1234')"><div class="demo-f" id="demo-f1">PPP Auth Failure</div><div class="demo-k">0661234567 · 1234</div></div>
+        <div class="demo-c" onclick="fill('0662345678','2345')"><div class="demo-f" id="demo-f2">Weak Signal</div><div class="demo-k">0662345678 · 2345</div></div>
+        <div class="demo-c" onclick="fill('0664567890','4567')"><div class="demo-f" id="demo-f3">VLAN Mismatch</div><div class="demo-k">0664567890 · 4567</div></div>
+        <div class="demo-c" onclick="fill('0666789012','6789')"><div class="demo-f" id="demo-f4">DNS Failure</div><div class="demo-k">0666789012 · 6789</div></div>
+        <div class="demo-c" onclick="fill('0663456789','3456')"><div class="demo-f" id="demo-f5">✓ Healthy Line</div><div class="demo-k">0663456789 · 3456</div></div>
       </div>
     </div>
     <div class="footer-credit">
       <span>Byrsa</span><span class="sep">·</span>
       <a href="https://byrsa.ai/en/" target="_blank" rel="noopener noreferrer">byrsa.ai</a><span class="sep">·</span>
-      <span>Built by</span>
+      <span id="foot-built-by">Built by</span>
       <a href="https://tritux.com" target="_blank" rel="noopener noreferrer">Tritux Groupe</a><span class="sep">·</span>
       <a href="https://www.linkedin.com/company/byrsa-ai/posts/?feedView=all" target="_blank" rel="noopener noreferrer">LinkedIn</a>
     </div>
@@ -530,11 +652,11 @@ button:focus:not(:focus-visible){outline:none}
       <div class="sb-name" id="sb-name">—</div>
       <div class="sb-plan" id="sb-plan">—</div>
       <div class="router-pill">
-        <div class="rp-hd">Router</div>
-        <div class="rp-row"><span class="rp-k">Model</span><span class="rp-v" id="rp-model">—</span></div>
-        <div class="rp-row"><span class="rp-k">Tech</span><span class="rp-v" id="rp-tech">—</span></div>
-        <div class="rp-row"><span class="rp-k">Vendor</span><span class="rp-v" id="rp-vendor">—</span></div>
-        <div class="rp-row"><span class="rp-k">Serial</span><span class="rp-v" id="rp-serial">—</span></div>
+        <div class="rp-hd" id="rp-hd">Router</div>
+        <div class="rp-row"><span class="rp-k" id="rp-k-model">Model</span><span class="rp-v" id="rp-model">—</span></div>
+        <div class="rp-row"><span class="rp-k" id="rp-k-tech">Tech</span><span class="rp-v" id="rp-tech">—</span></div>
+        <div class="rp-row"><span class="rp-k" id="rp-k-vendor">Vendor</span><span class="rp-v" id="rp-vendor">—</span></div>
+        <div class="rp-row"><span class="rp-k" id="rp-k-serial">Serial</span><span class="rp-v" id="rp-serial">—</span></div>
       </div>
       <div class="conn-badge ok" id="conn-badge"><span id="cb-ico">●</span><span id="cb-txt">Services Online</span></div>
     </div>
@@ -542,10 +664,11 @@ button:focus:not(:focus-visible){outline:none}
       <div class="sb-nl" id="sb-nl">Navigation</div>
       <button class="nb on" id="nb-chat" onclick="showView('chat')" aria-current="page"><span class="nb-ic" aria-hidden="true">💬</span><span id="nb-chat-l">Support Chat</span></button>
       <button class="nb" id="nb-tk" onclick="showView('tickets')"><span class="nb-ic" aria-hidden="true">🎫</span><span id="nb-tk-l">My Tickets</span><span class="nb-badge" id="tk-badge" aria-label="unread tickets">0</span></button>
+      <button class="nb" id="nb-an" onclick="showView('analytics')"><span class="nb-ic" aria-hidden="true">📊</span><span id="nb-an-l">My Network</span></button>
     </nav>
     <div class="sb-foot">
       <button class="sb-out" onclick="doLogout()">↩ <span id="sb-out-l">Sign Out</span></button>
-      <div class="sb-credit">Powered by <b style="color:var(--mist)">Byrsa</b> · <a href="https://tritux.com" target="_blank" rel="noopener noreferrer">Tritux Groupe</a></div>
+      <div class="sb-credit"><span id="sb-powered-by">Powered by</span> <b style="color:var(--mist)">Byrsa</b> · <a href="https://tritux.com" target="_blank" rel="noopener noreferrer">Tritux Groupe</a></div>
     </div>
   </aside>
 
@@ -558,7 +681,7 @@ button:focus:not(:focus-visible){outline:none}
         <div class="ag-st" id="ag-st">Online · Ready to help</div>
       </div>
       <div class="hd-actions">
-        <button class="hd-btn" onclick="clearChat()" title="Clear chat" aria-label="Clear chat">🗑</button>
+        <button class="hd-btn" id="clear-chat-btn" onclick="clearChat()" title="Clear chat" aria-label="Clear chat">🗑</button>
       </div>
     </div>
     <div class="msgs" id="msgs"></div>
@@ -581,12 +704,67 @@ button:focus:not(:focus-visible){outline:none}
     </div>
     <div class="tklist" id="tklist"></div>
   </div>
+
+  <!-- My Network (analytics) view -->
+  <div class="tkview" id="an-view">
+    <div class="tkhd">
+      <span class="tk-title" id="an-title">My Network</span>
+      <span class="tk-cnt" id="an-range">—</span>
+    </div>
+    <div class="anlist" id="anlist">
+      <div class="an-grid">
+        <div class="an-tile">
+          <div class="an-tile-lbl" id="an-uptime-lbl">Router Uptime</div>
+          <div class="an-tile-val mint" id="an-uptime">—</div>
+          <div class="an-tile-sub" id="an-uptime-sub">right now</div>
+        </div>
+        <div class="an-tile">
+          <div class="an-tile-lbl" id="an-faults-lbl">Times Disconnected</div>
+          <div class="an-tile-val gold" id="an-faults">—</div>
+          <div class="an-tile-sub" id="an-faults-sub">since tracking began</div>
+        </div>
+        <div class="an-tile">
+          <div class="an-tile-lbl" id="an-mttr-lbl">Avg Time to Fix</div>
+          <div class="an-tile-val sky" id="an-mttr">—</div>
+          <div class="an-tile-sub" id="an-mttr-sub">auto-recovery</div>
+        </div>
+      </div>
+
+      <div class="an-panel">
+        <div class="an-panel-hd" id="an-faulttypes-hd">Fault Types</div>
+        <div class="an-bars" id="an-bars"></div>
+      </div>
+
+      <div class="an-panel">
+        <div class="an-panel-hd" id="an-trend-hd">Uptime Over Time</div>
+        <div class="an-trend-wrap">
+          <svg class="an-trend-svg" id="an-trend-svg" viewBox="0 0 560 160" preserveAspectRatio="none"></svg>
+          <div class="an-trend-tooltip" id="an-trend-tooltip"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 </div>
 </div>
 
 <script>
+// Theme — applied before the rest of the script runs so there's no flash of
+// the wrong theme on load.
+(function(){
+  const saved=localStorage.getItem('byrsa-theme');
+  if(saved==='light'||(saved===null&&window.matchMedia('(prefers-color-scheme: light)').matches))
+    document.body.classList.add('light');
+})();
+function applyThemeIcon(){const b=document.getElementById('theme-toggle');if(b)b.textContent=document.body.classList.contains('light')?'☀️':'🌙';}
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light');
+  localStorage.setItem('byrsa-theme',isLight?'light':'dark');
+  applyThemeIcon();
+}
+applyThemeIcon();
+
 const SK = 'tn_sess';
 let lang='en', cust=null, busy=false, tkCache=null;
 
@@ -597,17 +775,33 @@ const TX = {
     lflPhone:'Phone Number',lflPin:'PIN Code',lbtn:'Sign In',lbusy:'Signing in…',
     demoHd:'🧪 Test Accounts — click to autofill',
     wtitle:'How can I help you today?',wsub:'Describe your issue and our AI will diagnose and fix it automatically.',
+    wgreet:'Hello, {name}! 👋',wgreetAnon:'Hello! 👋',
     qa1:'No Internet',qa1s:'Connection is down',qa2:'Very Slow',qa2s:'Speed problem',
     qa3:'WiFi Issue',qa3s:"Can't connect",qa4:'My Tickets',qa4s:'View history',
     agReady:'Online · Ready to help',agBusy:'Analysing your connection…',
-    sbNl:'Navigation',nbChat:'Support Chat',nbTk:'My Tickets',sbOut:'Sign Out',
+    sbNl:'Navigation',nbChat:'Support Chat',nbTk:'My Tickets',nbAn:'My Network',sbOut:'Sign Out',
     tkTitle:'My Tickets',sysOk:'All systems online',sysWarn:'Services unavailable',
     emptyT:'No tickets yet',emptyS:'Your support history will appear here',
     diagHd:'DIAGNOSTIC TRACE',
+    rpRouter:'Router',rpModel:'Model',rpTech:'Tech',rpVendor:'Vendor',rpSerial:'Serial',
+    poweredBy:'Powered by',footBuiltBy:'Built by',
+    demoF1:'PPP Auth Failure',demoF2:'Weak Signal',demoF3:'VLAN Mismatch',demoF4:'DNS Failure',demoF5:'✓ Healthy Line',
+    anTitle:'My Network',
+    anUptimeLbl:'Router Uptime',anUptimeSub:'right now',
+    anFaultsLbl:'Times Disconnected',anFaultsSub:'since tracking began',
+    anMttrLbl:'Avg Time to Fix',anMttrSub:'auto-recovery',
+    anFaultTypesHd:'Fault Types',anTrendHd:'Uptime Over Time',anNoFaults:'No faults recorded on your router yet',
+    loadingTxt:'Loading…',errorLoadingTxt:'Error loading',faultLbl:'Fault:',fixLbl:'Fix:',
+    lmapRouterState:'Router State',lmapSchemaLookup:'Schema Lookup',lmapDiagnosis:'Diagnosis',lmapFixApplied:'Fix Applied',
+    clearChatTitle:'Clear chat',openMenuTitle:'Open menu',sendMsgTitle:'Send message',
     ihint:'Enter ↵ send · Shift+Enter new line',
     clearQ:'Clear chat history?',toastOut:'👋 Signed out',toastErr:'⚠ Connection error',
+    toastIdle:'⏱ Signed out after 1h of inactivity',
+    idleWarnMsg:"You'll be signed out in <b>{s}s</b> due to inactivity.",idleWarnBtn:'Stay signed in',
     connOk:'Services Online',connWarn:'Degraded',connErr:'Offline',
     stBefore:'BEFORE',stAfter:'AFTER',
+    stStatus:'Status',stFault:'Fault',stPpp:'PPP Connection',stVlan:'VLAN ID',stDns:'DNS Server',
+    stRx:'Optical Power',stUptime:'Uptime',stLastErr:'Last Error',stNone:'None',
     bellTitle:'Notifications',bellEmpty:'No notifications yet',bellSub:'Click to see more',bellDelete:'Delete notification',
     yesBtn:'Yes',noBtn:'No',
     botAskFix:'Would you like me to fix the problem?',
@@ -631,17 +825,33 @@ const TX = {
     lflPhone:'Numéro de téléphone',lflPin:'Code PIN',lbtn:'Se connecter',lbusy:'Connexion…',
     demoHd:'🧪 Comptes de test — cliquer pour remplir',
     wtitle:'Comment puis-je vous aider ?',wsub:'Décrivez votre problème, notre IA le diagnostique et répare automatiquement.',
+    wgreet:'Bonjour, {name} ! 👋',wgreetAnon:'Bonjour ! 👋',
     qa1:"Pas d'internet",qa1s:'Connexion coupée',qa2:'Très lent',qa2s:'Problème de débit',
     qa3:'Problème WiFi',qa3s:'WiFi inaccessible',qa4:'Mes Tickets',qa4s:"Voir l'historique",
     agReady:'En ligne · Prêt à vous aider',agBusy:'Analyse en cours…',
-    sbNl:'Navigation',nbChat:'Chat Support',nbTk:'Mes Tickets',sbOut:'Déconnexion',
+    sbNl:'Navigation',nbChat:'Chat Support',nbTk:'Mes Tickets',nbAn:'Mon Réseau',sbOut:'Déconnexion',
     tkTitle:'Mes Tickets',sysOk:'Tous les services actifs',sysWarn:'Services indisponibles',
     emptyT:'Aucun ticket',emptyS:"Votre historique apparaîtra ici",
     diagHd:'TRACE DIAGNOSTIQUE',
+    rpRouter:'Routeur',rpModel:'Modèle',rpTech:'Techno',rpVendor:'Fabricant',rpSerial:'Série',
+    poweredBy:'Propulsé par',footBuiltBy:'Développé par',
+    demoF1:"Échec Auth PPP",demoF2:'Signal Faible',demoF3:'VLAN Incorrect',demoF4:'Échec DNS',demoF5:'✓ Ligne Saine',
+    anTitle:'Mon Réseau',
+    anUptimeLbl:'Disponibilité Routeur',anUptimeSub:'en ce moment',
+    anFaultsLbl:'Nombre de Déconnexions',anFaultsSub:'depuis le début du suivi',
+    anMttrLbl:'Temps Moyen de Réparation',anMttrSub:'récupération automatique',
+    anFaultTypesHd:'Types de Pannes',anTrendHd:'Disponibilité dans le Temps',anNoFaults:'Aucune panne enregistrée sur votre routeur pour le moment',
+    loadingTxt:'Chargement…',errorLoadingTxt:'Erreur de chargement',faultLbl:'Panne :',fixLbl:'Correctif :',
+    lmapRouterState:'État du Routeur',lmapSchemaLookup:'Consultation du Schéma',lmapDiagnosis:'Diagnostic',lmapFixApplied:'Correctif Appliqué',
+    clearChatTitle:'Effacer le chat',openMenuTitle:'Ouvrir le menu',sendMsgTitle:'Envoyer le message',
     ihint:'Entrée ↵ envoyer · Maj+Entrée saut de ligne',
     clearQ:"Effacer l'historique du chat ?",toastOut:'👋 Déconnexion réussie',toastErr:'⚠ Erreur de connexion',
+    toastIdle:'⏱ Déconnecté après 1h d\'inactivité',
+    idleWarnMsg:'Vous serez déconnecté dans <b>{s}s</b> par inactivité.',idleWarnBtn:'Rester connecté',
     connOk:'Services actifs',connWarn:'Dégradé',connErr:'Hors ligne',
     stBefore:'AVANT',stAfter:'APRÈS',
+    stStatus:'Statut',stFault:'Panne',stPpp:'Connexion PPP',stVlan:'ID VLAN',stDns:'Serveur DNS',
+    stRx:'Puissance Optique',stUptime:'Disponibilité',stLastErr:'Dernière Erreur',stNone:'Aucune',
     bellTitle:'Notifications',bellEmpty:'Aucune notification',bellSub:'Cliquez pour en savoir plus',bellDelete:'Supprimer la notification',
     yesBtn:'Oui',noBtn:'Non',
     botAskFix:'Souhaitez-vous que je corrige le problème ?',
@@ -670,25 +880,49 @@ function setLang(l) {
   lang = l;
   document.getElementById('lfr')?.classList.toggle('on',l==='fr');
   document.getElementById('len')?.classList.toggle('on',l==='en');
-  applyTx();renderBellList();
+  applyTx();
 }
 function applyTx() {
   const map = {
     'ltag':t('ltag'),'lt1':t('lt1'),'lt2':t('lt2'),'lsub':t('lsub'),
     'lfl-phone':t('lflPhone'),'lfl-pin':t('lflPin'),'lbtn-txt':t('lbtn'),
     'demo-hd':t('demoHd'),'sb-nl':t('sbNl'),
-    'nb-chat-l':t('nbChat'),'nb-tk-l':t('nbTk'),'sb-out-l':t('sbOut'),
+    'nb-chat-l':t('nbChat'),'nb-tk-l':t('nbTk'),'nb-an-l':t('nbAn'),'sb-out-l':t('sbOut'),
     'tk-title':t('tkTitle'),'ihint':t('ihint'),'ag-nm':'Byrsa AI Agent',
     'egate-title':t('egateTitle'),'egate-sub-email':t('egateSubEmail'),
     'egate-fl-email':t('egateFlEmail'),'egate-send-txt':t('egateSend'),
     'egate-code-title':t('egateCodeTitle'),'egate-fl-code':t('egateFlCode'),
     'egate-verify-txt':t('egateVerify'),'egate-change-btn':t('egateChangeEmail'),
-    'egate-signout-btn':t('egateSignOut')
+    'egate-signout-btn':t('egateSignOut'),
+    'demo-f1':t('demoF1'),'demo-f2':t('demoF2'),'demo-f3':t('demoF3'),'demo-f4':t('demoF4'),'demo-f5':t('demoF5'),
+    'foot-built-by':t('footBuiltBy'),'sb-powered-by':t('poweredBy'),
+    'rp-hd':t('rpRouter'),'rp-k-model':t('rpModel'),'rp-k-tech':t('rpTech'),
+    'rp-k-vendor':t('rpVendor'),'rp-k-serial':t('rpSerial'),
+    'an-title':t('anTitle'),
+    'an-uptime-lbl':t('anUptimeLbl'),'an-uptime-sub':t('anUptimeSub'),
+    'an-faults-lbl':t('anFaultsLbl'),'an-faults-sub':t('anFaultsSub'),
+    'an-mttr-lbl':t('anMttrLbl'),'an-mttr-sub':t('anMttrSub'),
+    'an-faulttypes-hd':t('anFaultTypesHd'),'an-trend-hd':t('anTrendHd'),
   };
   Object.entries(map).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=v;});
   const ui=document.getElementById('userinput');if(ui)ui.placeholder=t('wsub').slice(0,40)+'…';
   const rb=document.getElementById('egate-resend-btn');
   if(rb&&!rb.disabled)rb.textContent=t('egateResend');
+  const mb=document.getElementById('mob-btn');if(mb)mb.setAttribute('aria-label',t('openMenuTitle'));
+  const sb=document.getElementById('sbtn');if(sb)sb.setAttribute('aria-label',t('sendMsgTitle'));
+  const cc=document.getElementById('clear-chat-btn');
+  if(cc){cc.title=t('clearChatTitle');cc.setAttribute('aria-label',t('clearChatTitle'));}
+  const iwb=document.getElementById('idle-warn-btn');if(iwb)iwb.textContent=t('idleWarnBtn');
+  // Re-render dynamic views that bake language-specific text into their cached HTML.
+  if(document.getElementById('welcome')) renderWelcome();
+  if(tkCache) renderTK(tkCache);
+  if(anCache){
+    renderAnBars(anCache.fault_frequency_by_model);
+    document.getElementById('an-range').textContent=(anCache.uptime_pct_series&&anCache.uptime_pct_series.length)
+      ?new Date(anCache.uptime_pct_series[0].t).toLocaleTimeString(lang==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'})+' → '+new Date(anCache.uptime_pct_series[anCache.uptime_pct_series.length-1].t).toLocaleTimeString(lang==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'})
+      :'—';
+  }
+  renderBellList();
 }
 
 /* SESSION */
@@ -900,10 +1134,21 @@ function populateSB(){
 function showView(v){
   const cv=document.getElementById('chat-view');
   const tv=document.getElementById('tk-view');
+  const av=document.getElementById('an-view');
   const nc=document.getElementById('nb-chat');
   const nt=document.getElementById('nb-tk');
-  if(v==='chat'){cv.style.display='flex';tv.classList.remove('on');nc.classList.add('on');nt.classList.remove('on');nc.setAttribute('aria-current','page');nt.removeAttribute('aria-current');}
-  else{cv.style.display='none';tv.classList.add('on');nc.classList.remove('on');nt.classList.add('on');nc.removeAttribute('aria-current');nt.setAttribute('aria-current','page');loadTK();}
+  const na=document.getElementById('nb-an');
+  cv.style.display=v==='chat'?'flex':'none';
+  tv.classList.toggle('on',v==='tickets');
+  av.classList.toggle('on',v==='analytics');
+  nc.classList.toggle('on',v==='chat');
+  nt.classList.toggle('on',v==='tickets');
+  na.classList.toggle('on',v==='analytics');
+  [[nc,v==='chat'],[nt,v==='tickets'],[na,v==='analytics']].forEach(([el,active])=>{
+    if(active) el.setAttribute('aria-current','page'); else el.removeAttribute('aria-current');
+  });
+  if(v==='tickets') loadTK();
+  if(v==='analytics') loadAnalytics();
   closeSB();
 }
 
@@ -913,10 +1158,12 @@ function closeSB(){document.getElementById('sb').classList.remove('open');docume
 
 /* WELCOME */
 function renderWelcome(){
+  const first=(cust?.name||'').trim().split(' ')[0];
+  const greet=first?t('wgreet').replace('{name}',first):t('wgreetAnon');
   document.getElementById('msgs').innerHTML=`
   <div class="welcome" id="welcome">
     <div class="wicon">👋</div>
-    <h2 class="wtitle">${t('wtitle')}</h2>
+    <h2 class="wtitle">${greet}<br>${t('wtitle')}</h2>
     <p class="wsub">${t('wsub')}</p>
     <div class="qgrid">
       <button class="qbtn" onclick="sendQ('d')"><span class="qi">🔴</span><span class="ql">${t('qa1')}</span><span class="qd">${t('qa1s')}</span></button>
@@ -930,7 +1177,7 @@ function rmWelcome(){document.getElementById('welcome')?.remove();}
 function clearChat(){if(!confirm(t('clearQ')))return;document.getElementById('msgs').innerHTML='';renderWelcome();}
 
 /* MESSAGING */
-const LMAP={'GenieACS MCP':{ic:'📡',port:'8001',lbl:'Router State'},'Neo4j MCP':{ic:'🧠',port:'8000',lbl:'Schema Lookup'},'Diagnostic Engine':{ic:'🔍',port:'5000',lbl:'Diagnosis'},'RaDuce MCP':{ic:'🔧',port:'8002',lbl:'Fix Applied'}};
+const getLMAP=()=>({'GenieACS MCP':{ic:'📡',port:'8001',lbl:t('lmapRouterState')},'Neo4j MCP':{ic:'🧠',port:'8000',lbl:t('lmapSchemaLookup')},'Diagnostic Engine':{ic:'🔍',port:'5000',lbl:t('lmapDiagnosis')},'RaDuce MCP':{ic:'🔧',port:'8002',lbl:t('lmapFixApplied')}});
 
 function now(){return new Date().toLocaleTimeString(lang==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'});}
 function md(t){return(t||'').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>');}
@@ -949,15 +1196,16 @@ function addMsg(role,content,steps=[]){
     if(vis.length){
       const tr=document.createElement('div');tr.className='dtrace';
       tr.innerHTML=`<div class="dhead">${t('diagHd')}</div>`;
+      const lmap=getLMAP();
       vis.forEach(s=>{
-        const cfg=LMAP[s.layer]||{ic:'⚙️',port:'—',lbl:s.layer};
+        const cfg=lmap[s.layer]||{ic:'⚙️',port:'—',lbl:s.layer};
         const isOk=s.ok!==false&&!s.result?.error;
         const isW=s.layer==='Neo4j MCP'&&s.result?.warning;
         const sc=isW?'warn':(isOk?'ok':'err');
         const si=isW?'⚠':(isOk?'✓':'✗');
         let desc=s.description||s.tool||'';
-        if(s.result?.fault_detected)desc=`Fault: ${s.result.fault_detected.replace(/_/g,' ')}`;
-        else if(s.result?.fix_tool)desc=`Fix: ${s.result.fix_tool.replace(/_/g,' ')}`;
+        if(s.result?.fault_detected)desc=`${t('faultLbl')} ${s.result.fault_detected.replace(/_/g,' ')}`;
+        else if(s.result?.fix_tool)desc=`${t('fixLbl')} ${s.result.fix_tool.replace(/_/g,' ')}`;
         else if(s.result?.warning)desc=s.result.warning.slice(0,55);
         const step=document.createElement('div');step.className='dstep';
         step.innerHTML=`<div class="dstatus ${sc}">${si}</div><div class="dinfo"><div class="dlayer">${cfg.ic} ${cfg.lbl}<span class="dport">:${cfg.port}</span></div><div class="ddesc">${desc}</div></div><div class="dresult ${sc}">${isOk?'OK':isW?'WARN':'ERR'}</div>`;
@@ -1155,11 +1403,31 @@ async function loadTKBadge(){
 async function loadTK(){
   const list=document.getElementById('tklist');
   if(tkCache){renderTK(tkCache);return;}
-  list.innerHTML=`<div class="empty"><div class="empty-ico">⚙️</div><div class="empty-t">Loading…</div></div>`;
+  list.innerHTML=`<div class="empty"><div class="empty-ico">⚙️</div><div class="empty-t">${t('loadingTxt')}</div></div>`;
   try{
     const r=await fetch('/api/tickets');if(!r.ok)throw new Error();
     tkCache=await r.json();renderTK(tkCache);
-  }catch{list.innerHTML=`<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-t">Error loading</div></div>`;}
+  }catch{list.innerHTML=`<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-t">${t('errorLoadingTxt')}</div></div>`;}
+}
+
+// Router state snapshots store the readable fields under .parameters_named
+// (snake_case role names, e.g. ppp_connection_status/vlan_id/rx_optical_power),
+// not as flat PascalCase keys — build the before/after rows from there, plus
+// the top-level status/fault as the "simple" at-a-glance details.
+function stateRows(state){
+  if(!state||!Object.keys(state).length) return '';
+  const p=state.parameters_named||{};
+  const gv=v=>['Connected','None','UP'].includes(v)?'g':['Disconnected','AuthenticationFailure','ServerTimeout','DOWN'].includes(v)?'r':'n';
+  const rows=[];
+  if(state.status) rows.push([t('stStatus'),state.status,gv(state.status)]);
+  if(state.fault) rows.push([t('stFault'),state.fault==='healthy'?t('stNone'):state.fault.replace(/_/g,' '),state.fault==='healthy'?'g':'r']);
+  if(p.ppp_connection_status) rows.push([t('stPpp'),p.ppp_connection_status,gv(p.ppp_connection_status)]);
+  if(p.vlan_id!=null) rows.push([t('stVlan'),p.vlan_id,'n']);
+  if(p.dns_servers) rows.push([t('stDns'),p.dns_servers,p.dns_servers==='0.0.0.0'?'r':'n']);
+  if(p.rx_optical_power!=null) rows.push([t('stRx'),`${p.rx_optical_power} dBm`,p.rx_optical_power<-27?'r':'n']);
+  if(p.uptime!=null) rows.push([t('stUptime'),formatDuration(p.uptime),'n']);
+  if(p.last_connection_error) rows.push([t('stLastErr'),p.last_connection_error==='None'?t('stNone'):p.last_connection_error,gv(p.last_connection_error)]);
+  return rows.map(([k,v,c])=>`<div class="srow"><span class="sk">${k}</span><span class="sv ${c}">${v}</span></div>`).join('');
 }
 
 function renderTK(data){
@@ -1175,10 +1443,7 @@ function renderTK(data){
   tks.forEach((tk,i)=>{
     const dt=tk.created_at?new Date(tk.created_at).toLocaleString(lang==='fr'?'fr-FR':'en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
     const bef=tk.router_state_before||{};const aft=tk.router_state_after||{};
-    const stateKeys=['PPPStatus','ConnectionStatus','LastConnectionError','RXPower','ExternalIPAddress'];
-    const gv=v=>['Connected','None'].includes(v)?'g':['Disconnected','AuthenticationFailure'].includes(v)?'r':'n';
-    const befRows=stateKeys.filter(k=>bef[k]).map(k=>`<div class="srow"><span class="sk">${k}</span><span class="sv ${gv(bef[k])}">${bef[k]}</span></div>`).join('');
-    const aftRows=stateKeys.filter(k=>aft[k]).map(k=>`<div class="srow"><span class="sk">${k}</span><span class="sv ${gv(aft[k])}">${aft[k]}</span></div>`).join('');
+    const befRows=stateRows(bef);const aftRows=stateRows(aft);
     const hasState=Object.keys(bef).length||Object.keys(aft).length;
 
     const card=document.createElement('div');
@@ -1193,8 +1458,8 @@ function renderTK(data){
       </div>
       <div class="tkproblem">${tk.problem_description||''}</div>
       <div class="tkmeta">
-        <span class="tkfault">Fault: <span>${(tk.fault_detected||'unknown').replace(/_/g,' ')}</span></span>
-        ${tk.fix_applied?`<span class="tkfault">Fix: <span>${tk.fix_applied.replace(/_/g,' ')}</span></span>`:''}
+        <span class="tkfault">${t('faultLbl')} <span>${(tk.fault_detected||'unknown').replace(/_/g,' ')}</span></span>
+        ${tk.fix_applied?`<span class="tkfault">${t('fixLbl')} <span>${tk.fix_applied.replace(/_/g,' ')}</span></span>`:''}
       </div>
       ${hasState?`<div class="tkdetail">
         <div class="state-grid">
@@ -1204,6 +1469,93 @@ function renderTK(data){
       </div>`:''}`;
     list.appendChild(card);
   });
+}
+
+/* MY NETWORK (analytics) */
+let anCache=null;
+function formatDuration(sec){
+  if(sec===null||sec===undefined) return '—';
+  if(sec<60) return Math.round(sec)+'s';
+  if(sec<3600) return Math.round(sec/60)+'m';
+  return (sec/3600).toFixed(1)+'h';
+}
+async function loadAnalytics(){
+  try{
+    const r=await fetch('/api/analytics');
+    if(r.status===401){clearSess();doLogout();return;}
+    const d=await r.json();
+    anCache=d;
+    document.getElementById('an-uptime').textContent=(d.current_uptime_pct??'—')+(d.current_uptime_pct!=null?'%':'');
+    document.getElementById('an-faults').textContent=d.total_fault_events??'—';
+    document.getElementById('an-mttr').textContent=formatDuration(d.mttr_seconds);
+    document.getElementById('an-range').textContent=(d.uptime_pct_series&&d.uptime_pct_series.length)
+      ?new Date(d.uptime_pct_series[0].t).toLocaleTimeString(lang==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'})+' → '+new Date(d.uptime_pct_series[d.uptime_pct_series.length-1].t).toLocaleTimeString(lang==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'})
+      :'—';
+    renderAnBars(d.fault_frequency_by_model);
+    renderAnTrend(d.uptime_pct_series);
+  }catch(e){}
+}
+
+function renderAnBars(items){
+  const box=document.getElementById('an-bars');
+  if(!items||!items.length){box.innerHTML=`<div class="an-empty">${t('anNoFaults')}</div>`;return;}
+  const max=Math.max(...items.map(i=>i.count));
+  box.innerHTML=items.map(i=>`
+    <div class="an-bar-row" title="${i.label}: ${i.count}">
+      <div class="an-bar-label">${(i.label||'').replace(/_/g,' ')}</div>
+      <div class="an-bar-track"><div class="an-bar-fill" style="width:${max?Math.round(i.count/max*100):0}%"></div></div>
+      <div class="an-bar-value">${i.count}</div>
+    </div>`).join('');
+}
+
+function renderAnTrend(series){
+  const svg=document.getElementById('an-trend-svg');
+  const W=560,H=160,padL=8,padR=8,padT=10,padB=20;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  if(!series||!series.length){svg.innerHTML='';return;}
+  const pts=series.map((s,i)=>{
+    const x=padL+(i/(series.length-1||1))*plotW;
+    const y=padT+plotH-((s.pct??0)/100*plotH);
+    return {x,y,pct:s.pct,t:s.t};
+  });
+  const lineD='M'+pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L');
+  const areaD=lineD+` L${pts[pts.length-1].x.toFixed(1)},${(padT+plotH).toFixed(1)} L${pts[0].x.toFixed(1)},${(padT+plotH).toFixed(1)} Z`;
+  const gridLines=[0,50,100].map(v=>{
+    const y=padT+plotH-(v/100*plotH);
+    return `<line class="an-trend-grid" x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}"/><text class="an-trend-axis-lbl" x="${padL+2}" y="${y-3}">${v}%</text>`;
+  }).join('');
+  svg.innerHTML=`
+    <defs><linearGradient id="anTrendGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--mint)" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="var(--mint)" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${gridLines}
+    <path class="an-trend-area" d="${areaD}"/>
+    <path class="an-trend-line" d="${lineD}"/>
+    <line class="an-trend-hover-line" id="an-hover-line" x1="0" y1="${padT}" x2="0" y2="${padT+plotH}"/>
+    <circle class="an-trend-hover-dot" id="an-hover-dot" r="4"/>
+    <rect x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent" id="an-hover-capture" style="cursor:crosshair"/>
+  `;
+  const capture=document.getElementById('an-hover-capture');
+  const hoverLine=document.getElementById('an-hover-line');
+  const hoverDot=document.getElementById('an-hover-dot');
+  const tooltip=document.getElementById('an-trend-tooltip');
+  const wrap=svg.parentElement;
+  capture.addEventListener('mousemove',(ev)=>{
+    const rect=svg.getBoundingClientRect();
+    const mx=(ev.clientX-rect.left)/rect.width*W;
+    let idx=Math.round((mx-padL)/plotW*(pts.length-1));
+    idx=Math.max(0,Math.min(pts.length-1,idx));
+    const p=pts[idx];
+    hoverLine.setAttribute('x1',p.x);hoverLine.setAttribute('x2',p.x);hoverLine.style.opacity=1;
+    hoverDot.setAttribute('cx',p.x);hoverDot.setAttribute('cy',p.y);hoverDot.style.opacity=1;
+    const wrapRect=wrap.getBoundingClientRect();
+    const px=(p.x/W)*rect.width + (rect.left-wrapRect.left);
+    const py=(p.y/H)*rect.height + (rect.top-wrapRect.top);
+    tooltip.style.left=px+'px'; tooltip.style.top=py+'px'; tooltip.style.opacity=1;
+    tooltip.innerHTML=`${new Date(p.t).toLocaleTimeString(lang==='fr'?'fr-FR':'en-GB',{hour12:false})} — <span class="tt-pct">${p.pct==null?'—':p.pct+'%'}</span>`;
+  });
+  capture.addEventListener('mouseleave',()=>{hoverLine.style.opacity=0;hoverDot.style.opacity=0;tooltip.style.opacity=0;});
 }
 
 /* TOAST */
@@ -1224,6 +1576,36 @@ window.addEventListener('resize',()=>{
   else document.getElementById('mob-btn').style.display='none';
   if(window.innerWidth>760)closeSB();
 });
+
+/* IDLE TIMEOUT — 1h since the last real interaction, independent of the
+   background polling (checkStatus/loadNotifications) which would otherwise
+   keep touching the server session even while the user has stepped away. */
+const IDLE_LIMIT_MS=60*60*1000;
+const IDLE_WARN_MS=60*1000; // show the "you're about to be signed out" banner this long before the cutoff
+let lastActivity=Date.now();
+['mousemove','mousedown','keydown','touchstart','scroll'].forEach(ev=>
+  window.addEventListener(ev,()=>{lastActivity=Date.now();},{passive:true}));
+
+function showIdleWarning(secondsLeft){
+  document.getElementById('idle-warn-txt').innerHTML=t('idleWarnMsg').replace('{s}',secondsLeft);
+  document.getElementById('idle-warn').classList.add('show');
+}
+function hideIdleWarning(){document.getElementById('idle-warn').classList.remove('show');}
+function stayLoggedIn(){lastActivity=Date.now();hideIdleWarning();}
+
+setInterval(()=>{
+  if(!cust) return;
+  const idle=Date.now()-lastActivity;
+  if(idle>IDLE_LIMIT_MS){
+    hideIdleWarning();
+    doLogout();
+    toast(t('toastIdle'),'err');
+  }else if(idle>IDLE_LIMIT_MS-IDLE_WARN_MS){
+    showIdleWarning(Math.max(0,Math.ceil((IDLE_LIMIT_MS-idle)/1000)));
+  }else{
+    hideIdleWarning();
+  }
+},1000);
 
 /* INIT */
 (async()=>{

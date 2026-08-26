@@ -92,6 +92,7 @@ services:
       MONGO_DB: mypfe
       GENIE_PORT: "8001"
       GENIE_BASE_URL: http://genie:8001
+      CUSTOMER_API: http://customer:8003
     networks:
       - mypfe-net
 

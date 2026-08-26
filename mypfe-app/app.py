@@ -11,6 +11,7 @@ Key change from v1:
 import json
 import time
 import smtplib
+from datetime import timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
@@ -19,6 +20,11 @@ from flask import Flask, render_template, request, jsonify, session
 
 app = Flask(__name__)
 app.secret_key = "mypfe-secret-2025"
+# Idle timeout: a session with no requests for 1h expires. SESSION_REFRESH_EACH_REQUEST
+# (Flask default: True) re-stamps the cookie's expiry on every request, so this is a
+# rolling/inactivity window, not a fixed 1h-from-login TTL — and it's enforced by the
+# signed cookie's own embedded timestamp, not just the browser honoring Max-Age.
+app.permanent_session_lifetime = timedelta(hours=1)
 
 # ── Config ────────────────────────────────────────────────────────────────────
 import os
@@ -573,15 +579,10 @@ def send_notification_email(to_email: str, name: str, fault: str, lang: str) -> 
 
 
 def add_notification(account_id: str, customer_name: str, fault: str):
-    info = FAULT_INFO.get(fault, FAULT_INFO["healthy"])
-    api("post", f"{CUSTOMER_API}/notifications/create", json={
-        "account_id":     account_id,
-        "customer_name":  customer_name,
-        "fault":          fault,
-        "fault_label_en": info["en"]["title"],
-        "fault_label_fr": info["fr"]["title"],
-    })
-
+    # NOTE: the notification bell row itself is created by genie_server's
+    # _notify_customer(), which runs for every inject_fault call (manual and
+    # simulated alike) — this only handles the email side effect, so manually
+    # triggered faults don't end up with two identical bell notifications.
     profile, err = api("get", f"{CUSTOMER_API}/customer/profile", params={"account_id": account_id})
     if not err and profile and profile.get("email_verified") and profile.get("email"):
         send_notification_email(profile["email"], profile.get("name") or customer_name, fault, "en")
@@ -973,6 +974,7 @@ def api_login():
     if err:
         return jsonify({"success": False, "error": err}), 503
     if result and result.get("authenticated"):
+        session.permanent   = True
         session["customer"] = result
         session["lang"]     = lang
         return jsonify({"success": True, "customer": result})
@@ -1066,6 +1068,16 @@ def api_tickets():
     data, err = customer_get_tickets(customer["account_id"])
     if err:
         return jsonify({"error": err}), 503
+    return jsonify(data)
+
+
+@app.route("/api/analytics")
+def api_analytics():
+    customer = session.get("customer")
+    if not customer:
+        return jsonify({"error": "Not authenticated"}), 401
+    data, err = api("get", f"{GENIE_API}/noc/analytics", params={"account_id": customer["account_id"]})
+    if err: return jsonify({"error": err}), 503
     return jsonify(data)
 
 
@@ -1176,6 +1188,7 @@ def api_noc_login():
     if err:
         return jsonify({"success": False, "error": err}), 503
     if result and result.get("authenticated"):
+        session.permanent = True
         session["admin"] = result
         return jsonify({"success": True, "admin": result})
     return jsonify({"success": False,
@@ -1233,6 +1246,42 @@ def api_noc_clear():
     if not session.get("admin"):
         return jsonify({"error": "Not authenticated"}), 401
     data, err = api("post", f"{GENIE_API}/noc/clear_fault", json=request.json or {})
+    if err: return jsonify({"error": err}), 503
+    return jsonify(data)
+
+
+@app.route("/api/noc/simulation/start", methods=["POST"])
+def api_noc_simulation_start():
+    if not session.get("admin"):
+        return jsonify({"error": "Not authenticated"}), 401
+    data, err = api("post", f"{GENIE_API}/noc/simulation/start")
+    if err: return jsonify({"error": err}), 503
+    return jsonify(data)
+
+
+@app.route("/api/noc/simulation/stop", methods=["POST"])
+def api_noc_simulation_stop():
+    if not session.get("admin"):
+        return jsonify({"error": "Not authenticated"}), 401
+    data, err = api("post", f"{GENIE_API}/noc/simulation/stop")
+    if err: return jsonify({"error": err}), 503
+    return jsonify(data)
+
+
+@app.route("/api/noc/simulation/status")
+def api_noc_simulation_status():
+    if not session.get("admin"):
+        return jsonify({"error": "Not authenticated"}), 401
+    data, err = api("get", f"{GENIE_API}/noc/simulation/status")
+    if err: return jsonify({"error": err}), 503
+    return jsonify(data)
+
+
+@app.route("/api/noc/simulation/speed", methods=["POST"])
+def api_noc_simulation_speed():
+    if not session.get("admin"):
+        return jsonify({"error": "Not authenticated"}), 401
+    data, err = api("post", f"{GENIE_API}/noc/simulation/speed", json=request.json or {})
     if err: return jsonify({"error": err}), 503
     return jsonify(data)
 
@@ -1309,6 +1358,95 @@ def api_noc_tickets_search():
     data, err = api("get", f"{CUSTOMER_API}/admin/tickets", params=params)
     if err: return jsonify({"error": err}), 503
     return jsonify(data)
+
+
+@app.route("/noc/customers")
+def noc_customers_page():
+    if not session.get("admin"):
+        return render_template("noc.html")
+    return render_template("customers.html")
+
+
+@app.route("/noc/analytics")
+def noc_analytics_page():
+    if not session.get("admin"):
+        return render_template("noc.html")
+    return render_template("analytics.html")
+
+
+@app.route("/api/noc/analytics")
+def api_noc_analytics():
+    if not session.get("admin"):
+        return jsonify({"error": "Not authenticated"}), 401
+    data, err = api("get", f"{GENIE_API}/noc/analytics")
+    if err: return jsonify({"error": err}), 503
+    return jsonify(data)
+
+
+@app.route("/api/noc/customers/search")
+def api_noc_customers_search():
+    if not session.get("admin"):
+        return jsonify({"error": "Not authenticated"}), 401
+    params = {"limit": int(request.args.get("limit", 200))}
+    if request.args.get("q"): params["q"] = request.args["q"]
+    data, err = api("get", f"{CUSTOMER_API}/admin/customers/search", params=params)
+    if err: return jsonify({"error": err}), 503
+    return jsonify(data)
+
+
+# ── Engine console (live GenieACS / RaDuce MCP demonstration) ─────────────────
+
+@app.route("/noc/engine")
+def noc_engine_page():
+    if not session.get("admin"):
+        return render_template("noc.html")
+    return render_template("engine.html")
+
+
+@app.route("/api/noc/engine/manifest")
+def api_noc_engine_manifest():
+    if not session.get("admin"):
+        return jsonify({"error": "Not authenticated"}), 401
+    genie_tools,  genie_err  = api("get", f"{GENIE_API}/tools")
+    genie_health, _          = api("get", f"{GENIE_API}/health")
+    raduce_tools, raduce_err = api("get", f"{RADUCE_API}/tools")
+    raduce_health, _         = api("get", f"{RADUCE_API}/health")
+    return jsonify({
+        "genie":  {"tools": (genie_tools or {}).get("tools", []),  "health": genie_health,  "error": genie_err},
+        "raduce": {"tools": (raduce_tools or {}).get("tools", []), "health": raduce_health, "error": raduce_err},
+    })
+
+
+def _engine_lookup_customer(phone):
+    customer, err = genie_get_customer(phone)
+    if err or not customer or customer.get("error"):
+        return None, (customer or {}).get("error", err or "Customer not found")
+    return customer, None
+
+
+@app.route("/api/noc/engine/diagnose", methods=["POST"])
+def api_noc_engine_diagnose():
+    if not session.get("admin"):
+        return jsonify({"error": "Not authenticated"}), 401
+    phone = (request.json or {}).get("phone", "")
+    customer, err = _engine_lookup_customer(phone)
+    if err:
+        return jsonify({"error": err}), 404
+    result = investigate_problem(customer, "en")
+    return jsonify(result)
+
+
+@app.route("/api/noc/engine/fix", methods=["POST"])
+def api_noc_engine_fix():
+    if not session.get("admin"):
+        return jsonify({"error": "Not authenticated"}), 401
+    phone = (request.json or {}).get("phone", "")
+    customer, err = _engine_lookup_customer(phone)
+    if err:
+        return jsonify({"error": err}), 404
+    answer, steps = handle_problem(customer, "NOC-triggered live diagnostic", "en")
+    return jsonify({"answer": answer, "steps": steps})
+
 
 # ── Debug endpoint ────────────────────────────────────────────────────────────
 

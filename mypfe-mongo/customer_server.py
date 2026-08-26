@@ -19,9 +19,10 @@ Port: 8003
 
 import os
 import random
+import re
 import string
 import contextlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import bcrypt
 import requests
@@ -49,7 +50,15 @@ _router_meta_cache: dict[str, dict] = {}
 # -- HELPERS -------------------------------------------------------------------
 
 def _iso(value):
-    return value.isoformat() if isinstance(value, datetime) else value
+    if not isinstance(value, datetime):
+        return value
+    # Values are stored via datetime.utcnow(), which is naive — isoformat() on
+    # a naive datetime omits the UTC suffix, so the browser's `new Date(...)`
+    # parses it as local time instead of UTC and renders it an hour (or more)
+    # off. Stamp it as UTC before formatting so the client converts correctly.
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.isoformat()
 
 
 def _check_pw(plain: str, hashed) -> bool:
@@ -319,6 +328,15 @@ def logic_admin_tickets(status: str = None, fault: str = None,
     return {"total": len(tickets), "tickets": [_clean_ticket(t) for t in tickets]}
 
 
+def logic_search_customers(q: str = None, limit: int = 50) -> dict:
+    query = {}
+    if q:
+        rx = {"$regex": re.escape(q), "$options": "i"}
+        query["$or"] = [{"name": rx}, {"phone": rx}, {"email": rx}, {"account_id": rx}]
+    customers = list(db.customers.find(query, {"_id": 0, "pin_hash": 0}).limit(int(limit)))
+    return {"total": len(customers), "customers": customers}
+
+
 def logic_admin_ticket_detail(ticket_id: str) -> dict:
     from bson import ObjectId
     doc = None
@@ -517,6 +535,11 @@ def admin_tickets(status: str = None, fault: str = None,
 @app.get("/admin/ticket/{ticket_id}")
 def admin_ticket_detail(ticket_id: str):
     return logic_admin_ticket_detail(ticket_id)
+
+
+@app.get("/admin/customers/search")
+def admin_customers_search(q: str = None, limit: int = 50):
+    return logic_search_customers(q, limit)
 
 
 if __name__ == "__main__":

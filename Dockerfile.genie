@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 WORKDIR /app
-RUN pip install fastapi uvicorn pymongo python-dotenv requests "mcp>=1.13.0"
+RUN pip install fastapi uvicorn websockets pymongo python-dotenv requests "mcp>=1.13.0"
 COPY mypfe-mongo/mcp_engine.py mcp_engine.py
 COPY mypfe-mongo/genie_server.py server.py
 CMD ["python", "server.py"]

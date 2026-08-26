@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engine Console · NOC · MyPFE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020810;--s1:#07101E;--s2:#0B1929;
+  --glass:rgba(8,18,32,.88);
+  --b1:rgba(64,196,255,.13);--b2:rgba(64,196,255,.26);--b3:rgba(64,196,255,.44);
+  --e:#00CFFF;--e2:#0098CC;--mint:#00F0C0;--mint2:#00BF96;
+  --coral:#FF3355;--coral2:#CC1A3D;--gold:#FFB300;--violet:#8B5CF6;
+  --ice:#E6F8FF;--mist:#6B9AB8;--fog:#3A607C;
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ice);-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% -10%,rgba(139,92,246,.22) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 90%,rgba(0,207,255,.18) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(0,240,192,.06) 0%,transparent 60%),
+    linear-gradient(180deg,#020810 0%,#030C1A 50%,#020810 100%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(64,196,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(64,196,255,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.scanlines{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.025) 3px,rgba(0,0,0,.025) 4px)}
+.bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0}
+.bg-orb-1{width:700px;height:700px;top:-200px;right:-100px;background:radial-gradient(circle,rgba(139,92,246,.16) 0%,transparent 65%);animation:floatOrb1 28s ease-in-out infinite}
+.bg-orb-2{width:600px;height:600px;bottom:-150px;left:-100px;background:radial-gradient(circle,rgba(0,207,255,.13) 0%,transparent 65%);animation:floatOrb2 22s ease-in-out infinite}
+.bg-orb-3{width:400px;height:400px;top:40%;left:30%;background:radial-gradient(circle,rgba(0,240,192,.06) 0%,transparent 65%);animation:floatOrb3 35s ease-in-out infinite}
+@keyframes floatOrb1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-50px,70px) scale(1.05)}66%{transform:translate(80px,-40px) scale(.95)}}
+@keyframes floatOrb2{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(70px,-60px) scale(1.08)}75%{transform:translate(-40px,40px) scale(.96)}}
+@keyframes floatOrb3{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
+
+#shell{position:relative;z-index:1;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:100vh}
+
+.topbar{
+  flex-shrink:0;display:flex;align-items:center;gap:16px;padding:0 20px;height:60px;
+  background:rgba(7,16,30,.9);backdrop-filter:blur(20px);
+  border:1px solid var(--b1);border-radius:12px;
+  box-shadow:0 4px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);
+}
+.tb-back{
+  display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:700;
+  color:var(--mist);text-decoration:none;padding:7px 12px;border-radius:6px;
+  border:1px solid var(--b1);transition:all .15s;flex-shrink:0;
+}
+.tb-back:hover{border-color:var(--e);color:var(--e);background:rgba(0,207,255,.06)}
+.tb-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.tb-pulse{width:10px;height:10px;border-radius:50%;background:var(--mint);flex-shrink:0;box-shadow:0 0 14px var(--mint),0 0 0 5px rgba(0,240,192,.12);animation:heartbeat 2s ease-in-out infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(.6);opacity:.6}}
+.tb-logo{font-family:var(--mono);font-size:14px;font-weight:800;color:#fff;letter-spacing:.2em}
+.tb-slash{color:var(--fog);font-weight:300;font-size:14px}
+.tb-sys{font-size:12px;font-weight:600;color:var(--mist)}
+.tb-divider{width:1px;height:24px;background:linear-gradient(transparent,var(--b2),transparent);flex-shrink:0}
+.tb-right{display:flex;align-items:center;gap:14px;margin-left:auto;flex-shrink:0}
+.tb-clock{font-family:var(--mono);font-size:17px;font-weight:800;color:var(--e);text-shadow:0 0 20px rgba(0,207,255,.5);letter-spacing:.05em}
+.tb-user{font-size:11px;font-weight:600;color:var(--mist);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-logout{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--coral);background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.24);border-radius:6px;padding:7px 11px;cursor:pointer;transition:all .15s}
+.tb-logout:hover{background:var(--coral);color:#fff;box-shadow:0 0 16px rgba(255,51,85,.3)}
+.theme-toggle{width:34px;height:34px;border-radius:8px;flex-shrink:0;border:1px solid var(--b2);background:rgba(255,255,255,.06);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.theme-toggle:hover{background:rgba(255,255,255,.14);transform:rotate(20deg);box-shadow:0 0 14px var(--b3)}
+
+.panel{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--b1);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);overflow:hidden}
+.panel.panel-diag{overflow:visible;position:relative;z-index:5}
+.panel.panel-diag .panel-hdr{border-radius:9px 9px 0 0}
+.panel-hdr{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--b1);background:rgba(7,16,30,.6)}
+.ph-title{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--e);letter-spacing:.14em;text-transform:uppercase}
+.ph-count{font-family:var(--mono);font-size:10px;color:var(--fog);margin-left:auto}
+.ph-btn{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  color:var(--e);background:rgba(0,207,255,.07);
+  border:1px solid rgba(0,207,255,.22);border-radius:6px;
+  padding:9px 14px;cursor:pointer;letter-spacing:.06em;transition:all .15s;white-space:nowrap;
+}
+.ph-btn:hover{background:rgba(0,207,255,.16);box-shadow:0 0 12px rgba(0,207,255,.2)}
+.ph-btn.primary{color:#001A28;background:linear-gradient(135deg,var(--e2),var(--mint2));border-color:transparent;font-weight:800}
+.ph-btn.primary:hover{box-shadow:0 4px 16px rgba(0,207,255,.3)}
+.ph-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Service capability cards */
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:900px){.svc-grid{grid-template-columns:1fr}}
+.svc-card{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--b1);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);overflow:hidden}
+.svc-hdr{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--b1);background:rgba(7,16,30,.6)}
+.svc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.svc-dot.ok{background:var(--mint);box-shadow:0 0 8px var(--mint)}
+.svc-dot.err{background:var(--coral);box-shadow:0 0 8px var(--coral)}
+.svc-name{font-family:var(--mono);font-weight:800;font-size:12px;letter-spacing:.05em}
+.svc-port{font-family:var(--mono);font-size:9px;color:var(--fog);margin-left:auto;background:rgba(255,255,255,.05);padding:2px 7px;border-radius:4px;border:1px solid var(--b1)}
+.svc-tools{padding:10px 14px;display:flex;flex-direction:column;gap:8px;height:260px;overflow-y:auto}
+.svc-tools::-webkit-scrollbar{width:4px}.svc-tools::-webkit-scrollbar-thumb{background:rgba(0,207,255,.3);border-radius:2px}
+.svc-tool{padding:9px 11px;background:rgba(11,25,42,.6);border:1px solid var(--b1);border-radius:8px}
+.svc-tool-name{display:block;font-family:var(--mono);font-size:10px;font-weight:800;color:var(--e);margin-bottom:3px}
+.svc-tool-desc{display:block;font-size:10px;color:var(--mist);line-height:1.4}
+
+/* Run-diagnosis panel */
+.eng-body{padding:16px;display:flex;flex-direction:column;gap:14px}
+.search-wrap{position:relative;max-width:420px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--fog);pointer-events:none}
+.search-input{
+  width:100%;background:rgba(2,8,18,.8);border:1px solid rgba(64,196,255,.18);border-radius:8px;
+  padding:9px 12px 9px 30px;color:var(--ice);font-family:var(--mono);font-size:11px;outline:none;transition:all .18s;
+}
+.search-input:focus{border-color:var(--e);box-shadow:0 0 0 3px rgba(0,207,255,.14)}
+.search-input::placeholder{color:var(--fog)}
+.eng-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:rgba(6,14,26,.98);border:1px solid var(--b2);border-radius:8px;max-height:220px;overflow-y:auto;z-index:20;display:none;box-shadow:0 12px 32px rgba(0,0,0,.5)}
+.eng-dropdown.show{display:block}
+.eng-drop-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--b1);transition:background .12s}
+.eng-drop-item:last-child{border-bottom:none}
+.eng-drop-item:hover{background:rgba(0,207,255,.08)}
+.eng-drop-name{font-size:11px;font-weight:700;color:var(--ice)}
+.eng-drop-sub{font-family:var(--mono);font-size:9px;color:var(--fog);margin-top:2px}
+.eng-selected{display:none;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,240,192,.06);border:1px solid rgba(0,240,192,.24);border-radius:8px}
+.eng-selected.show{display:flex}
+.eng-selected-name{font-weight:700;font-size:12px}
+.eng-selected-sub{font-family:var(--mono);font-size:9px;color:var(--mist);margin-top:2px}
+.eng-actions{display:none;gap:10px}
+.eng-actions.show{display:flex}
+.eng-loading{display:none;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;color:var(--e)}
+.eng-loading.show{display:flex}
+.eng-spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(0,207,255,.2);border-top-color:var(--e);animation:engspin .7s linear infinite;flex-shrink:0}
+@keyframes engspin{to{transform:rotate(360deg)}}
+.eng-empty{text-align:center;padding:40px;color:var(--fog);font-family:var(--mono);font-size:11px}
+.eng-answer{padding:11px 14px;border-radius:8px;border:1px solid rgba(0,240,192,.26);background:rgba(0,240,192,.07);color:var(--mint);font-size:12px;line-height:1.6}
+
+/* Step (layer trace) cards — same shape as tickets.html's ticket-detail trace */
+.step-card{background:rgba(11,25,42,.7);border:1px solid var(--b1);border-radius:10px;overflow:hidden;transition:border-color .15s}
+.step-card:hover{border-color:var(--b2)}
+.step-card-hdr{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--b1);background:rgba(7,16,30,.6);cursor:pointer}
+.step-ok{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;border:1px solid}
+.step-ok.ok{background:rgba(0,240,192,.12);color:var(--mint);border-color:rgba(0,240,192,.3)}
+.step-ok.err{background:rgba(255,51,85,.12);color:var(--coral);border-color:rgba(255,51,85,.3)}
+.step-layer{font-family:var(--mono);font-size:11px;font-weight:800;color:#fff}
+.step-port{font-family:var(--mono);font-size:9px;color:var(--fog);background:rgba(255,255,255,.05);padding:2px 7px;border-radius:4px;border:1px solid var(--b1)}
+.step-tool{font-family:var(--mono);font-size:9px;color:var(--e);font-weight:700}
+.step-desc{font-size:10px;color:var(--mist);font-style:italic;margin-left:auto;text-align:right;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.step-status{font-family:var(--mono);font-size:9px;font-weight:800}
+.step-status.ok{color:var(--mint)}.step-status.err{color:var(--coral)}
+.step-body{padding:0;max-height:0;overflow:hidden;transition:max-height .25s ease}
+.step-body.open{padding:12px 14px;max-height:900px}
+.step-section{font-family:var(--mono);font-size:8px;font-weight:800;color:var(--fog);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;margin-top:10px}
+.step-section:first-child{margin-top:0}
+.param-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.param-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:rgba(7,16,30,.5);font-size:10px}
+.param-key{color:var(--mist);font-family:var(--mono);font-size:9px}
+.param-val{font-family:var(--mono);font-size:9px;max-width:180px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.param-val.ok{color:var(--mint)}.param-val.err{color:var(--coral)}.param-val.warn{color:var(--gold)}.param-val.dim{color:var(--mist)}
+.tr069-path{display:flex;align-items:flex-start;gap:8px;padding:6px 8px;background:rgba(7,16,30,.5);border-radius:5px;border-left:2px solid var(--e);margin-bottom:3px}
+.tr069-path.write{border-left-color:var(--mint)}
+.tr069-lbl{font-size:9px;color:var(--mist);flex-shrink:0;min-width:90px}
+.tr069-p{font-family:var(--mono);font-size:9px;color:var(--e);word-break:break-all}
+.tr069-path.write .tr069-p{color:var(--mint)}
+.tr069-v{font-family:var(--mono);font-size:9px;margin-left:auto;flex-shrink:0}
+
+/* ── Panel entrance ─────────────────────────────────────────────────────── */
+@keyframes panelIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.topbar{animation:panelIn .4s ease both}
+.svc-grid{animation:panelIn .4s .05s ease both}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width:640px){
+  #shell{padding:8px;gap:8px}
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── LIGHT MODE ─────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+body{transition:background .3s ease,color .25s ease}
+.topbar,.panel,.svc-card,.step-card,.theme-toggle,.search-input{transition:background .25s ease,border-color .22s ease,color .2s ease,box-shadow .2s ease}
+body.light{
+  --bg:#F2F6FB;--glass:rgba(255,255,255,.88);
+  --b1:rgba(0,130,195,.15);--b2:rgba(0,130,195,.30);--b3:rgba(0,130,195,.48);
+  --e:#006FB3;--e2:#005490;--mint:#00896A;--mint2:#006852;
+  --coral:#CC0030;--coral2:#99002A;--gold:#A86800;--violet:#5828AA;
+  --ice:#071525;--mist:#2A4A66;--fog:#587894;
+  color:#071525;
+}
+body.light::before{
+  background:
+    radial-gradient(ellipse 80% 60% at 70% -10%,rgba(100,60,200,.09) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 90%,rgba(0,130,195,.10) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(0,150,120,.05) 0%,transparent 60%),
+    linear-gradient(180deg,#F2F6FB 0%,#EAF0F8 50%,#F2F6FB 100%);
+}
+body.light::after{background-image:linear-gradient(rgba(0,130,195,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,130,195,.07) 1px,transparent 1px);background-size:40px 40px}
+body.light .bg-orb-1{background:radial-gradient(circle,rgba(100,60,200,.10) 0%,transparent 65%)}
+body.light .bg-orb-2{background:radial-gradient(circle,rgba(0,130,195,.09) 0%,transparent 65%)}
+body.light .bg-orb-3{background:radial-gradient(circle,rgba(0,150,120,.05) 0%,transparent 65%)}
+body.light .scanlines{background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.012) 3px,rgba(0,0,0,.012) 4px)}
+body.light .topbar{background:rgba(255,255,255,.92);box-shadow:0 4px 24px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.9)}
+body.light .tb-logo{color:#071525}
+body.light .tb-clock{text-shadow:none}
+body.light .theme-toggle{background:rgba(0,0,0,.05)}
+body.light .theme-toggle:hover{background:rgba(0,0,0,.10)}
+body.light .tb-logout{background:rgba(204,0,48,.07);border-color:rgba(204,0,48,.25)}
+body.light .panel,body.light .svc-card,body.light .step-card{background:rgba(255,255,255,.9)}
+body.light .panel-hdr,body.light .svc-hdr,body.light .step-card-hdr{background:rgba(230,237,246,.7)}
+body.light .search-input{background:rgba(235,243,252,.8)}
+body.light .svc-tool,body.light .param-row,body.light .tr069-path{background:rgba(245,250,255,.85)}
+body.light .eng-dropdown{background:rgba(255,255,255,.98)}
+
+/* ── IDLE-TIMEOUT WARNING ── */
+.idle-warn{
+  position:fixed;top:74px;left:50%;z-index:250;max-width:360px;
+  padding:14px 16px;border-radius:12px;
+  background:var(--glass);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,179,0,.35);
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;
+  transform:translate(-50%,-10px);transition:opacity .22s ease,transform .22s ease;
+}
+.idle-warn.show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.idle-warn-ic{font-size:20px;flex-shrink:0}
+.idle-warn-txt{font-size:12px;color:var(--mist);line-height:1.45;font-family:var(--sans)}
+.idle-warn-txt b{color:var(--ice)}
+.idle-warn-btn{
+  padding:8px 14px;border-radius:8px;border:none;flex-shrink:0;
+  background:linear-gradient(135deg,var(--e2),var(--mint2));color:#001A28;
+  font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;
+  font-family:var(--mono);letter-spacing:.04em;
+}
+</style>
+</head>
+<body>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+<div class="scanlines"></div>
+<div class="idle-warn" id="idle-warn" role="alert">
+  <span class="idle-warn-ic">⏱</span>
+  <span class="idle-warn-txt" id="idle-warn-txt"></span>
+  <button class="idle-warn-btn" onclick="stayLoggedIn()">Stay signed in</button>
+</div>
+
+<div id="shell">
+
+  <header class="topbar">
+    <a class="tb-back" href="/noc">← Dashboard</a>
+    <div class="tb-divider"></div>
+    <div class="tb-brand">
+      <div class="tb-pulse"></div>
+      <span class="tb-logo">NOC</span>
+      <span class="tb-slash">/</span>
+      <span class="tb-sys">Engine Console</span>
+    </div>
+    <div class="tb-right">
+      <a class="tb-back" href="/noc/analytics">📊 Analytics</a>
+      <a class="tb-back" href="/noc/customers">👥 Customers</a>
+      <a class="tb-back" href="/noc/tickets">🎫 Tickets</a>
+      <div class="tb-divider"></div>
+      <span class="tb-clock" id="tb-clock">00:00:00</span>
+      <div class="tb-divider"></div>
+      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark mode">🌙</button>
+      <div class="tb-divider"></div>
+      <span class="tb-user" id="tb-admin">—</span>
+      <button class="tb-logout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="svc-grid">
+    <div class="svc-card">
+      <div class="svc-hdr"><span class="svc-dot" id="genie-dot"></span><span class="svc-name">GenieACS MCP</span><span class="svc-port">:8001</span></div>
+      <div class="svc-tools" id="genie-tools"><div class="eng-empty">Loading…</div></div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-hdr"><span class="svc-dot" id="raduce-dot"></span><span class="svc-name">RaDuce MCP</span><span class="svc-port">:8002</span></div>
+      <div class="svc-tools" id="raduce-tools"><div class="eng-empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <div class="panel panel-diag">
+    <div class="panel-hdr"><span class="ph-title">Run Live Diagnosis</span></div>
+    <div class="eng-body">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="eng-search" placeholder="Search customer by name or phone…" oninput="engSearch()" onfocus="engSearch()" autocomplete="off">
+        <div class="eng-dropdown" id="eng-dropdown"></div>
+      </div>
+      <div class="eng-selected" id="eng-selected"></div>
+      <div class="eng-actions" id="eng-actions">
+        <button class="ph-btn" onclick="runDiagnose()">🔍 Diagnose Only</button>
+        <button class="ph-btn primary" onclick="runFix()">🔧 Diagnose &amp; Fix</button>
+      </div>
+      <div class="eng-loading" id="eng-loading"><span class="eng-spinner"></span><span id="eng-loading-txt">Calling MCP tools…</span></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-hdr"><span class="ph-title">Live Trace</span><span class="ph-count" id="trace-count">—</span></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:8px" id="trace-out">
+      <div class="eng-empty">Pick a customer above and run a diagnosis to see the real MCP call trace.</div>
+    </div>
+  </div>
+
+</div><!-- #shell -->
+
+<script>
+// ── Theme (shared with NOC dashboard) ───────────────────────────────────────
+(function(){
+  const saved=localStorage.getItem('noc-theme');
+  if(saved==='light'||(saved===null&&window.matchMedia('(prefers-color-scheme: light)').matches))
+    document.body.classList.add('light');
+})();
+function applyThemeIcon(){document.getElementById('theme-toggle').textContent=document.body.classList.contains('light')?'☀️':'🌙';}
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light');
+  localStorage.setItem('noc-theme',isLight?'light':'dark');
+  applyThemeIcon();
+}
+applyThemeIcon();
+
+function updateClock(){document.getElementById('tb-clock').textContent=new Date().toLocaleTimeString('en-GB',{hour12:false});}
+updateClock(); setInterval(updateClock,1000);
+
+// Idle timeout — 1h since the last real interaction (independent of the
+// background status/manifest polling, which would otherwise keep the tab
+// looking "active" even after the admin has walked away).
+(function(){
+  const IDLE_LIMIT_MS=60*60*1000;
+  const IDLE_WARN_MS=60*1000;
+  let lastActivity=Date.now();
+  ['mousemove','mousedown','keydown','touchstart','scroll'].forEach(ev=>
+    window.addEventListener(ev,()=>{lastActivity=Date.now();},{passive:true}));
+  window.stayLoggedIn=function(){
+    lastActivity=Date.now();
+    document.getElementById('idle-warn').classList.remove('show');
+  };
+  setInterval(()=>{
+    const idle=Date.now()-lastActivity;
+    const warn=document.getElementById('idle-warn');
+    if(idle>IDLE_LIMIT_MS){ warn.classList.remove('show'); logout(); }
+    else if(idle>IDLE_LIMIT_MS-IDLE_WARN_MS){
+      const s=Math.max(0,Math.ceil((IDLE_LIMIT_MS-idle)/1000));
+      document.getElementById('idle-warn-txt').innerHTML=`You'll be signed out in <b>${s}s</b> due to inactivity.`;
+      warn.classList.add('show');
+    } else warn.classList.remove('show');
+  },1000);
+})();
+
+async function checkAuth(){
+  const r=await fetch('/api/noc/fleet');
+  if(r.status===401){ window.location.href='/noc'; return false; }
+  return true;
+}
+async function logout(){ await fetch('/api/noc/logout',{method:'POST'}); sessionStorage.removeItem('noc-admin'); window.location.href='/noc'; }
+
+// ── Service capability panels ────────────────────────────────────────────
+async function loadManifest(){
+  try{
+    const r=await fetch('/api/noc/engine/manifest');
+    const d=await r.json();
+    renderService('genie', d.genie);
+    renderService('raduce', d.raduce);
+  }catch(e){}
+}
+function renderService(key, svc){
+  const dot=document.getElementById(key+'-dot');
+  const box=document.getElementById(key+'-tools');
+  if(!svc){ dot.className='svc-dot err'; box.innerHTML='<div class="eng-empty">Unreachable</div>'; return; }
+  const healthy=svc.health && svc.health.status==='ok';
+  dot.className='svc-dot '+(healthy?'ok':'err');
+  const tools=svc.tools||[];
+  box.innerHTML = tools.length
+    ? tools.map(t=>`<div class="svc-tool"><span class="svc-tool-name">${t.name}</span><span class="svc-tool-desc">${t.description||''}</span></div>`).join('')
+    : '<div class="eng-empty">No tools reported</div>';
+}
+
+// ── Customer picker ──────────────────────────────────────────────────────
+let engSelected=null, engSearchTimer=null;
+function engSearch(){
+  clearTimeout(engSearchTimer);
+  const q=document.getElementById('eng-search').value.trim();
+  const dd=document.getElementById('eng-dropdown');
+  engSearchTimer=setTimeout(async()=>{
+    try{
+      const url = q ? `/api/noc/customers/search?q=${encodeURIComponent(q)}&limit=200`
+                    : `/api/noc/customers/search?limit=200`;
+      const r=await fetch(url);
+      const d=await r.json();
+      const list=d.customers||[];
+      if(!list.length){ dd.innerHTML='<div class="eng-drop-item" style="cursor:default;color:var(--fog)">No matches</div>'; dd.classList.add('show'); return; }
+      dd.innerHTML=list.map(c=>`<div class="eng-drop-item" onclick='engSelect(${JSON.stringify(c).replace(/'/g,"&#39;")})'>
+        <div class="eng-drop-name">${c.name}</div>
+        <div class="eng-drop-sub">${c.phone} · ${c.account_id} · ${c.router_model||''}</div>
+      </div>`).join('');
+      dd.classList.add('show');
+    }catch(e){}
+  }, 200);
+}
+function engSelect(c){
+  engSelected=c;
+  document.getElementById('eng-dropdown').classList.remove('show');
+  document.getElementById('eng-search').value='';
+  const sel=document.getElementById('eng-selected');
+  sel.classList.add('show');
+  sel.innerHTML=`<div><div class="eng-selected-name">${c.name}</div><div class="eng-selected-sub">${c.phone} · ${c.account_id} · ${c.router_model||'—'} (${c.vendor||''})</div></div>`;
+  document.getElementById('eng-actions').classList.add('show');
+}
+document.addEventListener('click',(e)=>{
+  if(!e.target.closest('.search-wrap')) document.getElementById('eng-dropdown').classList.remove('show');
+});
+
+// ── Run diagnosis / fix ──────────────────────────────────────────────────
+function setEngLoading(on, txt){
+  document.getElementById('eng-loading').classList.toggle('show', on);
+  document.getElementById('eng-actions').style.pointerEvents = on ? 'none' : 'auto';
+  if(txt) document.getElementById('eng-loading-txt').textContent=txt;
+}
+
+async function runDiagnose(){
+  if(!engSelected) return;
+  setEngLoading(true, 'Calling GenieACS + Neo4j MCP tools…');
+  try{
+    const r=await fetch('/api/noc/engine/diagnose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:engSelected.phone})});
+    const d=await r.json();
+    renderTrace(d.steps||[], null);
+  }catch(e){
+    renderTrace([], null);
+  }finally{
+    setEngLoading(false);
+  }
+}
+
+async function runFix(){
+  if(!engSelected) return;
+  if(!confirm(`This will run the real diagnose → RaDuce fix → verify pipeline against ${engSelected.name}'s router, exactly as if they reported the issue themselves (it may write real state and open a ticket). Continue?`)) return;
+  setEngLoading(true, 'Calling GenieACS, RaDuce, and verifying recovery…');
+  try{
+    const r=await fetch('/api/noc/engine/fix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:engSelected.phone})});
+    const d=await r.json();
+    renderTrace(d.steps||[], d.answer);
+  }catch(e){
+    renderTrace([], null);
+  }finally{
+    setEngLoading(false);
+  }
+}
+
+function renderTrace(steps, answer){
+  document.getElementById('trace-count').textContent = steps.length ? `${steps.length} step${steps.length!==1?'s':''}` : '—';
+  const out=document.getElementById('trace-out');
+  if(!steps.length){ out.innerHTML='<div class="eng-empty">No trace returned.</div>'; return; }
+  out.innerHTML = (answer?`<div class="eng-answer">${md(answer)}</div>`:'') + renderLayerTrace(steps);
+}
+function md(t){return(t||'').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');}
+
+// ── Layer trace renderer (same shape/behavior as tickets.html) ─────────────
+function renderLayerTrace(log){
+  if(!log.length) return '<div style="color:var(--fog);font-size:12px;padding:12px">No trace data available.</div>';
+  const icons={'GenieACS MCP':'📡','Diagnostic Engine':'🔍','RaDuce MCP':'🔧','Customer MCP':'🎫','Neo4j MCP':'🗄️','GraphRAG Lookup':'🧠'};
+  return log.map((step,i)=>{
+    const ok=step.ok!==false;
+    const num=i+1;
+    const argsHtml=renderKV(step.args||{});
+    const resultHtml=renderResult(step.result||{},step.tool);
+    return `
+    <div class="step-card">
+      <div class="step-card-hdr" onclick="toggleStep(this)">
+        <div class="step-ok ${ok?'ok':'err'}">${ok?num:'✗'}</div>
+        <span class="step-layer">${icons[step.layer]||'⚙️'} ${step.layer||'Unknown'}</span>
+        <span class="step-port">:${step.port||'?'}</span>
+        <span class="step-tool">${step.tool||''}</span>
+        <span class="step-desc">${step.description||''}</span>
+        <span class="step-status ${ok?'ok':'err'}">${ok?'✓ OK':'✗ FAIL'}</span>
+      </div>
+      <div class="step-body">
+        ${step.args&&Object.keys(step.args).length?`<div class="step-section">Input Parameters</div><div class="param-grid">${argsHtml}</div>`:''}
+        ${step.tr069_paths_read&&step.tr069_paths_read.length?`
+          <div class="step-section">TR-069 Paths Read (from Neo4j Graph)</div>
+          ${step.tr069_paths_read.map(p=>`<div class="tr069-path"><span class="tr069-lbl">${p.label||p.role||''}</span><span class="tr069-p">${p.path||''}</span>${p.value!=null?`<span class="tr069-v">${p.value}</span>`:''}</div>`).join('')}
+        `:''}
+        ${step.tr069_paths_written&&step.tr069_paths_written.length?`
+          <div class="step-section">TR-069 Paths Written (SetParameterValues)</div>
+          ${step.tr069_paths_written.map(p=>`<div class="tr069-path write"><span class="tr069-lbl">${p.label||''}</span><span class="tr069-p">${p.path||''}</span><span style="font-size:9px;color:var(--fog);margin-left:auto">${p.category||''}</span></div>`).join('')}
+        `:''}
+        <div class="step-section">Result</div>
+        ${resultHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleStep(hdr){ hdr.nextElementSibling.classList.toggle('open'); }
+function renderKV(obj){
+  if(!obj||typeof obj!=='object') return `<div class="param-row"><span class="param-val dim">${JSON.stringify(obj)}</span></div>`;
+  return Object.entries(obj).slice(0,20).map(([k,v])=>{
+    const vs=v===null?'null':typeof v==='object'?JSON.stringify(v).slice(0,60):String(v);
+    const cls=classifyVal(k,vs);
+    return `<div class="param-row"><span class="param-key">${k}</span><span class="param-val ${cls}">${vs}</span></div>`;
+  }).join('');
+}
+function classifyVal(key,val){
+  const k=key.toLowerCase(), v=String(val).toLowerCase();
+  if(k.includes('status')&&v==='connected') return 'ok';
+  if(k.includes('status')&&(v==='disconnected'||v==='error')) return 'err';
+  if(k.includes('error')&&v==='none') return 'ok';
+  if(k.includes('error')&&v!=='none'&&v!=='null') return 'warn';
+  if(k.includes('rx')&&!isNaN(parseFloat(val))) return parseFloat(val)<-27?'err':'ok';
+  if(k.includes('dns')&&v==='0.0.0.0') return 'err';
+  if(k.includes('success')&&v==='true') return 'ok';
+  if(k.includes('ok')&&v==='true') return 'ok';
+  if(k.includes('ok')&&v==='false') return 'err';
+  return 'dim';
+}
+function renderResult(result,tool){
+  if(!result||typeof result!=='object') return `<div style="font-family:var(--mono);font-size:11px;color:var(--mist)">${result}</div>`;
+  if(result.error) return `<div style="padding:8px 10px;background:rgba(255,51,85,.08);border-radius:6px;font-family:var(--mono);font-size:11px;color:var(--coral)">✗ ${result.error}</div>`;
+  if(result.parameters_named || result.parameters){
+    const p=result.parameters_named || {};
+    return `<div class="param-grid">
+      ${Object.entries(p).map(([k,v])=>`<div class="param-row"><span class="param-key">${k}</span><span class="param-val ${classifyVal(k,v)}">${v}</span></div>`).join('')}
+    </div>
+    <div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--fog)">
+      Status: <span style="color:${result.status==='UP'?'var(--mint)':'var(--coral)'}">${result.status||'—'}</span>
+      · Fault: <span style="color:var(--gold)">${result.fault||'healthy'}</span>
+    </div>`;
+  }
+  const entries=Object.entries(result).slice(0,10);
+  return `<div class="param-grid">${entries.map(([k,v])=>`<div class="param-row"><span class="param-key">${k}</span><span class="param-val ${classifyVal(k,String(v))}">${typeof v==='object'?JSON.stringify(v).slice(0,60):String(v).slice(0,60)}</span></div>`).join('')}</div>`;
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────
+(async function init(){
+  if(!await checkAuth()) return;
+  try{
+    const saved=sessionStorage.getItem('noc-admin');
+    document.getElementById('tb-admin').textContent=saved?(JSON.parse(saved).name||'Admin'):'Admin';
+  }catch(e){ document.getElementById('tb-admin').textContent='Admin'; }
+  loadManifest();
+})();
+</script>
+</body>
+</html>

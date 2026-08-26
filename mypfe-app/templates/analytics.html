@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics · NOC · MyPFE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020810;--s1:#07101E;--s2:#0B1929;
+  --glass:rgba(8,18,32,.88);
+  --b1:rgba(64,196,255,.13);--b2:rgba(64,196,255,.26);--b3:rgba(64,196,255,.44);
+  --e:#00CFFF;--e2:#0098CC;--mint:#00F0C0;--mint2:#00BF96;
+  --coral:#FF3355;--coral2:#CC1A3D;--gold:#FFB300;--violet:#8B5CF6;
+  --ice:#E6F8FF;--mist:#6B9AB8;--fog:#3A607C;
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ice);-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% -10%,rgba(139,92,246,.22) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 90%,rgba(0,207,255,.18) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(0,240,192,.06) 0%,transparent 60%),
+    linear-gradient(180deg,#020810 0%,#030C1A 50%,#020810 100%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(64,196,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(64,196,255,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.scanlines{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.025) 3px,rgba(0,0,0,.025) 4px)}
+.bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0}
+.bg-orb-1{width:700px;height:700px;top:-200px;right:-100px;background:radial-gradient(circle,rgba(139,92,246,.16) 0%,transparent 65%);animation:floatOrb1 28s ease-in-out infinite}
+.bg-orb-2{width:600px;height:600px;bottom:-150px;left:-100px;background:radial-gradient(circle,rgba(0,207,255,.13) 0%,transparent 65%);animation:floatOrb2 22s ease-in-out infinite}
+.bg-orb-3{width:400px;height:400px;top:40%;left:30%;background:radial-gradient(circle,rgba(0,240,192,.06) 0%,transparent 65%);animation:floatOrb3 35s ease-in-out infinite}
+@keyframes floatOrb1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-50px,70px) scale(1.05)}66%{transform:translate(80px,-40px) scale(.95)}}
+@keyframes floatOrb2{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(70px,-60px) scale(1.08)}75%{transform:translate(-40px,40px) scale(.96)}}
+@keyframes floatOrb3{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
+
+#shell{position:relative;z-index:1;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:100vh}
+
+.topbar{
+  flex-shrink:0;display:flex;align-items:center;gap:16px;padding:0 20px;height:60px;
+  background:rgba(7,16,30,.9);backdrop-filter:blur(20px);
+  border:1px solid var(--b1);border-radius:12px;
+  box-shadow:0 4px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);
+}
+.tb-back{
+  display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:700;
+  color:var(--mist);text-decoration:none;padding:7px 12px;border-radius:6px;
+  border:1px solid var(--b1);transition:all .15s;flex-shrink:0;
+}
+.tb-back:hover{border-color:var(--e);color:var(--e);background:rgba(0,207,255,.06)}
+.tb-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.tb-pulse{width:10px;height:10px;border-radius:50%;background:var(--mint);flex-shrink:0;box-shadow:0 0 14px var(--mint),0 0 0 5px rgba(0,240,192,.12);animation:heartbeat 2s ease-in-out infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(.6);opacity:.6}}
+.tb-logo{font-family:var(--mono);font-size:14px;font-weight:800;color:#fff;letter-spacing:.2em}
+.tb-slash{color:var(--fog);font-weight:300;font-size:14px}
+.tb-sys{font-size:12px;font-weight:600;color:var(--mist)}
+.tb-divider{width:1px;height:24px;background:linear-gradient(transparent,var(--b2),transparent);flex-shrink:0}
+.tb-right{display:flex;align-items:center;gap:14px;margin-left:auto;flex-shrink:0}
+.tb-clock{font-family:var(--mono);font-size:17px;font-weight:800;color:var(--e);text-shadow:0 0 20px rgba(0,207,255,.5);letter-spacing:.05em}
+.tb-user{font-size:11px;font-weight:600;color:var(--mist);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-logout{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--coral);background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.24);border-radius:6px;padding:7px 11px;cursor:pointer;transition:all .15s}
+.tb-logout:hover{background:var(--coral);color:#fff;box-shadow:0 0 16px rgba(255,51,85,.3)}
+.theme-toggle{width:34px;height:34px;border-radius:8px;flex-shrink:0;border:1px solid var(--b2);background:rgba(255,255,255,.06);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.theme-toggle:hover{background:rgba(255,255,255,.14);transform:rotate(20deg);box-shadow:0 0 14px var(--b3)}
+
+.kpi-row{flex-shrink:0;display:flex;gap:10px;flex-wrap:wrap}
+.kpi{
+  flex:1;min-width:150px;position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:6px;
+  padding:14px 16px 12px;overflow:hidden;
+  background:var(--glass);backdrop-filter:blur(20px);
+  border:1px solid var(--b1);border-radius:10px;
+}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:10px 10px 0 0}
+.kpi.k-blue::before{background:linear-gradient(90deg,transparent,var(--e),transparent)}
+.kpi.k-teal::before{background:linear-gradient(90deg,transparent,var(--mint),transparent)}
+.kpi.k-amber::before{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.kpi.k-red::before{background:linear-gradient(90deg,transparent,var(--coral),transparent)}
+.kpi.k-violet::before{background:linear-gradient(90deg,transparent,var(--violet),transparent)}
+.kpi-label{font-size:9px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:.1em}
+.kpi-val{font-family:var(--mono);font-weight:900;font-size:28px;line-height:1}
+.kpi.k-blue .kpi-val{color:var(--e);text-shadow:0 0 30px rgba(0,207,255,.5)}
+.kpi.k-teal .kpi-val{color:var(--mint);text-shadow:0 0 30px rgba(0,240,192,.5)}
+.kpi.k-amber .kpi-val{color:var(--gold);text-shadow:0 0 30px rgba(255,179,0,.5)}
+.kpi.k-red .kpi-val{color:var(--coral);text-shadow:0 0 30px rgba(255,51,85,.5)}
+.kpi.k-violet .kpi-val{color:var(--violet);text-shadow:0 0 30px rgba(139,92,246,.5)}
+.kpi-sub{font-family:var(--mono);font-size:9px;color:var(--fog)}
+
+.d-panel{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--b1);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);overflow:hidden}
+.panel-hdr{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--b1);background:rgba(7,16,30,.6)}
+.ph-title{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--e);letter-spacing:.14em;text-transform:uppercase}
+.ph-count{font-family:var(--mono);font-size:10px;color:var(--fog);margin-left:auto}
+
+.a-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:900px){.a-grid{grid-template-columns:1fr}}
+
+/* Bar chart */
+.bar-chart{padding:16px;display:flex;flex-direction:column;gap:11px}
+.bar-row{display:grid;grid-template-columns:120px 1fr 32px;align-items:center;gap:10px}
+.bar-label{font-family:var(--mono);font-size:9px;color:var(--mist);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{height:13px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,1,.36,1);background:linear-gradient(90deg,#D97706,var(--gold))}
+.bar-value{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--gold);text-align:right}
+.chart-empty{text-align:center;padding:30px;color:var(--fog);font-family:var(--mono);font-size:10px}
+
+/* Fault-type categorical palette — fixed hue-per-category, validated for CVD
+   separation (adjacent + ring-wrap) and contrast against this app's panel
+   surfaces in both themes. Never reassign a slot's meaning. */
+:root{
+  --cat-blue:#3987e5;--cat-aqua:#199e70;--cat-yellow:#c98500;
+  --cat-green:#008300;--cat-violet:#9085e9;--cat-red:#e66767;--cat-magenta:#d55181;
+}
+body.light{
+  --cat-blue:#2a78d6;--cat-aqua:#1baf7a;--cat-yellow:#eda100;
+  --cat-green:#008300;--cat-violet:#4a3aa7;--cat-red:#e34948;--cat-magenta:#e87ba4;
+}
+
+/* Donut chart */
+.donut-wrap{padding:16px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.donut-svg{width:200px;height:200px;flex-shrink:0;overflow:visible}
+.donut-seg{cursor:pointer;transition:opacity .15s;stroke:var(--glass);stroke-width:2}
+.donut-seg:hover{opacity:.82}
+.donut-center-val{font-family:var(--mono);font-weight:900;font-size:26px;fill:var(--ice)}
+.donut-center-lbl{font-family:var(--mono);font-size:8px;fill:var(--fog);text-transform:uppercase;letter-spacing:.08em}
+.donut-pct-lbl{font-family:var(--mono);font-size:9px;font-weight:800;fill:#fff;text-anchor:middle;pointer-events:none}
+.donut-legend{flex:1;min-width:180px;display:flex;flex-direction:column;gap:7px}
+.dl-row{display:flex;align-items:center;gap:8px;font-size:11px}
+.dl-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.dl-label{color:var(--ice);flex:1}
+.dl-count{font-family:var(--mono);font-size:10px;color:var(--mist)}
+.dl-pct{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--e);min-width:38px;text-align:right}
+.viz-tooltip{
+  position:absolute;pointer-events:none;background:rgba(6,14,26,.97);border:1px solid var(--b2);
+  border-radius:7px;padding:6px 10px;font-family:var(--mono);font-size:10px;color:var(--ice);
+  box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;transition:opacity .1s;white-space:nowrap;transform:translate(-50%,-115%);
+}
+.viz-tooltip .tt-pct{color:var(--mint);font-weight:800}
+
+/* Ticket stat row reuses .kpi */
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width:640px){
+  #shell{padding:8px;gap:8px}
+  .kpi-row{overflow-x:auto}
+  .kpi{min-width:130px}
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── LIGHT MODE ─────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+body{transition:background .3s ease,color .25s ease}
+.topbar,.kpi,.d-panel,.theme-toggle{transition:background .25s ease,border-color .22s ease,color .2s ease,box-shadow .2s ease}
+body.light{
+  --bg:#F2F6FB;--glass:rgba(255,255,255,.88);
+  --b1:rgba(0,130,195,.15);--b2:rgba(0,130,195,.30);--b3:rgba(0,130,195,.48);
+  --e:#006FB3;--e2:#005490;--mint:#00896A;--mint2:#006852;
+  --coral:#CC0030;--coral2:#99002A;--gold:#A86800;--violet:#5828AA;
+  --ice:#071525;--mist:#2A4A66;--fog:#587894;
+  color:#071525;
+}
+body.light::before{
+  background:
+    radial-gradient(ellipse 80% 60% at 70% -10%,rgba(100,60,200,.09) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 90%,rgba(0,130,195,.10) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(0,150,120,.05) 0%,transparent 60%),
+    linear-gradient(180deg,#F2F6FB 0%,#EAF0F8 50%,#F2F6FB 100%);
+}
+body.light::after{background-image:linear-gradient(rgba(0,130,195,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,130,195,.07) 1px,transparent 1px);background-size:40px 40px}
+body.light .bg-orb-1{background:radial-gradient(circle,rgba(100,60,200,.10) 0%,transparent 65%)}
+body.light .bg-orb-2{background:radial-gradient(circle,rgba(0,130,195,.09) 0%,transparent 65%)}
+body.light .bg-orb-3{background:radial-gradient(circle,rgba(0,150,120,.05) 0%,transparent 65%)}
+body.light .scanlines{background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.012) 3px,rgba(0,0,0,.012) 4px)}
+body.light .topbar{background:rgba(255,255,255,.92);box-shadow:0 4px 24px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.9)}
+body.light .tb-logo{color:#071525}
+body.light .tb-clock{text-shadow:none}
+body.light .theme-toggle{background:rgba(0,0,0,.05)}
+body.light .theme-toggle:hover{background:rgba(0,0,0,.10)}
+body.light .tb-logout{background:rgba(204,0,48,.07);border-color:rgba(204,0,48,.25)}
+body.light .kpi,body.light .d-panel{background:rgba(255,255,255,.9)}
+body.light .kpi-val{text-shadow:none}
+body.light .panel-hdr{background:rgba(230,237,246,.7)}
+body.light .bar-track{background:rgba(0,0,0,.06)}
+body.light .viz-tooltip{background:rgba(255,255,255,.98);border-color:var(--b2);color:#071525}
+
+/* ── IDLE-TIMEOUT WARNING ── */
+.idle-warn{
+  position:fixed;top:74px;left:50%;z-index:250;max-width:360px;
+  padding:14px 16px;border-radius:12px;
+  background:var(--glass);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,179,0,.35);
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;
+  transform:translate(-50%,-10px);transition:opacity .22s ease,transform .22s ease;
+}
+.idle-warn.show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.idle-warn-ic{font-size:20px;flex-shrink:0}
+.idle-warn-txt{font-size:12px;color:var(--mist);line-height:1.45;font-family:var(--sans)}
+.idle-warn-txt b{color:var(--ice)}
+.idle-warn-btn{
+  padding:8px 14px;border-radius:8px;border:none;flex-shrink:0;
+  background:linear-gradient(135deg,var(--e2),var(--mint2));color:#001A28;
+  font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;
+  font-family:var(--mono);letter-spacing:.04em;
+}
+</style>
+</head>
+<body>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+<div class="scanlines"></div>
+<div class="idle-warn" id="idle-warn" role="alert">
+  <span class="idle-warn-ic">⏱</span>
+  <span class="idle-warn-txt" id="idle-warn-txt"></span>
+  <button class="idle-warn-btn" onclick="stayLoggedIn()">Stay signed in</button>
+</div>
+
+<div id="shell">
+
+  <header class="topbar">
+    <a class="tb-back" href="/noc">← Dashboard</a>
+    <div class="tb-divider"></div>
+    <div class="tb-brand">
+      <div class="tb-pulse"></div>
+      <span class="tb-logo">NOC</span>
+      <span class="tb-slash">/</span>
+      <span class="tb-sys">Analytics</span>
+    </div>
+    <div class="tb-right">
+      <a class="tb-back" href="/noc/engine">⚙️ Engine</a>
+      <a class="tb-back" href="/noc/customers">👥 Customers</a>
+      <a class="tb-back" href="/noc/tickets">🎫 Tickets</a>
+      <div class="tb-divider"></div>
+      <span class="tb-clock" id="tb-clock">00:00:00</span>
+      <div class="tb-divider"></div>
+      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark mode">🌙</button>
+      <div class="tb-divider"></div>
+      <span class="tb-user" id="tb-admin">—</span>
+      <button class="tb-logout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="kpi-row">
+    <div class="kpi k-teal">
+      <div class="kpi-label">Fleet Uptime</div>
+      <div class="kpi-val" id="s-uptime">—</div>
+      <div class="kpi-sub">right now</div>
+    </div>
+    <div class="kpi k-amber">
+      <div class="kpi-label">MTTR</div>
+      <div class="kpi-val" id="s-mttr">—</div>
+      <div class="kpi-sub">avg recovery time</div>
+    </div>
+    <div class="kpi k-red">
+      <div class="kpi-label">Faults Logged</div>
+      <div class="kpi-val" id="s-faults">—</div>
+      <div class="kpi-sub">since tracking began</div>
+    </div>
+    <div class="kpi k-red">
+      <div class="kpi-label">Routers Down</div>
+      <div class="kpi-val" id="s-down">—</div>
+      <div class="kpi-sub" id="s-down-sub">right now</div>
+    </div>
+    <div class="kpi k-blue">
+      <div class="kpi-label">Support Tickets</div>
+      <div class="kpi-val" id="s-tickets">—</div>
+      <div class="kpi-sub" id="s-tickets-sub">total</div>
+    </div>
+    <div class="kpi k-violet">
+      <div class="kpi-label">Avg Resolution</div>
+      <div class="kpi-val" id="s-avgres">—</div>
+      <div class="kpi-sub">support tickets</div>
+    </div>
+  </div>
+
+  <div class="a-grid">
+    <div class="d-panel">
+      <div class="panel-hdr"><span class="ph-title">Fault Frequency — By Router Model</span></div>
+      <div class="bar-chart" id="chart-model"></div>
+    </div>
+    <div class="d-panel">
+      <div class="panel-hdr"><span class="ph-title">Fault Frequency — By Vendor</span></div>
+      <div class="bar-chart" id="chart-vendor"></div>
+    </div>
+  </div>
+
+  <div class="d-panel">
+    <div class="panel-hdr"><span class="ph-title">Fault Type Distribution</span><span class="ph-count" id="donut-count">—</span></div>
+    <div class="donut-wrap" style="position:relative">
+      <svg class="donut-svg" id="donut-svg" viewBox="0 0 200 200"></svg>
+      <div class="donut-legend" id="donut-legend"></div>
+      <div class="viz-tooltip" id="donut-tooltip"></div>
+    </div>
+  </div>
+
+</div><!-- #shell -->
+
+<script>
+// ── Theme (shared with NOC dashboard) ───────────────────────────────────────
+(function(){
+  const saved=localStorage.getItem('noc-theme');
+  if(saved==='light'||(saved===null&&window.matchMedia('(prefers-color-scheme: light)').matches))
+    document.body.classList.add('light');
+})();
+function applyThemeIcon(){document.getElementById('theme-toggle').textContent=document.body.classList.contains('light')?'☀️':'🌙';}
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light');
+  localStorage.setItem('noc-theme',isLight?'light':'dark');
+  applyThemeIcon();
+  if(lastData) renderDonut(lastData.fault_frequency_by_type);
+}
+applyThemeIcon();
+
+function updateClock(){document.getElementById('tb-clock').textContent=new Date().toLocaleTimeString('en-GB',{hour12:false});}
+updateClock(); setInterval(updateClock,1000);
+
+// Idle timeout — 1h since the last real interaction (independent of the
+// background polling, which would otherwise keep the tab looking "active"
+// even after the admin has walked away).
+(function(){
+  const IDLE_LIMIT_MS=60*60*1000;
+  const IDLE_WARN_MS=60*1000;
+  let lastActivity=Date.now();
+  ['mousemove','mousedown','keydown','touchstart','scroll'].forEach(ev=>
+    window.addEventListener(ev,()=>{lastActivity=Date.now();},{passive:true}));
+  window.stayLoggedIn=function(){
+    lastActivity=Date.now();
+    document.getElementById('idle-warn').classList.remove('show');
+  };
+  setInterval(()=>{
+    const idle=Date.now()-lastActivity;
+    const warn=document.getElementById('idle-warn');
+    if(idle>IDLE_LIMIT_MS){ warn.classList.remove('show'); logout(); }
+    else if(idle>IDLE_LIMIT_MS-IDLE_WARN_MS){
+      const s=Math.max(0,Math.ceil((IDLE_LIMIT_MS-idle)/1000));
+      document.getElementById('idle-warn-txt').innerHTML=`You'll be signed out in <b>${s}s</b> due to inactivity.`;
+      warn.classList.add('show');
+    } else warn.classList.remove('show');
+  },1000);
+})();
+
+async function checkAuth(){
+  const r=await fetch('/api/noc/fleet');
+  if(r.status===401){ window.location.href='/noc'; return false; }
+  return true;
+}
+async function logout(){ await fetch('/api/noc/logout',{method:'POST'}); sessionStorage.removeItem('noc-admin'); window.location.href='/noc'; }
+
+function animateCounter(el,target,suffix=''){
+  if(target===null||target===undefined||isNaN(Number(target))){el.textContent='—';return;}
+  const n=Number(target);
+  const prev=parseFloat(el.dataset.val)||0;
+  el.dataset.val=n;
+  const dur=600,start=performance.now();
+  const tick=(now)=>{
+    const p=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=(prev+(n-prev)*ease).toFixed(n%1?1:0)+suffix;
+    if(p<1)requestAnimationFrame(tick); else el.textContent=n+suffix;
+  };
+  requestAnimationFrame(tick);
+}
+function formatDuration(sec){
+  if(sec===null||sec===undefined) return '—';
+  if(sec<60) return Math.round(sec)+'s';
+  if(sec<3600) return Math.round(sec/60)+'m';
+  return (sec/3600).toFixed(1)+'h';
+}
+
+// ── Bar charts ───────────────────────────────────────────────────────────
+function renderBarChart(containerId, items){
+  const box=document.getElementById(containerId);
+  if(!items || !items.length){ box.innerHTML='<div class="chart-empty">No fault data yet</div>'; return; }
+  const max=Math.max(...items.map(i=>i.count));
+  box.innerHTML=items.map(i=>`
+    <div class="bar-row" title="${i.label}: ${i.count} fault${i.count===1?'':'s'}">
+      <div class="bar-label">${i.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${max?Math.round(i.count/max*100):0}%"></div></div>
+      <div class="bar-value">${i.count}</div>
+    </div>`).join('');
+}
+
+// ── Donut chart (fault type distribution) ───────────────────────────────────
+// Fixed category → hue mapping (never reassigned), so a color always means the
+// same fault type across renders even as counts change. Unrecognized fault
+// keys fold into "Other" rather than growing the categorical set.
+let lastData=null;
+const FAULT_TYPE_META = {
+  ppp_auth_failure:  {label:'PPP Auth Failure',  var:'--cat-blue'},
+  wrong_vlan:        {label:'Wrong VLAN',        var:'--cat-aqua'},
+  dns_failure:       {label:'DNS Failure',       var:'--cat-yellow'},
+  random_disconnect: {label:'Random Disconnect', var:'--cat-green'},
+  weak_signal:       {label:'Weak Signal',       var:'--cat-violet'},
+  hardware_fault:    {label:'Hardware Fault',    var:'--cat-red'},
+};
+const OTHER_META = {label:'Other', var:'--cat-magenta'};
+
+function renderDonut(items){
+  const svg=document.getElementById('donut-svg');
+  const legend=document.getElementById('donut-legend');
+  const tooltip=document.getElementById('donut-tooltip');
+  items = items || [];
+  const total = items.reduce((s,i)=>s+i.count,0);
+  document.getElementById('donut-count').textContent = total ? `${total} fault${total!==1?'s':''}` : '—';
+
+  if(!total){
+    svg.innerHTML='';
+    legend.innerHTML='<div class="chart-empty">No fault data yet</div>';
+    return;
+  }
+
+  const slices = items.map(i=>{
+    const meta = FAULT_TYPE_META[i.type] || OTHER_META;
+    return {...i, ...meta};
+  }).sort((a,b)=>b.count-a.count);
+
+  const cx=100, cy=100, rOuter=80, rInner=48;
+  let angle=-90; // start at 12 o'clock
+  const style=getComputedStyle(document.body);
+  const paths=[];
+  const pctLabels=[];
+  slices.forEach((s,idx)=>{
+    const frac=s.count/total;
+    const sweep=frac*360;
+    const a0=angle, a1=angle+sweep;
+    angle=a1;
+    const color=style.getPropertyValue(s.var).trim();
+    const large=sweep>180?1:0;
+    const [x0,y0]=polar(cx,cy,rOuter,a0), [x1,y1]=polar(cx,cy,rOuter,a1);
+    const [ix1,iy1]=polar(cx,cy,rInner,a1), [ix0,iy0]=polar(cx,cy,rInner,a0);
+    const d=`M${x0},${y0} A${rOuter},${rOuter} 0 ${large} 1 ${x1},${y1} L${ix1},${iy1} A${rInner},${rInner} 0 ${large} 0 ${ix0},${iy0} Z`;
+    const pct=Math.round(frac*100);
+    paths.push(`<path class="donut-seg" d="${d}" fill="${color}"
+      data-label="${s.label}" data-count="${s.count}" data-pct="${pct}"></path>`);
+    if(pct>=6){
+      const midA=(a0+a1)/2, [lx,ly]=polar(cx,cy,(rOuter+rInner)/2,midA);
+      pctLabels.push(`<text class="donut-pct-lbl" x="${lx}" y="${ly+3}">${pct}%</text>`);
+    }
+  });
+
+  svg.innerHTML = paths.join('') + pctLabels.join('') +
+    `<text class="donut-center-val" x="${cx}" y="${cy-3}" text-anchor="middle">${total}</text>
+     <text class="donut-center-lbl" x="${cx}" y="${cy+13}" text-anchor="middle">faults</text>`;
+
+  legend.innerHTML = slices.map(s=>`
+    <div class="dl-row">
+      <span class="dl-swatch" style="background:var(${s.var})"></span>
+      <span class="dl-label">${s.label}</span>
+      <span class="dl-count">${s.count}</span>
+      <span class="dl-pct">${Math.round(s.count/total*100)}%</span>
+    </div>`).join('');
+
+  svg.querySelectorAll('.donut-seg').forEach(seg=>{
+    seg.addEventListener('mousemove',(ev)=>{
+      const rect=svg.parentElement.getBoundingClientRect();
+      tooltip.style.left=(ev.clientX-rect.left)+'px';
+      tooltip.style.top=(ev.clientY-rect.top)+'px';
+      tooltip.style.opacity=1;
+      tooltip.innerHTML=`${seg.dataset.label} — <span class="tt-pct">${seg.dataset.count} (${seg.dataset.pct}%)</span>`;
+    });
+    seg.addEventListener('mouseleave',()=>{ tooltip.style.opacity=0; });
+  });
+}
+function polar(cx,cy,r,angleDeg){
+  const rad=angleDeg*Math.PI/180;
+  return [cx+r*Math.cos(rad), cy+r*Math.sin(rad)];
+}
+
+// ── Load & render ────────────────────────────────────────────────────────
+async function loadAnalytics(){
+  try{
+    const r=await fetch('/api/noc/analytics');
+    const d=await r.json();
+    lastData=d;
+    animateCounter(document.getElementById('s-uptime'),d.current_uptime_pct,'%');
+    document.getElementById('s-mttr').textContent=formatDuration(d.mttr_seconds);
+    animateCounter(document.getElementById('s-faults'),d.total_fault_events);
+    animateCounter(document.getElementById('s-down'),d.routers_down);
+    document.getElementById('s-down-sub').textContent = d.routers_total!=null ? `of ${d.routers_total} routers` : 'right now';
+    const t=d.ticket_stats||{};
+    animateCounter(document.getElementById('s-tickets'),t.total);
+    document.getElementById('s-tickets-sub').textContent=`${t.open||0} open · ${t.escalated||0} escalated · ${t.resolved||0} resolved`;
+    document.getElementById('s-avgres').textContent=formatDuration(t.avg_resolution_s);
+    renderBarChart('chart-model', d.fault_frequency_by_model);
+    renderBarChart('chart-vendor', d.fault_frequency_by_vendor);
+    renderDonut(d.fault_frequency_by_type);
+  }catch(e){
+    console.error(e);
+  }
+}
+
+(async function init(){
+  if(!await checkAuth()) return;
+  try{
+    const saved=sessionStorage.getItem('noc-admin');
+    document.getElementById('tb-admin').textContent=saved?(JSON.parse(saved).name||'Admin'):'Admin';
+  }catch(e){ document.getElementById('tb-admin').textContent='Admin'; }
+  loadAnalytics();
+  setInterval(loadAnalytics,15000);
+})();
+</script>
+</body>
+</html>
